@@ -129,15 +129,13 @@ The Remote players module can enhance this functionality with remote players.
 • A player must be able to play against another player, but it should also be possible to propose a tournament.
 This tournament will consist of multiple players who can take turns playing against each other.
 
-You have flexibility in how you implement
-the tournament,
+You have flexibility in how you implement the tournament,
 but it must clearly display who is playing against whom and the order of the players.
 
 • A registration system is required:
 At the start of a tournament, each player must input their alias name.
 
-The aliases will be reset when a new tournament
-begins.
+The aliases will be reset when a new tournament begins.
 However, this requirement can be modified using the Standard User Management module.
 
 • There must be a matchmaking system:
@@ -174,8 +172,7 @@ either within the base page if no backend is used or on the server side if a bac
 Please make sure you use a strong password hashing algorithm
 
 For obvious security reasons, any credentials, API keys, env variables etc...
-must be saved locally in a .env file and ignored by
-git.
+must be saved locally in a .env file and ignored by git.
 
 Publicly stored credentials will lead you directly to a failure of the project.
 
