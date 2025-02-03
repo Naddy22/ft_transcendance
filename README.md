@@ -7,7 +7,10 @@
 
 </div>
 
-<details><summary><h2>Essential Points</h2></summary>
+<details>
+  <summary>
+    <h2>Essential Points</h2>
+  </summary>
   
   This project is a complex undertaking, requiring decision-making within the specified constraints.  
   You have some flexibility in implementing certain modules, 
@@ -56,7 +59,9 @@
   
 
 <details>
-  <summary><h2>Mandatory part</h2></summary>
+  <summary>
+    <h2>Mandatory part</h2>
+  </summary>
 
   This project is about creating a website for the mighty **Pong** contest!  
 
@@ -202,9 +207,10 @@ either within the base page if no backend is used or on the server side if a bac
 </details>
 
 
-
 <details>
-  <summary><h2>Modules</h2></summary>
+  <summary>
+    <h2>Modules</h2>
+  </summary>
 
 Now that you’ve accomplished 25% of the project, congratulations!  
 
@@ -227,107 +233,110 @@ Therefore, we strongly recommend reading this entire subject thoroughly.
 <details>
   <summary><h3>Overview</h3></summary>
 
-Web  
-◦ Major module: Use a Framework as backend.  
-◦ Minor module: Use a front-end framework or toolkit.  
-◦ Minor module: Use a database for the backend.  
-◦ Major module: Store the score of a tournament in the Blockchain.  
+• [**Web**]()  
+◦ **Major module**: Use a Framework as backend.  
+◦ **Minor module**: Use a front-end framework or toolkit.  
+◦ **Minor module**: Use a database for the backend.  
+◦ **Major module**: Store the score of a tournament in the Blockchain.  
 
-User Management  
-◦ Major module: Standard user management, authentication, users across tournaments.  
-◦ Major module: Implementing a remote authentication.  
+• [**User Management**]()  
+◦ **Major module**: Standard user management, authentication, users across tournaments.  
+◦ **Major module**: Implementing a remote authentication.  
 
-Gameplay and user experience  
-◦ Major module: Remote players  
-◦ Major module: Multiplayers (more than 2 in the same game).  
-◦ Major module: Add Another Game with User History and Matchmaking.  
-◦ Minor module: Game Customization Options.  
-◦ Major module: Live chat.  
+• [**Gameplay and user experience**]()  
+◦ **Major module**: Remote players  
+◦ **Major module**: Multiplayers (more than 2 in the same game).  
+◦ **Major module**: Add Another Game with User History and Matchmaking.  
+◦ **Minor module**: Game Customization Options.  
+◦ **Major module**: Live chat.  
 
-• AI-Algo  
-◦ Major module: Introduce an AI Opponent.  
-◦ Minor module: User and Game Stats Dashboards  
+• [**AI-Algo**]()  
+◦ **Major module**: Introduce an AI Opponent.  
+◦ **Minor module**: User and Game Stats Dashboards  
 
-• Cybersecurity  
-◦ Major module: Implement WAF/ModSecurity with Hardened Configuration and HashiCorp Vault for Secrets Management.  
-◦ Minor module: GDPR Compliance Options with User Anonymization, Local Data Management, and Account Deletion.  
-◦ Major module: Implement Two-Factor Authentication (2FA) and JWT.  
+• [**Cybersecurity**]()  
+◦ **Major module**: Implement WAF/ModSecurity with Hardened Configuration and HashiCorp Vault for Secrets Management.  
+◦ **Minor module**: GDPR Compliance Options with User Anonymization, Local Data Management, and Account Deletion.  
+◦ **Major module**: Implement Two-Factor Authentication (2FA) and JWT.  
 
-• Devops  
-◦ Major module: Infrastructure Setup for Log Management.  
-◦ Minor module: Monitoring system.  
-◦ Major module: Designing the Backend as Microservices.  
+• [**Devops**]()  
+◦ **Major module**: Infrastructure Setup for Log Management.  
+◦ **Minor module**: Monitoring system.  
+◦ **Major module**: Designing the Backend as Microservices.  
 
-• Graphics  
-◦ Major module: Use of advanced 3D techniques.  
+• [**Graphics**]()  
+◦ **Major module**: Use of advanced 3D techniques.  
 
-• Accessibility  
-◦ Minor module: Support on all devices.  
-◦ Minor module: Expanding Browser Compatibility.  
-◦ Minor module: Multiple language supports.  
-◦ Minor module: Add accessibility for Visually Impaired Users.  
-◦ Minor module: Server-Side Rendering (SSR) Integration.  
+• [**Accessibility**]()  
+◦ **Minor module**: Support on all devices.  
+◦ **Minor module**: Expanding Browser Compatibility.  
+◦ **Minor module**: Multiple language supports.  
+◦ **Minor module**: Add accessibility for Visually Impaired Users.  
+◦ **Minor module**: Server-Side Rendering (SSR) Integration.  
 
-• Server-Side Pong  
-◦ Major module: Replacing Basic Pong with Server-Side Pong and Implementing an API.  
-◦ Major module: Enabling Pong Gameplay via CLI against Web Users with API Integration.  
+• [**Server-Side Pong**]()  
+◦ **Major module**: Replacing Basic Pong with Server-Side Pong and Implementing an API.  
+◦ **Major module**: Enabling Pong Gameplay via CLI against Web Users with API Integration.  
 
 </details>
 
+<details>
+  <summary>
+    <h3>Web</h3>
+  </summary>
 
----
----
+These modules enable the integration of advanced web features into your Pong game.  
 
-Web
+• **Major module**: Use a Framework as backend.  
+In this major module, you are required to utilize a specific web framework for your backend development,  
+and that framework is :small_orange_diamond:Django:small_orange_diamond:.  
 
-These modules enable the integration of advanced web features into your Pong game.
+> You can create a backend without using the constraints of this module by using the default language/framework.  
+> However, this module will only be valid if you use the associated constraints.  
 
-• Major module: Use a Framework as backend.
-In this major module, you are required to utilize a specific web framework for your backend development, and that framework is Django .
+• **Minor module**: Use a front-end framework or toolkit.  
+Your frontend development will utilize the :small_orange_diamond:Bootstrap toolkit:small_orange_diamond:.  
 
-You can create a backend without using the constraints of this module by using the default language/framework.
-However, this module will
-only be valid if you use the associated constraints.
+> You can create a front-end without using the constraints of this module by using the default language/framework.  
+> However, this module will only be valid if you use the associated constraints.  
 
-• Minor module: Use a front-end framework or toolkit.
-Your frontend development will utilize the Bootstrap toolkit .
-You can create a front-end without using the constraints of this module by using the default language/framework.
-However, this module will only be valid if you use the associated constraints.
+• Minor module: Use a database for the backend -and more.  
+The designated database for all DB instances in your project is :small_orange_diamond:PostgreSQL:small_orange_diamond:.  
+This choice guarantees data consistency and compatibility across all project components 
+and may be a prerequisite for other modules, such as the **backend Framework module**.  
 
-• Minor module: Use a database for the backend -and more.
-The designated database for all DB instances in your project is PostgreSQL .
+• Major module: Store the score of a tournament in the Blockchain.  
+This Major module focuses on implementing a feature within the Pong website to store tournament scores securely on a blockchain.  
+It is essential to clarify that for development and testing purposes, we will utilize a testing blockchain environment.  
+The chosen blockchain for this implementation is :small_orange_diamond:Ethereum:small_orange_diamond:,  
+and :small_orange_diamond:Solidity:small_orange_diamond: will be the programming language used for smart contract development.  
 
-This choice guarantees data consistency and compatibility across all project components and may be a prerequisite for other modules, such as the backend Framework module.
+◦ Blockchain Integration: The primary goal of this module is to seamlessly integrate blockchain technology, 
+specifically :small_orange_diamond:Ethereum:small_orange_diamond:, into the Pong website.  
+This integration ensures the secure and immutable storage of tournament scores, 
+providing players with a transparent and tamper-proof record of their gaming achievements.  
 
-• Major module: Store the score of a tournament in the Blockchain.
-This Major module focuses on implementing a feature within the Pong website to store tournament scores securely on a blockchain.
-It is essential to clarify that for development and testing purposes, we will utilize a testing blockchain environment.
-
-The chosen blockchain for this implementation is Ethereum, and Solidity will be the programming language used for smart contract development.
-
-◦ Blockchain Integration: The primary goal of this module is to seamlessly integrate blockchain technology, specifically Ethereum, into the Pong website.
-
-This integration ensures the secure and immutable storage of tournament scores, providing players with a transparent and tamper-proof record of their gaming achievements.
-
-◦ Solidity Smart Contracts: To interact with the blockchain, we will develop Solidity smart contracts.
+◦ :small_orange_diamond:Solidity:small_orange_diamond: Smart Contracts: To interact with the blockchain, 
+we will develop :small_orange_diamond:Solidity:small_orange_diamond: smart contracts.  
 These contracts will be responsible for recording,
-managing, and retrieving tournament scores.
+managing, and retrieving tournament scores.  
 
-◦Testing Blockchain: As mentioned earlier, a testing blockchain will be employed for development and testing purposes.
-This ensures that all blockchain-related functionalities are thoroughly validated without any risks associated with a live blockchain.
+◦Testing Blockchain: As mentioned earlier, a testing blockchain will be employed for development and testing purposes.  
+This ensures that all blockchain-related functionalities are thoroughly validated without any risks associated with a live blockchain.  
 
-Interoperability: This module may have dependencies on other modules, particularly the Backend Framework module.
-Integrating blockchain functionality might necessitate adjustments in the backend to accommodate interactions with the blockchain.
+Interoperability: This module may have dependencies on other modules, particularly the Backend Framework module.  
+Integrating blockchain functionality might necessitate adjustments in the backend to accommodate interactions with the blockchain.  
 
-By implementing this module, we aim to enhance the Pong website by introducing a blockchain-based score storage system.
+By implementing this module, we aim to enhance the Pong website by introducing a blockchain-based score storage system.  
 
-Users will benefit from the added layer
-of security and transparency, ensuring the integrity of their gaming scores.
+Users will benefit from the added layer of security and transparency,  
+ensuring the integrity of their gaming scores.  
+The module emphasizes the use of a testing blockchain environment to minimize risks associated with blockchain development.  
 
-The module emphasizes the use of a testing blockchain environment to minimize risks
-associated with blockchain development.
+</details>
 
-..
+---
+---
 
 User Management
 This module delves into the realm of User Management, addressing crucial aspects
@@ -730,24 +739,24 @@ Key features and objectives include:
 
 This major module aims to enhance the Pong gaming experience by creating a CLI that seamlessly connects CLI users to web players through API integration, offering a unified and interactive gameplay environment.
 
-ℹ️If you want to do this module, we strongly recommend that you do the
-previous one.
+> If you want to do this module, we strongly recommend that you do the previous one.  
 
 </details>
 
 
 <details>
-  <summary><h2>Bonus part</h2></summary>
+  <summary>
+    <h2>Bonus part</h2>
+  </summary>
 
-For this project, the bonus section is designed to be straightforward.
-You are required to include more modules.
+For this project, the bonus section is designed to be straightforward.  
+You are required to include more modules.  
 
-• Five points will be awarded for each minor module.
-• Ten points will be awarded for each major module.
+• Five points will be awarded for each **minor module**.  
+• Ten points will be awarded for each **major module**.  
 
-The bonus part will only be assessed if the mandatory part is PERFECT.
-Perfect means the mandatory part has been integrally done and works without malfunctioning. 
-
-If you have not passed ALL the mandatory requirements, your bonus part will not be evaluated at all.
+> The bonus part will only be assessed if the mandatory part is PERFECT.  
+> Perfect means the mandatory part has been integrally done and works without malfunctioning.  
+> If you have not passed ALL the mandatory requirements, your bonus part will not be evaluated at all.  
 
 </details>
