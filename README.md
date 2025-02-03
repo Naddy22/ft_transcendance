@@ -8,9 +8,7 @@
 </div>
 
 <details>
-  <summary>
-    <h2>Essential Points</h2>
-  </summary>
+  <summary><h2>Essential Points</h2></summary>
   
   This project is a complex undertaking, requiring decision-making within the specified constraints.  
   You have some flexibility in implementing certain modules, 
@@ -59,9 +57,7 @@
   
 
 <details>
-  <summary>
-    <h2>Mandatory part</h2>
-  </summary>
+  <summary><h2>Mandatory part</h2></summary>
 
   This project is about creating a website for the mighty **Pong** contest!  
 
