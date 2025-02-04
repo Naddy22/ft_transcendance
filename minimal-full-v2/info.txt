@@ -1,0 +1,43 @@
+
+Minimal Functional Setup for ft_transcendence (Using PHP & TypeScript)
+This setup strictly follows the project rules:
+
+Backend: Pure PHP (no frameworks)
+Frontend: TypeScript
+Game: Pong implemented with TypeScript & HTML5 Canvas
+Database: MariaDB (or SQLite for minimal setup)
+Containerization: Docker + Docker Compose (single command deployment)
+Security: HTTPS, validation, and hashing for passwords
+
+ft_transcendence/
+│── backend/              # Pure PHP backend
+│   ├── public/           # Public files (index.php, API endpoints)
+│   │   ├── index.php
+│   │   ├── api.php
+│   ├── src/              # PHP business logic
+│   │   ├── Database.php
+│   │   ├── User.php
+│   │   ├── Game.php
+│   ├── .env              # Environment variables (ignored by Git)
+│   ├── config.php        # Database config
+│   ├── router.php        # Simple router for API endpoints
+│
+│── frontend/             # TypeScript frontend
+│   ├── src/
+│   │   ├── main.ts       # Main logic
+│   │   ├── game.ts       # Pong logic
+│   │   ├── api.ts        # API calls
+│   │   ├── ui.ts         # UI interactions
+│   ├── index.html        # Frontend entry point
+│   ├── styles.css        # Minimal styling
+│   ├── vite.config.ts    # TypeScript-based frontend bundler
+│
+│── docker/               # Docker-related configurations
+│   ├── Dockerfile.php    # PHP-FPM + NGINX
+│   ├── Dockerfile.front  # Node.js for frontend build
+│   ├── nginx.conf        # NGINX config for serving frontend/backend
+│
+│── docker-compose.yml    # One-command launch
+│── Makefile              # Helper commands
+│── README.md             # Documentation
+│── .gitignore            # Ignore unnecessary files

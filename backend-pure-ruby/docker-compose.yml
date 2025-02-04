@@ -1,0 +1,23 @@
+
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: ft_transcendence
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: .
+    environment:
+      DB_USER: user
+      DB_PASSWORD: password
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+      - "4000:4000"
