@@ -1,0 +1,19 @@
+
+(in app.rb)
+
+require 'bundler/setup'	# Load Bundler
+Bundler.require			# Require all gems from Gemfile
+
+# Run Your App with Bundler Since gems are inside vendor/bundle, run:
+
+	bundle exec ruby app.rb
+
+# If you don't want to type bundle exec every time, you can enable Bundler automatically in your shell:
+
+	export RUBYOPT='-rbundler/setup'
+
+# Then, restart your terminal or run:
+
+	source ~/.zshrc  # or source ~/.bashrc
+
+# Now, ruby app.rb should work without needing bundle exec

@@ -1,0 +1,16 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+# gem "rails"
+
+gem 'sinatra'  # Lightweight Ruby web framework
+gem 'rackup'  # Rackup is needed to start the app
+gem 'puma'    # Default web server for Sinatra
+
+gem 'json'     # JSON parsing
+gem 'bcrypt'   # For password hashing
+gem 'dotenv'   # Manage environment variables
+
+gem 'pg'             # PostgreSQL adapter
+gem 'faye-websocket' # WebSocket support

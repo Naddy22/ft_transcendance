@@ -1,0 +1,50 @@
+# Ignore bundler's vendor directory (if configured)
+vendor/bundle/
+
+# Ignore logs and temporary files
+log/
+tmp/
+*.log
+
+# Ignore compiled Ruby extensions
+*.o
+*.so
+*.bundle
+
+# Ignore coverage reports
+coverage/
+*.cov
+
+# Ignore IRB history
+.irb_history
+
+# Ignore system-specific files
+.DS_Store
+*.swp
+*.swo
+
+# Ignore bundler's installed gems
+.gem/
+
+#####
+
+# Ignore RVM-specific files
+.rvmrc
+.ruby-version
+.ruby-gemset
+
+# Ignore rbenv-specific files
+.rbenv-version
+.rbenv-gemsets
+
+# Ignore Docker-related files
+docker-compose.override.yml
+
+# ** If You Use bundle config set --local path 'vendor/bundle'
+# Ignore the locally installed gems
+vendor/bundle/
+
+#####
+# ** If you want a general .gitignore template for Ruby, you can use GitHub's recommended Ruby .gitignore:
+# curl -o .gitignore https://raw.githubusercontent.com/github/gitignore/main/Ruby.gitignore
+
