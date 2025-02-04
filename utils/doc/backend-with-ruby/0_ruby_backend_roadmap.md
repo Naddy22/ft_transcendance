@@ -211,7 +211,7 @@ end
 ruby app.rb
 ```
 
-3. Open __`http://localhost:4567`__ in your browser to see the output.
+3. Open http://localhost:4567 in your browser to see the output.
 
 ---
 
