@@ -84,7 +84,7 @@ contributing only a small portion to the final grade.
 
 • The second part of this subject will offer additional modules that can replace or complete the following rules.
 
-In this Subject, certain words are ~~highlighted in green~~ :small_orange_diamond:Bordered like this:small_orange_diamond:.  
+In this Subject, certain words are ~~highlighted in green~~ 🔸Bordered like this🔸.  
 These represent technology choices that will evolve over time.  
 Pay close attention to the version of the subject.
 
@@ -102,23 +102,23 @@ Your project has to comply with the following rules:
 You are free to develop the site, with or without a backend.  
 
 If you choose to include a backend, 
-it must be written in pure :small_orange_diamond:Ruby:small_orange_diamond:.  
+it must be written in pure 🔸Ruby🔸.  
 However, this requirement can be overridden by the **Framework module**.  
 
 If your backend or framework uses a database,  
 you must follow the constraints of the **Database module**.  
 
-The frontend should be developed using pure vanilla :small_orange_diamond:Javascript:small_orange_diamond:.  
+The frontend should be developed using pure vanilla 🔸Javascript🔸.  
 However, this requirement can be altered through the **FrontEnd module**.  
 
 Your website must be a [single-page application](https://en.wikipedia.org/wiki/Single-page_application).  
 The user should be able to use the **Back** and **Forward** buttons of the browser.
 
-Your website must be compatible with the **latest stable up-to-date version** of :small_orange_diamond:Google Chrome:small_orange_diamond:.  
+Your website must be compatible with the **latest stable up-to-date version** of 🔸Google Chrome🔸.  
 
 The user should encounter no unhandled errors and no warnings when browsing the website.  
 
-Everything must be launched with a single command line to run an autonomous container provided by :small_orange_diamond:Docker:small_orange_diamond:.  
+Everything must be launched with a single command line to run an autonomous container provided by 🔸Docker🔸.  
 Example : `docker-compose up --build`  
 
 > *If your container solution is Docker:*  
@@ -289,35 +289,35 @@ These modules enable the integration of advanced web features into your Pong gam
 
 • **Major module**: Use a Framework as backend.  
 In this major module, you are required to utilize a specific web framework for your backend development,  
-and that framework is :small_orange_diamond:Django:small_orange_diamond:.  
+and that framework is 🔸Django🔸.  
 
 > You can create a backend without using the constraints of this module by using the default language/framework.  
 > However, this module will only be valid if you use the associated constraints.  
 
 • **Minor module**: Use a front-end framework or toolkit.  
-Your frontend development will utilize the :small_orange_diamond:Bootstrap toolkit:small_orange_diamond:.  
+Your frontend development will utilize the 🔸Bootstrap toolkit🔸.  
 
 > You can create a front-end without using the constraints of this module by using the default language/framework.  
 > However, this module will only be valid if you use the associated constraints.  
 
 • Minor module: Use a database for the backend -and more.  
-The designated database for all DB instances in your project is :small_orange_diamond:PostgreSQL:small_orange_diamond:.  
+The designated database for all DB instances in your project is 🔸PostgreSQL🔸.  
 This choice guarantees data consistency and compatibility across all project components 
 and may be a prerequisite for other modules, such as the **backend Framework module**.  
 
 • Major module: Store the score of a tournament in the Blockchain.  
 This Major module focuses on implementing a feature within the Pong website to store tournament scores securely on a blockchain.  
 It is essential to clarify that for development and testing purposes, we will utilize a testing blockchain environment.  
-The chosen blockchain for this implementation is :small_orange_diamond:Ethereum:small_orange_diamond:,  
-and :small_orange_diamond:Solidity:small_orange_diamond: will be the programming language used for smart contract development.  
+The chosen blockchain for this implementation is 🔸Ethereum🔸,  
+and 🔸Solidity🔸 will be the programming language used for smart contract development.  
 
 ◦ Blockchain Integration: The primary goal of this module is to seamlessly integrate blockchain technology, 
-specifically :small_orange_diamond:Ethereum:small_orange_diamond:, into the Pong website.  
+specifically 🔸Ethereum🔸, into the Pong website.  
 This integration ensures the secure and immutable storage of tournament scores, 
 providing players with a transparent and tamper-proof record of their gaming achievements.  
 
-◦ :small_orange_diamond:Solidity:small_orange_diamond: Smart Contracts: To interact with the blockchain, 
-we will develop :small_orange_diamond:Solidity:small_orange_diamond: smart contracts.  
+◦ 🔸Solidity🔸 Smart Contracts: To interact with the blockchain, 
+we will develop 🔸Solidity🔸 smart contracts.  
 These contracts will be responsible for recording,
 managing, and retrieving tournament scores.  
 
@@ -336,6 +336,7 @@ The module emphasizes the use of a testing blockchain environment to minimize ri
 </details>
 
 ---
+(wip)
 ---
 
 User Management
