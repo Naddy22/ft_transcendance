@@ -1,0 +1,32 @@
+
+# Docker Compose for Backend & Frontend
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: pong_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/var/www/html
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: pong_frontend
+    restart: always
+    ports:
+      - "8080:8080"
+      - "5173:5173"  # Ensure this is mapped
+    volumes:
+      - ./frontend:/app
+    command: ["npm", "run", "dev", "--", "--port", "5173", "--host"]
+
+    
