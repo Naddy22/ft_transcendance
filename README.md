@@ -207,9 +207,7 @@ Even if you decide not to use JWT tokens, securing the site remains critical.
 </details>
 
 <details>
-  <summary>
-    <h2>Modules</h2>
-  </summary>
+  <summary><h2>Modules</h2></summary>
 
 Now that you’ve accomplished 25% of the project, congratulations!  
 
@@ -231,8 +229,8 @@ Therefore, we strongly recommend reading this entire subject thoroughly.
 > [!NOTE]
 > Two Minor Modules count as one Major Module.
 
-<details>
-  <summary><h3>Overview</h3></summary>
+<!-- <details>
+  <summary><h3>Overview</h3></summary> -->
 
 - [**Web**](#web)
 	- **Major module**: Use a Framework to build the backend.
@@ -281,12 +279,12 @@ Therefore, we strongly recommend reading this entire subject thoroughly.
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="web"></a>
 ### Web
-<details>
-  <summary><h3>Web</h3></summary>
+<!-- <details>
+  <summary><h3>Web</h3></summary> -->
 
 These modules enable the integration of advanced web features into your Pong game.  
 
@@ -355,12 +353,12 @@ The module emphasizes the use of a testing blockchain environment to minimize ri
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="user-management"></a>
 ### User Management
-<details>
-  <summary><h3>User Management</h3></summary>
+<!-- <details>
+  <summary><h3>User Management</h3></summary> -->
 
 This module delves into the realm of **User Management**,\
 addressing key aspects of user interactions and access control within the Pong platform.\
@@ -408,12 +406,12 @@ offering users a secure and convenient way to access the web application.
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="gameplay"></a>
 ### Gameplay and User Experience
-<details>
-  <summary><h3>Gameplay and user experience</h3></summary>
+<!-- <details>
+  <summary><h3>Gameplay and user experience</h3></summary> -->
 
 These modules are designed to enhance the general gameplay of the project.
 
@@ -493,12 +491,12 @@ In this module, you need to create a chat feature for users:
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="ai-algo"></a>
 ### AI-Algo
-<details>
-  <summary><h3>AI-Algo</h3></summary>
+<!-- <details>
+  <summary><h3>AI-Algo</h3></summary> -->
 
 These modules serve to introduce data-driven elements to the project.\
 The major module introduces an AI opponent for enhanced gameplay, 
@@ -552,12 +550,12 @@ through user-friendly dashboards, providing a comprehensive view of their gaming
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="cybersecurity"></a>
 ### Cybersecurity
-<details>
-  <summary><h3>Cybersecurity</h3></summary>
+<!-- <details>
+  <summary><h3>Cybersecurity</h3></summary> -->
 
 These cybersecurity modules are designed to enhance the security posture of the project.\
 The major module focuses on robust protection through Web Application Firewall (WAF) and ModSecurity configurations, 
@@ -637,12 +635,12 @@ and enhancing authentication and authorization through the use of JSON Web Token
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="devops"></a>
 ### DevOps
-<details>
-  <summary><h3>Devops</h3></summary>
+<!-- <details>
+  <summary><h3>Devops</h3></summary> -->
 
 These modules focus on enhancing the project’s infrastructure and architecture.\
 The major modules address infrastructure setup for efficient log management using 
@@ -703,12 +701,12 @@ enabling greater flexibility, scalability, and maintainability of the backend co
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="graphics"></a>
 ### Graphics
-<details>
-  <summary><h3>Graphics</h3></summary>
+<!-- <details>
+  <summary><h3>Graphics</h3></summary> -->
 
 <details>
 	<summary><h4><b>Major module</b>: Implementing Advanced 3D Techniques </h4></summary>
@@ -736,12 +734,12 @@ we aim to provide players with an immersive and visually stunning gaming experie
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="accessibility"></a>
 ### Accessibility
-<details>
-  <summary><h3>Accessibility</h3></summary>
+<!-- <details>
+  <summary><h3>Accessibility</h3></summary> -->
 
 These modules are designed to enhance the accessibility of our web application, 
 with a focus on ensuring compatibility across all devices, expanding browser support, offering multi-language capabilities, 
@@ -834,12 +832,12 @@ for faster page loads and improved user experience.
 
 ---
 
-</details>
+<!-- </details> -->
 
 <a name="server-side-pong"></a>
 ### Server-Side Pong
-<details>
-  <summary><h3>Server-Side Pong</h3></summary>
+<!-- <details>
+  <summary><h3>Server-Side Pong</h3></summary> -->
 
 <details>
 	<summary><h4><b>Major module</b>: Replacing Basic Pong with Server-Side Pong and Implementing an API.</h4></summary>
@@ -887,7 +885,7 @@ offering a unified and interactive gameplay environment.
 
 ---
 
-</details>
+<!-- </details> -->
 
 ---
 
