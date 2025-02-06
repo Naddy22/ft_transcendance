@@ -2,3 +2,6 @@
 .env
 
 node_modules/
+
+# Local folder for notes, tests, etc.
+_local/
