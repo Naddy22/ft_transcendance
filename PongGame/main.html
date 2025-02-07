@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ft_transcendance</title>
+	<style>
+		/* voir si on doit mettre d'autre style avant */
+		body {
+			font-family: Arial, sans-serif;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100vh;
+			margin: 0;
+			background-color: #f0f0f0;
+		}
+		#menu {
+			text-align: center;
+		}
+		#game {
+			display: none; /* On cache le jeu au début */
+			width: 600px;
+			height: 400px;
+			background-color: black;
+			position: relative; /* Pour positionner les noms à l'intérieur du jeu */
+		}
+		/* Pour la section playerNames */
+		#playerNames {
+			position: absolute;       /* Positionner le titre au-dessus du canvas */
+			top: -30px;                /* Espacement du haut du jeu */
+			left: 0;                   /* Coller à gauche */
+			width: 100%;               /* Largeur à 100% */
+			text-align: center;        /* Centrer horizontalement */
+			font-size: 24px;           /* Taille de police */
+			font-family: sans-serif;   /* Police simple */
+			color: black;              /* Couleur du texte */
+			z-index: 1;                /* S'assurer que le texte est au-dessus du canvas */
+		}
+
+		/* Pour le leftPlayerName et rightPlayerName */
+		#leftPlayerName {
+			position: absolute;      /* On positionne le nom à gauche */
+			left: 10px;              /* Espacement à gauche */
+			text-align: left;        /* Alignement à gauche */
+		}
+
+		#rightPlayerName {
+			position: absolute;      /* On positionne le nom à droite */
+			right: 10px;             /* Espacement à droite */
+			text-align: right;       /* Alignement à droite */
+		}
+	</style>
+</head>
+<body>
+	<!-- Menu -->
+	<div id="menu">
+		<h1>Menu Principal</h1>
+		<button id="startButton">Démarrer le jeu</button>
+	</div>
+	
+	<!-- Jeu -->
+	<div id="game">
+		<!-- Noms des joueurs -->
+		<div id="playerNames">
+			<span id="leftPlayerName"></span><span id="rightPlayerName"></span>
+		</div>
+		<canvas id="gameCanvas" width="600" height="400"></canvas>
+	</div>
+	<script type="module" src="main.js"></script>
+</body>
+</html>
