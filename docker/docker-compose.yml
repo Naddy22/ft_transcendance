@@ -1,19 +1,15 @@
 
-version: '3'
+version: '3.8'
 
 services:
-
   backend:
     build:
       context: ..
       dockerfile: docker/Dockerfile.backend
     ports:
-      - "8080:80"
-
-  frontend:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.frontend
-    ports:
       - "3000:3000"
-
+    volumes:
+      - ../backend:/app
+    command: ["node", "server.js"]
+    environment:
+      - NODE_ENV=development

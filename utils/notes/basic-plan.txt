@@ -12,10 +12,13 @@ ft_transcendence/
 │   ├── public/					# Publicly accessible PHP files
 │   │   ├── index.php			# Entry point for backend
 │   ├── src/					# Core backend logic
-│   │   ├── Database.php		# SQLite connection (if needed)
+│   │   ├── Database.php		# SQLite connection
 │   │   ├── Matchmaking.php		# Basic matchmaking placeholder
 │   ├── config/					# Configuration files
 │   │   ├── config.php			# Configuration (DB, ENV loading)
+|	├── database/				# Database storage folder
+│   |	├── init.sql			# SQL schema (initial tables)
+│   |	├── db.sqlite			# SQLite database file (auto-generated)
 │   ├── .env.example			# Example env file (ignored in .gitignore)
 │
 │── frontend/					# Frontend files (TypeScript SPA)
@@ -87,3 +90,42 @@ ft_transcendence/
   "include": ["src"]  // Only compile files inside 'src' folder
 }
 
+
+
+
+.
+├── backend
+│   ├── config
+│   │   └── config.php
+│   ├── database
+│   │   ├── db.sqlite
+│   │   └── init.sql
+│   ├── public
+│   │   └── index.php
+│   └── src
+│       └── Database.php
+├── docker
+│   ├── backend
+│   │   └── database
+│   │       └── db.sqlite
+│   ├── docker-compose.yml
+│   ├── Dockerfile.backend
+│   └── Dockerfile.frontend
+├── frontend
+│   ├── package.json
+│   ├── public
+│   │   └── index.html
+│   ├── src
+│   │   └── index.ts
+│   └── tsconfig.json
+├── Makefile
+├── README.md
+└── utils
+    ├── img
+    │   └── pong.png
+    ├── notes
+    │   └── basic-plan.txt
+    └── pdf
+        ├── ft_transcendance_en.pdf
+        ├── ft_transcendance_fr.pdf
+        └── ft_transcendence_new.pdf

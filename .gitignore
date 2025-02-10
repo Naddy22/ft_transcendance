@@ -1,7 +1,43 @@
 
+# Ignore environment variables (Sensitive Data)
 .env
+backend/.env
+backend/.env.example
 
+# Ignore SQLite Database File (Generated Data)
+backend/database/db.sqlite
+
+# Ignore Logs & Cache
+backend/logs/
+backend/tmp/
+
+# Ignore Vendor Directory (If Using Composer)
+backend/vendor/
+
+# Ignore Node.js Dependencies
 node_modules/
+frontend/node_modules/
+frontend/.parcel-cache/
+frontend/dist/
 
-# Local folder for notes, tests, etc.
+# Ignore Build Files (Generated Code)
+frontend/public/bundle.js
+frontend/public/bundle.js.map
+
+# Ignore Docker-Related Files
+docker/data/
+docker/volumes/
+docker-compose.override.yml
+
+# Ignore System Junk Files
+.DS_Store
+Thumbs.db
+
+# Ignore Editor & IDE Configurations
+.vscode/
+.idea/
+*.swp  # Vim swap files
+*.swo
+
+# Ignore local folder for notes, tests, etc.
 _local/
