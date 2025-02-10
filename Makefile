@@ -84,3 +84,22 @@ check-frontend:
 	@curl -i $(FRONTEND_URL) || echo "❌ Frontend is NOT running!"
 
 .PHONY: open-frontend open-backend check-frontend check-backend
+
+
+# cd backend
+# npm init -y
+# npm install fastify
+
+
+# npm install @prisma/client
+# npm install --save-dev prisma
+# npx prisma init --datasource-provider sqlite
+# # (in database/.env)
+# DATABASE_URL="file:./database.sqlite"
+# npx prisma migrate dev --name init
+
+# # adding a user:
+# curl -X POST http://localhost:3000/users -H "Content-Type: application/json" -d '{"name": "Alice", "email": "alice@example.com"}'
+
+# # checking users:
+# curl http://localhost:3000/users
