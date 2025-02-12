@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "es5", // Version de JavaScript ciblée
+		"module": "es6", // Utilise les modules ES6
+		"outDir": "./dist", // Répertoire de sortie
+		"rootDir": "./src", // Répertoire des fichiers source
+		"esModuleInterop": true, // Compatibilité avec les modules CommonJS
+		"strict": true, // Active les vérifications strictes des types
+		"skipLibCheck": true // Ignore les vérifications des types dans les bibliothèques
+	},
+	"include": [
+		"src/**/*.ts" // Inclut tous les fichiers .ts dans src
+	],
+	"exclude": [
+		"node_modules" // Exclut le répertoire node_modules
+	]
+}
