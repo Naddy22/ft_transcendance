@@ -1,6 +1,6 @@
 export class Player {
 	name: string;
-    score: number;
+	score: number;
 
 	constructor(name: string) {
 		this.name = name;
