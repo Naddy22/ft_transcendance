@@ -78,11 +78,7 @@ export function startPongGame() {
         ball.reset(serves);
         leftPaddle.reset(canvas.height / 2 - leftPaddle.height / 2);
         rightPaddle.reset(canvas.height / 2 - rightPaddle.height / 2);
-        if (gameLoopId !== null) {
-            cancelAnimationFrame(gameLoopId); // Stoppe la boucle en cours
-        }
-        gameLoopId = null; // Réinitialise l'ID de la boucle
-        gameStarted = false;
+        stopPongGame();
         gameLoop(); // Redémarre la boucle du jeu
     }
     // Fonction pour afficher le gagnant et arrêter le jeu
