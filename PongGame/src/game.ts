@@ -2,8 +2,11 @@ import { Ball } from './ball.js';
 import { Paddle } from './paddle.js';
 import { Player } from './player.js';
 
+let gameLoopId: number | null = null;
+let gameStarted = false; // Variable pour savoir si le jeu a commencé
+
 // Fonction pour démarrer le jeu
-export function startPingPongGame(): void {
+export function startPongGame(): void {
 	const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 	const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
@@ -14,8 +17,6 @@ export function startPingPongGame(): void {
 	const leftPlayer = new Player("Player 1");
 
 	const MAX_SCORE = 3;
-	let gameLoopId: number | null = null;
-	let gameStarted = false; // Variable pour savoir si le jeu a commencé
 
 	// Une fois que tes joueurs sont créés, mets à jour le DOM pour afficher leurs noms
 	function updatePlayerNames(): void {
@@ -51,6 +52,7 @@ export function startPingPongGame(): void {
 
 		if (ball.x - ball.radius <= 0) {
 			rightPlayer.score++;  // Si la balle sort à gauche, le joueur de droite marque
+			gameStarted = false;
 			if (rightPlayer.score >= MAX_SCORE) {
 				endGame(rightPlayer.name); // Fin du jeu si le joueur de droite atteint le score limite
 				return;
@@ -60,6 +62,7 @@ export function startPingPongGame(): void {
 			ball.reset(true);  // Le joueur gauche sert
 		} else if (ball.x + ball.radius >= canvas.width) {
 			leftPlayer.score++;  // Si la balle sort à droite, le joueur de gauche marque
+			gameStarted = false;
 			if (leftPlayer.score >= MAX_SCORE) {
 				endGame(leftPlayer.name); // Fin du jeu si le joueur de gauche atteint le score limite
 				return;
@@ -88,10 +91,7 @@ export function startPingPongGame(): void {
 		ball.reset(serves);
 		leftPaddle.reset(canvas.height / 2 - leftPaddle.height / 2);
 		rightPaddle.reset(canvas.height / 2 - rightPaddle.height / 2);
-		if (gameLoopId !== null) {
-			cancelAnimationFrame(gameLoopId); // Stoppe la boucle en cours
-		}
-		gameLoopId = null; // Réinitialise l'ID de la boucle
+		stopPongGame();
 		gameLoop(); // Redémarre la boucle du jeu
 	}
 
@@ -159,11 +159,20 @@ export function startPingPongGame(): void {
 			ctx.fillText("Appuyez sur ESPACE pour commencer", canvas.width / 2, canvas.height / 2 - 75);
 			return; // On arrête ici tant que le jeu n'a pas commencé
 		}
-		update();  // Met à jour la position de la balle
-		draw();    // Dessine la balle à sa nouvelle position
+		update(); // Met à jour la position de la balle
+		draw(); // Dessine la balle à sa nouvelle position
 		gameLoopId = requestAnimationFrame(gameLoop);  // Recommence à l'infini
 	}
 
 	// Démarrer le jeu
 	gameLoop();
+}
+
+export function stopPongGame(): void {
+	console.log('stopPongGame appelé, gameLoopId:', gameLoopId);
+	if (gameLoopId !== null) {
+		cancelAnimationFrame(gameLoopId); // Stoppe la boucle en cours
+	}
+	gameLoopId = null; // Réinitialise l'ID de la boucle
+	gameStarted = false;
 }
