@@ -1,4 +1,4 @@
-export class Player {
+export class Player3D {
 	name: string;
 	score: number;
 
