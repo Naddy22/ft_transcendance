@@ -101,5 +101,15 @@ check-frontend:
 # # adding a user:
 # curl -X POST http://localhost:3000/users -H "Content-Type: application/json" -d '{"name": "Alice", "email": "alice@example.com"}'
 
+# curl -X POST http://localhost:3000/register \
+#      -H "Content-Type: application/json" \
+#      -d '{"name": "Alice", "email": "alice@example.com", "password": "securepass"}'
+
+# Test Login
+# curl -X POST http://localhost:3000/login \
+#      -H "Content-Type: application/json" \
+#      -d '{"email": "alice@example.com", "password": "securepass"}'
+
+
 # # checking users:
 # curl http://localhost:3000/users

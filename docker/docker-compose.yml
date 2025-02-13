@@ -14,3 +14,4 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=file:/app/database.sqlite
+      - JWT_SECRET=supersecret  # 🔐 Change this for production!
