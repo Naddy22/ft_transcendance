@@ -1,8 +1,10 @@
 import { Ball } from './ball.js';
 import { Paddle } from './paddle.js';
 import { Player } from './player.js';
+var gameLoopId = null;
+var gameStarted = false; // Variable pour savoir si le jeu a commencé
 // Fonction pour démarrer le jeu
-export function startPingPongGame() {
+export function startPongGame() {
     var canvas = document.getElementById('gameCanvas');
     var ctx = canvas.getContext('2d');
     var ball = new Ball(canvas.width, canvas.height);
@@ -11,8 +13,6 @@ export function startPingPongGame() {
     var rightPlayer = new Player("Player 2");
     var leftPlayer = new Player("Player 1");
     var MAX_SCORE = 3;
-    var gameLoopId = null;
-    var gameStarted = false; // Variable pour savoir si le jeu a commencé
     // Une fois que tes joueurs sont créés, mets à jour le DOM pour afficher leurs noms
     function updatePlayerNames() {
         // Sélectionner les éléments du DOM et assigner les noms des joueurs
@@ -42,6 +42,7 @@ export function startPingPongGame() {
         ball.update(canvas.height, leftPaddle, rightPaddle);
         if (ball.x - ball.radius <= 0) {
             rightPlayer.score++; // Si la balle sort à gauche, le joueur de droite marque
+            gameStarted = false;
             if (rightPlayer.score >= MAX_SCORE) {
                 endGame(rightPlayer.name); // Fin du jeu si le joueur de droite atteint le score limite
                 return;
@@ -52,6 +53,7 @@ export function startPingPongGame() {
         }
         else if (ball.x + ball.radius >= canvas.width) {
             leftPlayer.score++; // Si la balle sort à droite, le joueur de gauche marque
+            gameStarted = false;
             if (leftPlayer.score >= MAX_SCORE) {
                 endGame(leftPlayer.name); // Fin du jeu si le joueur de gauche atteint le score limite
                 return;
@@ -80,6 +82,7 @@ export function startPingPongGame() {
             cancelAnimationFrame(gameLoopId); // Stoppe la boucle en cours
         }
         gameLoopId = null; // Réinitialise l'ID de la boucle
+        gameStarted = false;
         gameLoop(); // Redémarre la boucle du jeu
     }
     // Fonction pour afficher le gagnant et arrêter le jeu
@@ -152,4 +155,12 @@ export function startPingPongGame() {
     }
     // Démarrer le jeu
     gameLoop();
+}
+export function stopPongGame() {
+    console.log('stopPongGame appelé, gameLoopId:', gameLoopId);
+    if (gameLoopId !== null) {
+        cancelAnimationFrame(gameLoopId); // Stoppe la boucle en cours
+    }
+    gameLoopId = null; // Réinitialise l'ID de la boucle
+    gameStarted = false;
 }
