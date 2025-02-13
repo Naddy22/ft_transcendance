@@ -4,6 +4,7 @@
 		"module": "es6", // Utilise les modules ES6
 		"outDir": "./dist", // Répertoire de sortie
 		"rootDir": "./src", // Répertoire des fichiers source
+		"moduleResolution": "node", // pour babylonjs
 		"esModuleInterop": true, // Compatibilité avec les modules CommonJS
 		"strict": true, // Active les vérifications strictes des types
 		"skipLibCheck": true // Ignore les vérifications des types dans les bibliothèques
