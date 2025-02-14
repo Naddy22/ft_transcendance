@@ -1,20 +1,27 @@
+# Use Node.js for frontend build
+FROM node:18 AS build
 
-# Use latest Node.js for TypeScript support
-FROM node:18-alpine
-
-# Set working directory
 WORKDIR /app
 
-# Copy package.json first to optimize caching
-COPY frontend/package.json frontend/tsconfig.json ./
+# Copy package.json and package-lock.json (if available)
+COPY frontend/package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy project files
-COPY frontend/ ./
+# Copy the frontend source code
+COPY frontend/ .
 
-# Build frontend
+# Build the TypeScript project
 RUN npm run build
 
-CMD ["npm", "start"]
+# Use a lightweight web server to serve the frontend
+FROM nginx:alpine
+
+# Copy built frontend files
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose port 80 for serving the frontend
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

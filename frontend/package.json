@@ -1,15 +1,15 @@
-
 {
-	"name": "ft_transcendence_frontend",
+	"name": "ft_transcendence",
 	"version": "1.0.0",
-	"description": "Frontend for ft_transcendence",
 	"scripts": {
-	  "build": "tsc",
-	  "start": "npm run build && npx http-server public -p 3000"
+	  "dev": "vite",
+	  "build": "vite build",
+	  "preview": "vite preview"
 	},
-	"dependencies": {},
+	"dependencies": {
+	  "babylonjs": "^7.49.0"
+	},
 	"devDependencies": {
-	  "typescript": "^5.0.0",
-	  "http-server": "^14.1.1"
+	  "vite": "^6.1.0"
 	}
-}
+  }

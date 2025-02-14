@@ -15,3 +15,17 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=file:/app/database.sqlite
       - JWT_SECRET=supersecret  # 🔐 Change this for production!
+  
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    volumes:
+      - ../frontend:/app
+    environment:
+      - VITE_API_URL=http://backend:3000
+    command: ["sh", "-c", "npm install && npm run build && npm run preview"]
