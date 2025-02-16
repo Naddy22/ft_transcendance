@@ -1,10 +1,14 @@
 
 import Fastify from 'fastify';
 import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 const app = Fastify({ logger: true });
+
+app.get('/', async (request, reply) => {
+	return { message: 'Backend is running!' };
+  });
 
 app.register(userRoutes);
 

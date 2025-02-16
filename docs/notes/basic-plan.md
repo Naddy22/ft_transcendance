@@ -220,10 +220,14 @@ npm install --save-dev typescript ts-node @types/node @types/jsonwebtoken @types
 ```typescript
 import Fastify from 'fastify';
 import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 const app = Fastify({ logger: true });
+
+app.get('/', async (request, reply) => {
+  return { message: 'Backend is running!' };
+});
 
 app.register(userRoutes);
 
@@ -285,16 +289,63 @@ export default async function userRoutes(fastify: FastifyInstance) {
 }
 ```
 
-#### 6. Start Backend
-**Before Running** `make backend`
-- **Ensure `.env` is created and correctly configured.**
-- **Run `npx prisma migrate dev --name init` again if needed.**
-- **Start the backend:**
-```sh
-make backend
+#### 6. Add Scripts inside `backend/package.json`
+If the `"scripts"` section does not have `"dev"`, update `backend/package.json` to include it:
+```json
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --loader ts-node/esm src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc"
+},
+```
+> This ensures that ts-node runs in ESM mode, allowing TypeScript imports to work properly.
+
+##### Install `ts-node` (if missing)
+Since `"dev": "ts-node src/server.ts"` is using `ts-node`, ensure it's installed:
+```bash
+cd backend
+npm install --save-dev ts-node
 ```
 
-#### Suggested current content for `backend/.env`
+##### Create `backend/tsconfig.json`
+Run this command inside the `backend/ directory:
+```bash
+npx tsc --init
+```
+This will generate a basic tsconfig.json. However, we need to customize it.\
+Replace its content with the following:
+```json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+> This ensures full compatibility with ES Modules.
+
+#####  Install ts-node Loader for ES Modules
+Run:
+```bash
+cd backend
+npm install --save-dev ts-node @types/node
+```
+> Ensures ts-node is correctly installed with TypeScript types.
+
+#### 7. Create the `backend/.env` File
+
+##### Suggested current content for `backend/.env`
 ```bash
 # Database Configuration
 DATABASE_URL="file:./prisma/database.db"  # Path to the SQLite database file
@@ -310,7 +361,6 @@ CORS_ORIGIN="http://localhost:5173"  # Frontend URL during development
 ```
 
 ##### Explanations of Each Variable
-
 1. `DATABASE_URL`
 - Specifies the **SQLite database file location**.
 - This should match the database URL in `prisma/schema.prisma`:
@@ -333,18 +383,17 @@ datasource db {
 - This should match the **frontend URL** (`http://localhost:5173` in dev mode).
 
 ##### Makefile Target to Create `.env`
-```make
+```makefile
 # Define multi-line variable for the .env content
 define ENV_CONTENT
 DATABASE_URL="file:./prisma/database.db"
 JWT_SECRET="your_super_secret_key"
 PORT=3000
 CORS_ORIGIN="http://localhost:5173"
-
 endef
 export ENV_CONTENT
 
-create-env:
+env-create:
 	@if [ ! -f backend/.env ]; then \
 		echo "Creating backend/.env file..."; \
 		echo -e $$DEFINE_ENV > backend/.env; \
@@ -354,14 +403,112 @@ create-env:
 	fi
 ```
 
+#### Start Backend
+**Before Running** `make backend`
+- **Ensure `.env` is created and correctly configured.**
+- **Run `npx prisma migrate dev --name init` again if needed.**
+- **Start the backend:**
+```sh
+make backend
+```
+
+##### Alternative: Run Manually
+If `make backend` fails, manually start the backend:
+```bash
+cd backend
+npm run dev
+```
 
 #### Next Steps
 If everything works fine, the backend should start successfully on `http://localhost:3000`.\
-You can test if it's running using:
+You can test if it's running by sending a request:
 ```bash
 curl -i http://localhost:3000
 ```
 or open it in a browser.
+
+#### Problem - ES modules vs CommonJS - Troubleshoot
+We might get the error **"Cannot use import statement outside a module"**.\
+It happens because **TypeScript is trying to use ES modules (`import ...`) in a CommonJS environment**.\
+Let's fix it by updating/adding these settings in `backend/tsconfig.json`:
+```json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  }
+}
+```
+And making sure `backend/package.json` has:
+```json
+"type": "module"
+```
+So our `package.json` should look like:
+```json
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node --esm src/server.ts",
+    "start": "node dist/server.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "fastify": "^4.15.0",
+    "dotenv": "^16.0.3",
+    "@prisma/client": "^4.8.0",
+    "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1",
+    "@types/node": "^18.14.2",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/bcrypt": "^5.0.0",
+    "prisma": "^4.8.0"
+  }
+}
+```
+And `backend/tsconfig.json` should have:
+```json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true
+  }
+}
+```
+
+##### Alternative Fix - Using CommonJS
+
+If you prefer **CommonJS** (instead of ES modules), \
+remove `"type": "module"` from `package.json` and update `backend/src/server.ts`:
+
+Replace:
+```typescript
+import Fastify from 'fastify';
+```
+With
+```typescript
+const Fastify = require('fastify');
+```
+Then restart the backend.
 
 ---
 ---

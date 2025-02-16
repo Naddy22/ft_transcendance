@@ -75,17 +75,19 @@ logs: ## Show logs
 ##@ 🧹 Cleanup
 # ==============================
 
-clean fclean: ## Remove all containers, images, volumes
+clean: ## Remove all containers, images, volumes
 	$(DOCKER_CLEAN)
 	$(DOCKER_PRUNE)
 
+fclean: clean ## Full Clean (currently same as `clean`)
+
 ffclean: fclean ## Remove all generated files and folders
 	@$(MAKE) pdf-clean $(NPD)
-	@$(MAKE) clean_env $(NPD)
+	@$(MAKE) env-clean $(NPD)
 
-restart re: down build up ## Restart all services
+re: down build up ## Restart all services
 
-.PHONY: clean fclean ffclean restart re
+.PHONY: clean fclean ffclean re
 
 # ==============================
 ##@ ** WIP **
