@@ -1,0 +1,56 @@
+
+version: '3.8'
+
+services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - backend/.env
+    depends_on:
+      - database
+  
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+  
+  game:
+    build:
+      context: .
+      dockerfile: docker/game.Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+  
+  database:
+    image: "sqlite"
+    volumes:
+      - sqlite_data:/database
+
+volumes:
+  sqlite_data:
+
+# services:
+#   backend:
+#     build:
+#       context: ..
+#       dockerfile: docker/Dockerfile.backend
+#     ports:
+#       - "3000:3000"
+#     volumes:
+#       - ../backend:/app
+#     command: ["sh", "-c", "npx prisma migrate deploy && node server.js"]
+#     environment:
+#       - NODE_ENV=development
+#       - DATABASE_URL=file:/app/database.sqlite
+#       - JWT_SECRET=supersecret  # 🔐 Change this for production!

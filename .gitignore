@@ -1,43 +1,64 @@
 
-# Ignore environment variables (Sensitive Data)
-.env
-backend/.env
-backend/.env.example
+# ======================
+# Node.js & Fastify
+# ======================
+node_modules/    # Dependencies installed via npm or yarn
+.dist/           # Compiled and minified files
+build/           # Build artifacts generated for deployment
 
-# Ignore SQLite Database File (Generated Data)
-backend/database/db.sqlite
+# ======================
+# Environment Variables
+# ======================
+.env             # Environment variables file (contains secrets and API keys)
 
-# Ignore Logs & Cache
-backend/logs/
-backend/tmp/
+# ======================
+# IDE and Editor Configs
+# ======================
+.vscode/         # VSCode editor settings and extensions
+.DS_Store        # macOS system file (not needed in repositories)
 
-# Ignore Vendor Directory (If Using Composer)
-backend/vendor/
+# ======================
+# Logs and Debugging
+# ======================
+logs/            # Logs folder for application logs
+npm-debug.log    # Log file generated when npm encounters an issue
+yarn-error.log   # Log file generated when yarn encounters an issue
 
-# Ignore Node.js Dependencies
-node_modules/
-frontend/node_modules/
-frontend/.parcel-cache/
-frontend/dist/
+# ======================
+# SQLite Database
+# ======================
+sqlite_data/     # Folder for SQLite database storage
+*.sqlite         # SQLite database files
+*.sqlite3        # SQLite v3 database files
+*.db             # Generic database files
+*.db-wal         # Write-ahead log for SQLite databases
+*.db-shm         # Shared memory files for SQLite
 
-# Ignore Build Files (Generated Code)
-frontend/public/bundle.js
-frontend/public/bundle.js.map
+# ======================
+# Docker
+# ======================
+.dockerignore                   # Docker ignore file (similar to .gitignore but for Docker)
+docker-compose.override.yml     # Local override for docker-compose setup
+**/docker-entrypoint-initdb.d/  # Init scripts for database setup in Docker
 
-# Ignore Docker-Related Files
-docker/data/
-docker/volumes/
-docker-compose.override.yml
+# ======================
+# Tailwind CSS & Frontend Build
+# ======================
+.next/           # Next.js build directory
+out/             # Static export directory for Next.js
+*.cache/         # Caches generated for faster builds
+*.lock           # Lock files for package managers (yarn.lock, package-lock.json)
 
-# Ignore System Junk Files
-.DS_Store
-Thumbs.db
+# ======================
+# Babylon.js / WebGL Artifacts
+# ======================
+*.glb            # Binary GLTF files for 3D assets
+*.gltf           # GLTF 3D model files
+*.bin            # Binary files used with GLTF
+*.babylon        # Babylon.js-specific 3D model format
 
-# Ignore Editor & IDE Configurations
-.vscode/
-.idea/
-*.swp  # Vim swap files
-*.swo
-
-# Ignore local folder for notes, tests, etc.
-_local/
+# ======================
+# Temporary & Local Files
+# ======================
+_local/          # Local folder for personal notes, tests, or temp files
+tmp*             # Temporary files (wildcard to match any file prefixed with tmp)

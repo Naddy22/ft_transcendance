@@ -1,0 +1,11 @@
+
+
+Connect front end and back end
+
+modify .gitignore to include stuff, maybe not nested but more generalized
+
+create the docker volume inside ./docker/data ?
+
+fix makefile:
+- have a target to launch frontend only and open the web browser (using vite)
+

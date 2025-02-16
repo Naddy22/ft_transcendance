@@ -11,11 +11,10 @@ This project involves undertaking tasks you have never done before.\
 Remember the beginning of your journey in computer science.\
 Look at you now; it’s time to shine!*
 
-
 </div>
 
-<details>
-  <summary><h2>Objectives</h2></summary>
+
+## Objectives
 
 <!-- This project is a surprise. -->
 
@@ -24,20 +23,20 @@ This project will confront you with -maybe- unknown technologies, intentionally.
 Once again, you will have to adapt, discover, explore, experiment to create the expected software.
 
 The project includes a mandatory part and a series of modules on various topics, as detailed below in this subject.\
-You will be able to choose the modules you want among a large list, 
+You will be able to choose the modules you want among a large list, \
 but each module and mandatory element contains technical constraints you cannot bypass.\
 So you can select the topics you like, but not technologies you like.\
 This is a deliberate pedagogical choice.
 
 This project is not intended to be a portfolio for an incoming internship or other professional experience.\
 Its purpose is to reveal your ability to become acquainted with and complete a complex task using an unfamiliar technology.\
-This situation will inevitably be faced during your career, 
+This situation will inevitably be faced during your career, \
 and we aim to develop your self-confidence in front of such situations.
 
-Especially on this big and long project, we encourage you to carefully read the entire subject, 
+Especially on this big and long project, we encourage you to carefully read the entire subject, \
 consider several possible strategies, think about your design, before starting coding anything!\
 Some modules may depend on others, some modules may conflict with others.\
-Ft_transcendence will bring many doubts and requires a lot of difficult decisions!
+Ft_transcendence will bring many doubts and requires a lot of difficult decisions!\
 Act wisely `:-)`
 
 Also, this project is definitely a long run, and a wrong path will lead you to a huge loss of time.\
@@ -46,31 +45,31 @@ Many approaches and tools exist to support you on these topics.
 
 Good luck, and have fun playing Pong!
 
----
 
-</details>
+## Mandatory part
 
-<details>
-  <summary><h2>Mandatory part</h2></summary>
+This project is about creating a website for the mighty **Pong** contest!
 
-This project is about creating a website for the mighty <b>Pong</b> contest!  
-
-<details>
-  <summary><h3>Overview</h3></summary>
+### Overview
 
 Your software will offer a nice user interface and real-time multiplayer capabilities
 allowing to play Pong with all your friends!  
 
-<ul>
+- At first, your project needs to adhere to the mandatory guidelines as a minimum requirement (see next section), 
+which will represent only a small portion to the final grade.
+
+- The second part of this subject will offer additional modules that can replace or complement the mandatory part.
+
+<!-- <ul>
 	<li>At first, your project needs to adhere to the mandatory guidelines as a minimum requirement (see next section),<br>
 	which will represent only a small portion to the final grade.</li>
 	<br>
 	<li>The second part of this subject will offer additional modules that can replace or complement the mandatory part.</li>
-</ul>
+</ul> -->
 
-In this subject, you will face words that are ~~highlighted in green~~ 🔸Bordered like this🔸.  
-They represent technology choices that will evolve over time.  
-Be sure to pay close attention to the version of the subject.  
+In this subject, you will face words that are ~~highlighted in green~~ 🔸Bordered like this🔸.\
+They represent technology choices that will evolve over time.\
+Be sure to pay close attention to the version of the subject.\
 
 <!-- <blockquote>
 	<ul>
@@ -86,13 +85,13 @@ Be sure to pay close attention to the version of the subject.
 > - The use of libraries or tools that provide an immediate and complete solution for an entire feature or a module is prohibited.
 > - Any direct instruction regarding the use (can, must, can’t) of a third-party library or tool must be followed.
 > - The use of a small library or tool that solves a simple, unique task representing a subcomponent of a larger feature or module, is allowed.
-> - During the evaluation, the team will justify any use of library or tool that is not explicitly approved by the project guidelines and is not in contradiction with the project’s constraints.
-> - During the evaluation, the evaluator will take responsibility for determining whether the use of a specific library or tool is legitimate (and allowed) or if it essentially solves an entire feature or module (and is therefore prohibited).
+> - During the evaluation, the team will justify any use of library or tool that is not explicitly approved by the project guidelines
+> and is not in contradiction with the project’s constraints.
+> - During the evaluation, the evaluator will take responsibility for determining whether the use of a specific library or tool is legitimate (and allowed)
+> or if it essentially solves an entire feature or module (and is therefore prohibited).
 
-</details>
 
-<details>
-  <summary><h3>Minimal technical requirement</h3></summary>
+### Minimal technical requirement
 
 Your project has to comply with the following rules:  
 
@@ -132,10 +131,8 @@ Everything must be launched with a single command line to run an autonomous cont
 > you may need to adopt different strategies, such as:\
 > container solution in virtual machine, rebuild your container after your changes, craft your own image with root as unique UID.
 
-</details>
 
-<details>
-  <summary><h3>Game</h3></summary>
+### Game
 
 The main purpose of this website is to play Pong versus other players.
 
@@ -166,17 +163,7 @@ or you may choose to use the **FrontEnd module**, or override it with the **Grap
 While the visual aesthetics can vary,\
 the game must still capture the essence of the **original Pong** (1972).
 
-> [!WARNING]
-> - The use of libraries or tools that provide an immediate and complete solution for an entire feature or module is prohibited.
-> - Any direct instruction regarding the use (can, must, can’t) of a third-party library or tool must be followed.
-> - The use of a small library or tool that solves a simple, unique task, representing a subcomponent of a larger feature or module, is allowed.
-> - During the evaluation, the team will justify any use of a library or tool that is not explicitly approved by the project guidelines and is not in contradiction with the project’s constraints.
-> - During the evaluation, the evaluator will determine whether the use of a specific library or tool is legitimate (and allowed) or if it essentially solves an entire feature or module (and is therefore prohibited).
-
-</details>
-
-<details>
-  <summary><h3>Security concerns</h3></summary>
+### Security concerns
 
 In order to create a functional website, there are several security concerns you must address:
 
@@ -200,14 +187,8 @@ Even if you decide not to use JWT tokens, securing the site remains critical.
 > must be saved locally in a .env file and ignored by git.\
 > Publicly stored credentials will lead you directly to a failure of the project.
 
-</details>
 
----
-
-</details>
-
-<details>
-  <summary><h2>Modules</h2></summary>
+## Modules
 
 Now that you’ve accomplished 25% of the project, congratulations!  
 
@@ -219,18 +200,10 @@ It’s crucial to carefully review each module as it may require modifications t
 
 Therefore, we strongly recommend reading this entire subject thoroughly.
 
-> [!WARNING]
-> - The use of libraries or tools that provide an immediate and complete solution for an entire feature or module is prohibited.
-> - Any direct instructions regarding the use (can, must, can’t) of a third-party library or tool must be followed.
-> - The use of a small library or tool that solves a simple,  unique task, representing a subcomponent of a larger feature or module, is allowed.
-> - During the evaluation, the team will justify any usage of library or tool that is not explicitly approved by the subject, and that does not contradict the subject’s constraints.
-> - During the evaluation, the evaluator will determine whether the use of a specific library or tool is legitimate (and allowed) or if it essentially solves an entire feature or module (and is therefore prohibited).
-
 > [!NOTE]
 > Two Minor Modules count as one Major Module.
 
-<!-- <details>
-  <summary><h3>Overview</h3></summary> -->
+### Overview
 
 - [**Web**](#web)
 	- **Major module**: Use a Framework to build the backend.
@@ -278,18 +251,15 @@ Therefore, we strongly recommend reading this entire subject thoroughly.
 	- **Major module**: Enabling Pong gameplay via CLI against web users with API integration
 
 ---
+---
 
-<!-- </details> -->
-
-<a name="web"></a>
 ### Web
-<!-- <details>
-  <summary><h3>Web</h3></summary> -->
 
 These modules enable the integration of advanced web features into your Pong game.  
 
-<details>
-	<summary><h4><b>Major module</b>: Use a framework to build the backend.</h4></summary>
+---
+
+#### **Major module**: Use a framework to build the backend.
 
 In this major module, you are required to use a specific web framework for backend development: 🔸Fastify🔸 with 🔸Node.js🔸.
 
@@ -298,10 +268,9 @@ In this major module, you are required to use a specific web framework for backe
 > (as specified above in the mandatory part).
 > However, this module will only be valid if you follow its requirements.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: Use a framework or toolkit to build the front-end.</h4></summary>
+#### **Minor module**: Use a framework or toolkit to build the front-end.
 
 Your frontend development must use the 🔸Tailwind CSS🔸 in addition of the Type-script, and nothing else.
 
@@ -310,19 +279,17 @@ Your frontend development must use the 🔸Tailwind CSS🔸 in addition of the T
 > (as specified above in the mandatory part).
 > However, this module will only be valid if you follow its requirements.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: Use a database for the backend -and more.</h4></summary>
+#### **Minor module**: Use a database for the backend -and more.
 
 The designated database for all DB instances in your project is 🔸SQLite🔸.\
 This choice ensures data consistency and compatibility across all project components\
 and may be a prerequisite for other modules, such as the **backend Framework module**.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Major module</b>: Store the score of a tournament in the Blockchain.</h4></summary>
+#### **Major module**: Store the score of a tournament in the Blockchain.
 
 This Major module focuses on implementing a feature within the Pong website to store tournament scores securely on a blockchain.\
 It is essential to clarify that for development and testing purposes, we will utilize a testing blockchain environment.\
@@ -349,16 +316,10 @@ By implementing this module, we aim to enhance the Pong website by introducing a
 Users will benefit from the added layer of security and transparency, ensuring the integrity of their gaming scores.\
 The module emphasizes the use of a testing blockchain environment to minimize risks associated with blockchain development.
 
-</details>
-
+---
 ---
 
-<!-- </details> -->
-
-<a name="user-management"></a>
 ### User Management
-<!-- <details>
-  <summary><h3>User Management</h3></summary> -->
 
 This module delves into the realm of **User Management**,\
 addressing key aspects of user interactions and access control within the Pong platform.\
@@ -366,8 +327,9 @@ It encompasses two major components,
 each focused on essential elements of user management and authentication: 
 user participation across multiple tournaments and the implementation of remote authentication.
 
-<details>
-	<summary><h4><b>Major module</b>: Standard user management, authentication, users across tournaments.</h4></summary>
+---
+
+#### **Major module**: Standard user management, authentication, users across tournaments.
 
 - Users can securely subscribe to the website.
 - Registered users can securely log in.
@@ -382,10 +344,9 @@ user participation across multiple tournaments and the implementation of remote 
 > The management of duplicate usernames/emails is at your discretion;\
 > please ensure a logical solution in provided.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Major module</b>: Implementing a remote authentication.</h4></summary>
+#### **Major module**: Implementing a remote authentication.
 
 In this major module, the goal is to implement the following authentication system: 🔸Google Sign-in🔸.  
 
@@ -402,21 +363,16 @@ Key features and objectives include:
 This major module aims to provide a remote user authentication,\
 offering users a secure and convenient way to access the web application.
 
-</details>
-
+---
 ---
 
-<!-- </details> -->
-
-<a name="gameplay"></a>
 ### Gameplay and User Experience
-<!-- <details>
-  <summary><h3>Gameplay and user experience</h3></summary> -->
 
 These modules are designed to enhance the general gameplay of the project.
 
-<details>
-	<summary><h4><b>Major module</b>: Remote players.</h4></summary>
+---
+
+#### **Major module**: Remote players.
 
 It should be possible for two players to play remotely.\
 Each player is located on a separated computer, accessing the same website and playing the same Pong game.
@@ -425,10 +381,9 @@ Each player is located on a separated computer, accessing the same website and p
 > Consider network issues, such as unexpected disconnections or lag.\
 > You must offer the best user experience possible.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Major module</b>: Multiple players</h4></summary>
+#### **Major module**: Multiple players
 
 It should be possible to have more than two players.\
 Each player needs live control (so the “remote players” module is strongly recommanded).\
@@ -438,10 +393,9 @@ you can define a specific number of players, greater than 2, for this multiplaye
 	
 Ex: 4 players could play on a square board, with each player controlling one unique side of the square.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Major module</b>: Add another game with user history and matchmaking.</h4></summary>
+#### **Major module**: Add another game with user history and matchmaking.
 
 The goal of this major module, is to introduce a new game, distinct from Pong,\
 and incorporate features such as user history tracking and matchmaking.
@@ -457,10 +411,9 @@ Regularly update and maintain the game to fix bugs, add new features, and enhanc
 This major module aims to expand your platform by introducing a new game,\
 enhancing user engagement with gameplay history, and facilitating matchmaking for an enjoyable gaming experience.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: Game customization options.</h4></summary>
+#### **Minor module**: Game customization options.
 
 In this minor module, the goal is to provide customization options for all available games on the platform.
 
@@ -475,10 +428,9 @@ This module aims to give users the flexibility to tailor their gaming experience
 by providing a variety of customization options 
 while also offering a default version for those who prefer a straightforward gameplay experience.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Major module</b>: Live Chat.</h4></summary>
+#### **Major module**: Live Chat.
 
 In this module, you need to create a chat feature for users:
 - The user should be able to send direct messages to other users.
@@ -487,24 +439,19 @@ In this module, you need to create a chat feature for users:
 - The tournament system should be able to notify users about the next game.
 - The user should be able to access other players’ profiles through the chat interface.
 
-</details>
-
+---
 ---
 
-<!-- </details> -->
-
-<a name="ai-algo"></a>
 ### AI-Algo
-<!-- <details>
-  <summary><h3>AI-Algo</h3></summary> -->
 
 These modules serve to introduce data-driven elements to the project.\
 The major module introduces an AI opponent for enhanced gameplay, 
 while the minor module focuses on user and game statistics dashboards, 
 offering users a minimalistic yet insightful glimpse into their gaming experiences.
 
-<details>
-	<summary><h4><b>Major module</b>: Introduce an AI Opponent.</h4></summary>
+---
+
+#### **Major module**: Introduce an AI Opponent.
 
 In this major module, the objective is to incorporate an AI player into the game.\
 Notably, the use of the **A* algorithm** is not permitted for this task.
@@ -528,10 +475,9 @@ The constraint here is that the AI can only refresh its view of the game once pe
 This major module aims to enhance the game by introducing an AI opponent that 
 adds excitement and competitiveness without relying on the A* algorithm.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: User and Game Stats Dashboards. </h4></summary>
+#### **Minor module**: User and Game Stats Dashboards. 
 
 In this minor module, the goal is to introduce dashboards that display statistics for individual users and game sessions.  
 
@@ -546,16 +492,10 @@ Key features and objectives include:
 This minor module aims to empower users with the ability to monitor their gaming statistics and game session details 
 through user-friendly dashboards, providing a comprehensive view of their gaming experience.
 
-</details>
-
+---
 ---
 
-<!-- </details> -->
-
-<a name="cybersecurity"></a>
 ### Cybersecurity
-<!-- <details>
-  <summary><h3>Cybersecurity</h3></summary> -->
 
 These cybersecurity modules are designed to enhance the security posture of the project.\
 The major module focuses on robust protection through Web Application Firewall (WAF) and ModSecurity configurations, 
@@ -564,8 +504,9 @@ The minor modules complement this effort by adding features for GDPR compliance,
 user data anonymization, account deletion, Two-Factor authentication (2FA), and JSON Web Tokens (JWT), 
 collectively ensuring the project’s commitment to data protection, privacy, and authentication security.
 
-<details>
-	<summary><h4><b>Major module</b>: Implement WAF/ModSecurity with Hardened Configuration and HashiCorp Vault for Secrets Management.</h4></summary>
+---
+
+#### **Major module**: Implement WAF/ModSecurity with Hardened Configuration and HashiCorp Vault for Secrets Management.
 
 The objective of this major module is to enhance the security infrastructure of the project by implementing several key components.
 
@@ -577,10 +518,9 @@ ensuring that these secrets are properly encrypted and isolated.
 This major module aims to bolster the project’s security infrastructure by implementing robust security measures, 
 including WAF/ModSecurity for web application protection and HashiCorp Vault for secrets management to ensure a safe and secure environment.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: GDPR compliance options with user anonymization, local data management, and account deletion.</h4></summary>
+#### **Minor module**: GDPR compliance options with user anonymization, local data management, and account deletion.
 
 The goal of this minor module is to introduce GDPR compliance options that allow users to exercise their data privacy rights.
 
@@ -601,7 +541,8 @@ The GDPR is a regulation that aims to protect the personal data and privacy of i
 It sets out strict rules and guidelines for organizations on how they should handle and process personal data.
 
 To gain a better understanding of the GDPR and its requirements,
-it is strongly recommended to visit the [official website of the European Commission on data protection](https://commission.europa.eu/law/law-topic/data-protection/data-protection-eu_en).\
+it is strongly recommended to visit the 
+[official website of the European Commission on data protection](https://commission.europa.eu/law/law-topic/data-protection/data-protection-eu_en).\
 This website provides comprehensive information about the GDPR, including its principles, objectives, and user rights.\
 It also offers additional resources to delve deeper into the topic and ensure compliance with the regulation.
 
@@ -609,10 +550,9 @@ It also offers additional resources to delve deeper into the topic and ensure co
 If you are unfamiliar with the GDPR, please take the time to visit the provided link 
 and familiarize yourself with the regulations before proceeding with this project.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Major module</b>: Implement Two-Factor Authentication (2FA) and JWT.</h4></summary>
+#### **Major module**: Implement Two-Factor Authentication (2FA) and JWT.
 
 The goal of this major module is to enhance security and user authentication 
 by introducing Two-Factor Authentication (2FA) and utilizing JSON Web Tokens (JWT).
@@ -631,24 +571,19 @@ to prevent unauthorized access to user accounts and sensitive data.
 This major module aims to strengthen user account security by offering Two-Factor Authentication (2FA) 
 and enhancing authentication and authorization through the use of JSON Web Tokens (JWT).
 
-</details>
+---
+---
+
+### DevOps
+
+These modules focus on enhancing the project’s infrastructure and architecture.\
+The major modules address infrastructure setup for efficient log management using 🔸ELK🔸(Elasticsearch, Logstash, Kibana), \
+designing the backend as microservices for flexibility and scalability, \
+and implementing Prometheus/Grafana for comprehensive system monitoring.
 
 ---
 
-<!-- </details> -->
-
-<a name="devops"></a>
-### DevOps
-<!-- <details>
-  <summary><h3>Devops</h3></summary> -->
-
-These modules focus on enhancing the project’s infrastructure and architecture.\
-The major modules address infrastructure setup for efficient log management using 
-🔸ELK🔸(Elasticsearch, Logstash, Kibana), designing the backend as microservices for flexibility and scalability, 
-and implementing Prometheus/Grafana for comprehensive system monitoring.
-
-<details>
-	<summary><h4><b>Major module</b>: Infrastructure Setup with 🔸ELK🔸 (Elasticsearch, Logstash, Kibana) for Log Management.</h4></summary>
+#### **Major module**: Infrastructure Setup with 🔸ELK🔸 (Elasticsearch, Logstash, Kibana) for Log Management.
 
 The objective of this major module is to establish a robust infrastructure for log management and analysis 
 using the 🔸ELK🔸 stack (Elasticsearch, Logstash, Kibana).
@@ -660,13 +595,12 @@ Key features and goals include:
 - Define data retention and archiving policies to manage log data storage effectively.
 - Implement security measures to protect log data and access to the ELK stack components.
 
-This major module aims to establish a powerful log management and analysis system using the 🔸ELK🔸 stack, 
+This major module aims to establish a powerful log management and analysis system using the 🔸ELK🔸 stack, \
 enabling effective troubleshooting, monitoring, and insights into the system’s operation and performance.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: Monitoring system.</h4></summary>
+#### **Minor module**: Monitoring system.
 
 The goal of this minor module is to set up a comprehensive monitoring system using 🔸Prometheus and Grafana🔸.
 
@@ -678,13 +612,12 @@ Key features and goals include:
 - Ensure proper data retention and storage strategies for historical metrics data.
 - Implement secure authentication and access control mechanisms for 🔸Grafana🔸 to protect sensitive monitoring data.
 
-This minor module aims to establish a robust monitoring infrastructure using 🔸Prometheus and Grafana🔸, 
+This minor module aims to establish a robust monitoring infrastructure using 🔸Prometheus and Grafana🔸, \
 enabling real-time visibility into system metrics and proactive issue detection for improved system performance and reliability.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Major module</b>: Designing the Backend as Microservices.</h4></summary>
+#### **Major module**: Designing the Backend as Microservices.
 
 The goal of this major module is to architect the backend of the system using a microservices approach.
 
@@ -697,19 +630,14 @@ Key features and objectives include:
 This major module aims to enhance the system’s architecture by adopting a microservices design approach, 
 enabling greater flexibility, scalability, and maintainability of the backend components.
 
-</details>
+---
+---
+
+### Graphics
 
 ---
 
-<!-- </details> -->
-
-<a name="graphics"></a>
-### Graphics
-<!-- <details>
-  <summary><h3>Graphics</h3></summary> -->
-
-<details>
-	<summary><h4><b>Major module</b>: Implementing Advanced 3D Techniques </h4></summary>
+#### **Major module**: Implementing Advanced 3D Techniques 
 
 This major module,"Graphics," focuses on enhancing the visual aspects of the Pong game.\
 It introduces the use of advanced 3D techniques to create a more immersive gaming experience.\
@@ -730,24 +658,19 @@ This major module aims to revolutionize the Pong game’s visual elements by int
 Through the utilization of 🔸TreeJS/WebGL🔸, 
 we aim to provide players with an immersive and visually stunning gaming experience.
 
-</details>
+---
+---
+
+### Accessibility
+
+These modules are designed to enhance the accessibility of our web application, \
+with a focus on ensuring compatibility across all devices, expanding browser support, offering multi-language capabilities, \
+providing accessibility features for visually impaired users, \
+and integrating Server-Side Rendering (SSR) for improved performance and user experience.
 
 ---
 
-<!-- </details> -->
-
-<a name="accessibility"></a>
-### Accessibility
-<!-- <details>
-  <summary><h3>Accessibility</h3></summary> -->
-
-These modules are designed to enhance the accessibility of our web application, 
-with a focus on ensuring compatibility across all devices, expanding browser support, offering multi-language capabilities, 
-providing accessibility features for visually impaired users, and integrating Server-Side Rendering (SSR) 
-for improved performance and user experience.
-
-<details>
-	<summary><h4><b>Minor module</b>: Support on all devices.</h4></summary>
+#### **Minor module**: Support on all devices.
 
 In this module, the main focus is to ensure that your website works seamlessly on all types of devices.  
 
@@ -759,10 +682,9 @@ such as touchscreens, keyboards, and mice, depending on the device they are usin
 
 This module aims to provide a consistent and user-friendly experience on all devices, maximizing accessibility and user satisfaction.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: Expanding Browser Compatibility. </h4></summary>
+#### **Minor module**: Expanding Browser Compatibility. 
 
 In this minor module, the objective is to enhance the compatibility of the web application by adding support for an additional web browser.
 
@@ -772,13 +694,12 @@ Key features and objectives include:
 - Address any compatibility issues or rendering discrepancies that may arise in the added web browser.
 - Ensure a consistent user experience across all supported browsers, maintaining usability and functionality.
 
-This minor module aims to broaden the accessibility of the web application by supporting an additional web browser, 
+This minor module aims to broaden the accessibility of the web application by supporting an additional web browser, \
 providing users with more choices for their browsing experience.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: Multiple language supports.</h4></summary>
+#### **Minor module**: Multiple language supports.
 
 In this minor module, the objective is to ensure that your website supports multiple languages to cater to a diverse user base.
 
@@ -790,13 +711,12 @@ Key features and goals include:
 - Consider using language packs or localization libraries to simplify the translation process and maintain consistency across different languages.
 - Allow users to set their preferred language as a default choice for subsequent visits to the website.
 
-This minor module aims to enhance the accessibility and inclusivity of your website by offering content in multiple languages, 
+This minor module aims to enhance the accessibility and inclusivity of your website by offering content in multiple languages, \
 making it more user-friendly for a diverse international audience.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: Add accessibility for Visually Impaired Users.</h4></summary>
+#### **Minor module**: Add accessibility for Visually Impaired Users.
 
 In this minor module, the goal is to make your website more accessible for visually impaired users.
 
@@ -811,10 +731,9 @@ Key features include:
 This module aims to improve the website’s usability for individuals with visual impairments 
 and ensure compliance with accessibility standards.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Minor module</b>: Server-Side Rendering (SSR) Integration.</h4></summary>
+#### **Minor module**: Server-Side Rendering (SSR) Integration.
 
 In this minor module, the focus is on integrating Server-Side Rendering (SSR) 
 to enhance the performance and user experience of your website.
@@ -825,24 +744,19 @@ Key objectives include:
 - Optimize SEO by providing search engines with pre-rendered HTML content.
 - Maintain a consistent user experience while benefiting from the advantages of SSR.
 
-This module aims to boost website performance and SEO by integrating Server-Side Rendering
+This module aims to boost website performance and SEO by integrating Server-Side Rendering \
 for faster page loads and improved user experience.
 
-</details>
+---
+---
+
+### Server-Side Pong
 
 ---
 
-<!-- </details> -->
+#### **Major module**: Replacing Basic Pong with Server-Side Pong and Implementing an API.
 
-<a name="server-side-pong"></a>
-### Server-Side Pong
-<!-- <details>
-  <summary><h3>Server-Side Pong</h3></summary> -->
-
-<details>
-	<summary><h4><b>Major module</b>: Replacing Basic Pong with Server-Side Pong and Implementing an API.</h4></summary>
-
-In this major module, the goal is to replace the basic Pong game with a server-side Pong game, 
+In this major module, the goal is to replace the basic Pong game with a server-side Pong game, \
 accompanied by the implementation of an API.
 
 Key features and objectives include:
@@ -853,13 +767,12 @@ allowing partial usage of the game via the Command-Line Interface (CLI) and web 
 - Ensure that the server-side Pong game is responsive, providing an engaging and enjoyable gaming experience.
 - Integrate the server-side Pong game with the web application, allowing users to play the game directly on the website.
 
-This major module aims to elevate the Pong game by migrating it to the server side, 
+This major module aims to elevate the Pong game by migrating it to the server side, \
 enabling interaction through both a web interface and CLI while offering an API for easy access to game resources and features.
 
-</details>
+---
 
-<details>
-	<summary><h4><b>Major module</b>: Enabling Pong Gameplay via CLI against Web Users with API Integration.</h4></summary>
+#### **Major module**: Enabling Pong Gameplay via CLI against Web Users with API Integration.
 
 In this major module, the goal is to develop a Command-Line Interface (CLI) that allows users to play Pong against players using the web version of the game.\
 The CLI should connect to the web application seamlessly, enabling CLI users to join and interact with web players.
@@ -874,26 +787,17 @@ enabling CLI users to connect to the site and interact with web players.
 - Enable CLI users to join and create Pong matches with web players, facilitating cross-platform gameplay.
 - Provide comprehensive documentation and guidance on how to use the CLI effectively for Pong matches against web users.
 
-This major module aims to enhance the Pong gaming experience 
-by creating a CLI that seamlessly connects CLI users to web players through API integration, 
+This major module aims to enhance the Pong gaming experience \
+by creating a CLI that seamlessly connects CLI users to web players through API integration, \
 offering a unified and interactive gameplay environment.  
 
 > [!WARNING]
 > If you want to do this module, we strongly recommend that you do the previous one.
 
-</details>
-
+---
 ---
 
-<!-- </details> -->
-
----
-
-</details> <!-- Modules -->
-
-
-<details>
-  <summary><h2>Bonus part</h2></summary>
+## Bonus part
 
 For this project, the bonus section is designed to be straightforward.  
 You are required to include more modules.  
@@ -906,12 +810,7 @@ You are required to include more modules.
 > "Perfect" means the mandatory part has been completed fully and works without any issues.\
 > If you do not meet ALL the mandatory requirements, your bonus part will not be evaluated at all. 
 
----
-
-</details>
-
-<details>
-	<summary><h2>Submission and peer-evaliation</h2></summary>
+## Submission and peer-evaluation
 
 Submit your assignment in your Git repository as usual.\
 Only the work inside your repository will be evaluated during the defense.\
