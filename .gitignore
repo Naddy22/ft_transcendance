@@ -42,7 +42,7 @@ yarn-error.log
 # ======================
 
 # Folder for SQLite database storage
-sqlite_data/
+database/
 # SQLite database files
 *.sqlite
 # SQLite v3 database files
@@ -90,6 +90,16 @@ out/
 *.bin
 # Babylon.js-specific 3D model format
 *.babylon
+
+# ======================
+# Prisma & Database ORM
+# ======================
+
+# Prisma-generated database client files
+prisma/db.sqlite
+prisma/db.sqlite-journal
+prisma/migrations/
+prisma/generated/
 
 # ======================
 # Temporary & Local Files

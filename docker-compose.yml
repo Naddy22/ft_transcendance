@@ -31,11 +31,18 @@ services:
   #     - "8080:8080"
   #   depends_on:
   #     - backend
-  
+
   database:
-    image: "sqlite"
+    container_name: sqlite_db
+    image: alpine  # ✅ Using a minimal Linux image instead of a non-existent SQLite image
     volumes:
-      - sqlite_data:/database
+      - ./database/data.db:/database/data.db
+    command: ["tail", "-f", "/dev/null"]  # ✅ Keeps the container running
+  
+  # database:
+  #   image: "sqlite"
+  #   volumes:
+  #     - sqlite_data:/database
 
 volumes:
   sqlite_data:
