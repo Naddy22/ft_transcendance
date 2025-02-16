@@ -2,63 +2,100 @@
 # ======================
 # Node.js & Fastify
 # ======================
-node_modules/    # Dependencies installed via npm or yarn
-.dist/           # Compiled and minified files
-build/           # Build artifacts generated for deployment
+
+# Dependencies installed via npm or yarn
+node_modules/
+# Compiled and minified files
+dist/
+# Build artifacts generated for deployment
+build/
 
 # ======================
 # Environment Variables
 # ======================
-.env             # Environment variables file (contains secrets and API keys)
+
+# Environment variables file (contains secrets and API keys)
+.env
 
 # ======================
 # IDE and Editor Configs
 # ======================
-.vscode/         # VSCode editor settings and extensions
-.DS_Store        # macOS system file (not needed in repositories)
+
+# VSCode editor settings and extensions
+.vscode/
+# macOS system file (not needed in repositories)
+.DS_Store
 
 # ======================
 # Logs and Debugging
 # ======================
-logs/            # Logs folder for application logs
-npm-debug.log    # Log file generated when npm encounters an issue
-yarn-error.log   # Log file generated when yarn encounters an issue
+
+# Logs folder for application logs
+logs/
+# Log file generated when npm encounters an issue
+npm-debug.log
+# Log file generated when yarn encounters an issue
+yarn-error.log
 
 # ======================
 # SQLite Database
 # ======================
-sqlite_data/     # Folder for SQLite database storage
-*.sqlite         # SQLite database files
-*.sqlite3        # SQLite v3 database files
-*.db             # Generic database files
-*.db-wal         # Write-ahead log for SQLite databases
-*.db-shm         # Shared memory files for SQLite
+
+# Folder for SQLite database storage
+sqlite_data/
+# SQLite database files
+*.sqlite
+# SQLite v3 database files
+*.sqlite3
+# Generic database files
+*.db
+# Write-ahead log for SQLite databases
+*.db-wal
+# Shared memory files for SQLite
+*.db-shm
 
 # ======================
 # Docker
 # ======================
-.dockerignore                   # Docker ignore file (similar to .gitignore but for Docker)
-docker-compose.override.yml     # Local override for docker-compose setup
-**/docker-entrypoint-initdb.d/  # Init scripts for database setup in Docker
+
+# Docker ignore file (similar to .gitignore but for Docker)
+.dockerignore
+# Local override for docker-compose setup
+docker-compose.override.yml
+# Init scripts for database setup in Docker
+**/docker-entrypoint-initdb.d/
 
 # ======================
 # Tailwind CSS & Frontend Build
 # ======================
-.next/           # Next.js build directory
-out/             # Static export directory for Next.js
-*.cache/         # Caches generated for faster builds
-*.lock           # Lock files for package managers (yarn.lock, package-lock.json)
+
+# Next.js build directory
+.next/
+# Static export directory for Next.js
+out/
+# Caches generated for faster builds
+*.cache/
+# Lock files for package managers (yarn.lock, package-lock.json)
+*.lock
 
 # ======================
 # Babylon.js / WebGL Artifacts
 # ======================
-*.glb            # Binary GLTF files for 3D assets
-*.gltf           # GLTF 3D model files
-*.bin            # Binary files used with GLTF
-*.babylon        # Babylon.js-specific 3D model format
+
+# Binary GLTF files for 3D assets
+*.glb
+# GLTF 3D model files
+*.gltf
+# Binary files used with GLTF
+*.bin
+# Babylon.js-specific 3D model format
+*.babylon
 
 # ======================
 # Temporary & Local Files
 # ======================
-_local/          # Local folder for personal notes, tests, or temp files
-tmp*             # Temporary files (wildcard to match any file prefixed with tmp)
+
+# Local folder for personal notes, tests, or temp files
+_local/
+# Temporary files (wildcard to match any file prefixed with tmp)
+tmp*
