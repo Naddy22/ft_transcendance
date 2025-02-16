@@ -23,14 +23,14 @@ services:
     depends_on:
       - backend
   
-  game:
-    build:
-      context: .
-      dockerfile: docker/game.Dockerfile
-    ports:
-      - "8080:8080"
-    depends_on:
-      - backend
+  # game:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/game.Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   depends_on:
+  #     - backend
   
   database:
     image: "sqlite"

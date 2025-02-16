@@ -1,14 +1,20 @@
 
-import Fastify from 'fastify';
-import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes.js';
+// import Fastify from 'fastify';
+// import dotenv from 'dotenv';
+// import userRoutes from './routes/userRoutes.js';
+
+const Fastify = require('fastify');
+const dotenv = require('dotenv');
+const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 const app = Fastify({ logger: true });
 
-app.get('/', async (request, reply) => {
-	return { message: 'Backend is running!' };
-  });
+import { FastifyRequest, FastifyReply } from 'fastify';
+
+app.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
+    return { message: 'Backend is running!' };
+});
 
 app.register(userRoutes);
 

@@ -225,8 +225,10 @@ import userRoutes from './routes/userRoutes.js';
 dotenv.config();
 const app = Fastify({ logger: true });
 
-app.get('/', async (request, reply) => {
-  return { message: 'Backend is running!' };
+import { FastifyRequest, FastifyReply } from 'fastify';
+
+app.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
+    return { message: 'Backend is running!' };
 });
 
 app.register(userRoutes);
@@ -243,6 +245,8 @@ const start = async () => {
 
 start();
 ```
+- FastifyRequest → Represents an incoming HTTP request.
+- FastifyReply → Represents the response object.
 
 #### 3. Define Prisma Schema (`backend/prisma/schema.prisma`)
 ```prisma
@@ -433,16 +437,20 @@ It happens because **TypeScript is trying to use ES modules (`import ...`) in a 
 Let's fix it by updating/adding these settings in `backend/tsconfig.json`:
 ```json
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true
-  }
+	"compilerOptions": {
+	  "target": "ESNext",
+	  "module": "NodeNext",
+	  "moduleResolution": "NodeNext",
+	  "outDir": "dist",
+	  "rootDir": "src",
+	  "strict": true,
+	  "esModuleInterop": true,
+	  "skipLibCheck": true,
+	  "resolveJsonModule": true,
+	  "allowSyntheticDefaultImports": true
+	},
+	"include": ["src"],
+	"exclude": ["node_modules", "dist"]
 }
 ```
 And making sure `backend/package.json` has:
@@ -457,57 +465,67 @@ So our `package.json` should look like:
   "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node --esm src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --loader ts-node/esm src/server.ts",
     "start": "node dist/server.js",
     "build": "tsc"
   },
   "dependencies": {
-    "fastify": "^4.15.0",
-    "dotenv": "^16.0.3",
-    "@prisma/client": "^4.8.0",
-    "bcrypt": "^5.1.0",
-    "jsonwebtoken": "^9.0.0",
-    "cors": "^2.8.5"
+    "@prisma/client": "^6.3.1",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
-    "ts-node": "^10.9.1",
-    "@types/node": "^18.14.2",
-    "@types/jsonwebtoken": "^9.0.0",
-    "@types/bcrypt": "^5.0.0",
-    "prisma": "^4.8.0"
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/node": "^22.13.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
   }
 }
 ```
-And `backend/tsconfig.json` should have:
-```json
-{
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "outDir": "dist",
-    "rootDir": "src",
-    "strict": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true
-  }
-}
-```
+> - "dev": "ts-node src/server.ts",  // Runs TypeScript directly
+> - "start": "node dist/server.js",  // Runs compiled JavaScript version
+> - "build": "tsc"                   // Compiles TypeScript to JavaScript
 
 ##### Alternative Fix - Using CommonJS
 
-If you prefer **CommonJS** (instead of ES modules), \
-remove `"type": "module"` from `package.json` and update `backend/src/server.ts`:
+If you prefer **CommonJS** (instead of ES modules)
+- Remove `"type": "module"` from `package.json` or set it to `"type": "commonjs"`\
+- Fix imports in `backend/src/server.ts`:
 
 Replace:
 ```typescript
 import Fastify from 'fastify';
+import dotenv from 'dotenv';
+import userRoutes from './routes/userRoutes.js';
 ```
 With
 ```typescript
 const Fastify = require('fastify');
+const dotenv = require('dotenv');
+const userRoutes = require('./routes/userRoutes');
 ```
+> Remove `.js` from imports.
+
+- Update `backend/package.json scripts`\
+Modify `"dev"`:
+```json
+"scripts": {
+  "dev": "ts-node src/server.ts",
+  "start": "node dist/server.js",
+  "build": "tsc"
+}
+```
+> Remove --loader ts-node/esm because it's only for ES Modules.
+
+#### What Should You Do?
+- ✔ Want modern syntax? → Solution 1 (Use ES Modules)
+- ✔ Want an easier setup? → Solution 2 (Use CommonJS) (Recommended for Fastify)
+
 Then restart the backend.
 
 ---
