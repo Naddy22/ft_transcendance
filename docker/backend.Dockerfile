@@ -1,20 +1,30 @@
+
 FROM node:18-alpine
 
-# Set working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json and package-lock.json first, then install dependencies
 COPY backend/package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm install --only=production
-
-# Copy the backend source code
-COPY backend .
+# Copy Prisma schema before generating client
+COPY backend/prisma ./prisma
 RUN npx prisma generate
 
-# Expose port 3000 for Fastify
+# Now copy the rest of the app
+COPY backend ./
+
+# Ensure Prisma Client is in the correct location
+RUN ls -lah node_modules/.prisma && ls -lah node_modules/.prisma/client
+RUN cp -R node_modules/.prisma node_modules/@prisma
+
+# Build TypeScript
+RUN npm run build
+
+# Expose backend port
 EXPOSE 3000
 
-# Start the server
-CMD ["node", "server.js"]
+# Ensure Prisma Client is generated before running the server
+CMD ["sh", "-c", "npx prisma generate && node dist/server.js"]
+

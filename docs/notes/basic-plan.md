@@ -249,23 +249,75 @@ start();
 - FastifyReply → Represents the response object.
 
 #### 3. Define Prisma Schema (`backend/prisma/schema.prisma`)
-```prisma
+```Prisma
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/@prisma/client"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./database.db"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id       String  @id @default(uuid())
-  email    String  @unique
-  password String
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  avatar    String?
+  createdAt DateTime @default(now())
+
+  matchesAsPlayer1 Match[]                 @relation(name: "Player1Match") // ✅ Reference player1
+  matchesAsPlayer2 Match[]                 @relation(name: "Player2Match") // ✅ Reference player2
+  tournaments      TournamentParticipant[]
+}
+
+model Match {
+  id String @id @default(uuid())
+
+  player1   User   @relation(name: "Player1Match", fields: [player1Id], references: [id])
+  player1Id String
+
+  player2   User   @relation(name: "Player2Match", fields: [player2Id], references: [id])
+  player2Id String
+
+  winnerId  String?
   createdAt DateTime @default(now())
 }
+
+model Tournament {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  participants TournamentParticipant[]
+}
+
+model TournamentParticipant {
+  id           String     @id @default(uuid())
+  userId       String
+  tournamentId String
+  user         User       @relation(fields: [userId], references: [id])
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+}
 ```
+From inside the `backend/` directory,
+- 1️⃣ Update prisma/schema.prisma with the changes above.
+- 2️⃣ Format the schema to check for errors:
+```bash
+npx prisma format
+```
+Run the migrations:
+```bash
+npx prisma migrate dev --name init
+```
+Verify everithing in Prisma Studio
+```bash
+npx prisma studio
+```
+You should be able to see both User and Match tables correctly!
+
 
 #### 4. Run Prisma Migrations
 ```sh
@@ -352,7 +404,7 @@ npm install --save-dev ts-node @types/node
 ##### Suggested current content for `backend/.env`
 ```bash
 # Database Configuration
-DATABASE_URL="file:./prisma/database.db"  # Path to the SQLite database file
+DATABASE_URL="file:../database/data.db"  # Path to the SQLite database file
 
 # Authentication
 JWT_SECRET="your_super_secret_key"  # Change this to a strong secret for JWT
@@ -371,7 +423,7 @@ CORS_ORIGIN="http://localhost:5173"  # Frontend URL during development
 ```prisma
 datasource db {
   provider = "sqlite"
-  url      = "file:./database.db"
+  url      = env("DATABASE_URL")
 }
 ```
 
@@ -390,7 +442,7 @@ datasource db {
 ```makefile
 # Define multi-line variable for the .env content
 define ENV_CONTENT
-DATABASE_URL="file:./prisma/database.db"
+DATABASE_URL="file:../database/data.db"
 JWT_SECRET="your_super_secret_key"
 PORT=3000
 CORS_ORIGIN="http://localhost:5173"

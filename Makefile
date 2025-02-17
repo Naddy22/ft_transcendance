@@ -35,6 +35,15 @@ include $(MK_PATH)/env.mk		# .env File Management
 ##@ 🛠  Utility
 # ==============================
 
+# # When lagging **
+# sudo pkill -9 node
+# docker stop $(docker ps -aq)
+# docker system prune -af --volumes
+
+
+# sudo lsof -i :3000  # Find any process using port 3000
+# sudo kill -9 <PID>  # Replace <PID> with the actual process ID
+
 help: ## Display available targets
 	@echo "\nAvailable targets:"
 	@awk 'BEGIN {FS = ":.*##";} \
@@ -49,16 +58,25 @@ repo: ## Open the GitHub repository
 	@$(call INFO,$(NAME),Opening $(AUTHOR)'s github repo...)
 	@open $(REPO_LINK);
 
-.PHONY: help repo
+tree: ## Show file structure (without node_modules/)
+	@ tree -I "node_modules"
+
+.PHONY: help repo tree
 
 # ==============================
 ##@ 🐳 Docker
 # ==============================
 
-all: build up ## Build and start containers
+# docker volume rm ft_transcendence_sqlite_data
+# docker logs ft_transcendence-backend-1 --tail 50
+
+all: env build up ## Build and start containers
 
 build: ## Build Docker Containers
 	$(DOCKER_COMPOSE) build
+
+build-no-cache: ## Build Docker Containers
+	$(DOCKER_COMPOSE) build --no-cache
 
 up: ## Start containers in detached mode
 	$(DOCKER_COMPOSE) up -d
@@ -69,7 +87,7 @@ down: ## Stop and Remove Containers
 logs: ## Show logs
 	$(DOCKER_COMPOSE) logs -f
 
-.PHONY: all build up down logs
+.PHONY: all build build-no-cache up down logs
 
 # ==============================
 ##@ 🧹 Cleanup
@@ -85,7 +103,7 @@ ffclean: fclean ## Remove all generated files and folders
 	@$(MAKE) pdf-clean $(NPD)
 	@$(MAKE) env-clean $(NPD)
 
-re: down build up ## Restart all services
+re: down build-no-cache up ## Restart all services
 
 .PHONY: clean fclean ffclean re
 

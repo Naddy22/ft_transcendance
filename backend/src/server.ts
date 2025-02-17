@@ -1,29 +1,39 @@
 
-// import Fastify from 'fastify';
-// import dotenv from 'dotenv';
-// import userRoutes from './routes/userRoutes.js';
-
-const Fastify = require('fastify');
-const dotenv = require('dotenv');
-const userRoutes = require('./routes/userRoutes');
+import Fastify, { FastifyRequest, FastifyReply } from "fastify";
+import dotenv from "dotenv";
+import userRoutes from "./routes/userRoutes";
+import { PrismaClient } from "@prisma/client";
 
 dotenv.config();
 const app = Fastify({ logger: true });
+const prisma = new PrismaClient();
 
-import { FastifyRequest, FastifyReply } from 'fastify';
+// ✅ Register Fastify plugins
+app.register(require("@fastify/cors"), { origin: "*" });
+app.register(require("@fastify/formbody"));
 
-app.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
-    return { message: 'Backend is running!' };
+/**
+ * Root route
+ */
+app.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
+  return { message: "Backend is running!" };
 });
 
-app.register(userRoutes);
+// ✅ Global error handler to catch Prisma & Fastify errors
+app.setErrorHandler((error, request, reply) => {
+  console.error("❌ Server Error:", error);
+  reply.status(500).send({ error: "Internal server error" });
+});
+
+// ✅ Register Routes
+userRoutes(app);
 
 const start = async () => {
   try {
-    await app.listen({ port: 3000, host: '0.0.0.0' });
-    console.log(`Server running on http://localhost:3000`);
+    await app.listen({ port: 3000, host: "0.0.0.0" });
+    console.log(`✅ Server running on http://localhost:3000`);
   } catch (err) {
-    app.log.error(err);
+    app.log.error("❌ Failed to start server:", err);
     process.exit(1);
   }
 };

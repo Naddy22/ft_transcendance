@@ -5,7 +5,7 @@ ENV_FILE = backend/.env
 # Define multi-line variable for the .env content
 define ENV_CONTENT
 ## Database Configuration
-DATABASE_URL="file:./prisma/database.db"
+DATABASE_URL="file:/database/data.db"
 # (Path to the SQLite database file)
 
 # Authentication
@@ -27,19 +27,23 @@ export ENV_CONTENT
 ##@ .env Automation
 # ==============================
 
+env:
+	@echo "$$ENV_CONTENT" > $(ENV_FILE)
+	@echo "$(ENV_FILE) $(GREEN)Generated!$(RESET)" 
+
 env-create: ## Generate the .env file at backend/.env
 	@if [ ! -f $(ENV_FILE) ]; then \
-		echo "Creating $(ENV_FILE) file..."; \
+		echo "$(YELLOW)Creating $(RESET)$(ENV_FILE) $(YELLOW)file...$(RESET)"; \
 		echo "$$ENV_CONTENT" > $(ENV_FILE); \
-		echo ".env file created at $(ENV_FILE)!"; \
+		echo "$(GREEN).env file created at$(RESET) $(ENV_FILE)!"; \
 	else \
-		read -p "$(ENV_FILE) already exists. Overwrite? [Y/n]: " confirm; \
+		read -p "$(ENV_FILE) $(ORANGE)already exists.$(RESET) Overwrite? [Y/n]: " confirm; \
 		if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ] || [ -z "$$confirm" ]; then \
-			echo "Overwriting $(ENV_FILE)..."; \
+			echo "$(YELLOW)Overwriting$(RESET) $(ENV_FILE)$(ORANGE)...$(RESET)"; \
 			echo "$$ENV_CONTENT" > $(ENV_FILE); \
-			echo ".env file overwritten!"; \
+			echo ".env $(GREEN)file overwritten!$(RESET)"; \
 		else \
-			echo "Keeping existing .env file."; \
+			echo "$(GREEN)Keeping existing .env file.$(RESET)"; \
 		fi \
 	fi
 
@@ -48,4 +52,4 @@ env-clean: ## Remove .env file
 
 env-reset: env-clean env-create ## Overwrite .env file
 
-.PHONY: env-create env-clean env-reset
+.PHONY: env env-create env-clean env-reset
