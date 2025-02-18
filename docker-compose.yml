@@ -1,130 +1,51 @@
 
 version: "3.8"
 
+volumes:
+  sqlite_data:
+  backend_database:
+
+networks:
+  ft_transcendence-network:  # Custom internal network
+
 services:
+
   backend:
-    image: ft_transcendence-backend
-    restart: unless-stopped  # ✅ Automatically restart if it crashes
+    container_name: ft_transcendence-backend
+    image: ft_transcendence-backend:latest
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
+    restart: unless-stopped
     ports:
       - "3000:3000"
-      - "5555:5555"  # ✅ To expose Prisma Studio
+      - "5555:5555" # Prisma Studio
     env_file:
       - backend/.env
     volumes:
-      - ./backend/database:/database  # ✅ Ensures SQLite DB persists
-      - ./backend/prisma:/app/prisma  # ✅ Ensures Prisma schema is accessible
-      - ./backend/node_modules:/app/node_modules  # ✅ Prevents redundant reinstallations
-    depends_on:
-      - database
-    command: ["sh", "-c", "npx prisma generate && node dist/server.js"]
-
+        - sqlite_data:/database
+        - ./backend/prisma:/app/prisma  # Prisma schema available
+    networks:
+      - ft_transcendence-network
+    entrypoint: ["/app/entrypoint.sh"] # Uses script to handle DB migrations
+    healthcheck:
+      test: ["CMD", "sh", "-c", "/app/healthcheck.sh"]
+      interval: 10s
+      retries: 5
+  
   frontend:
+    container_name: ft_transcendence-frontend
+    image: ft_transcendence-frontend:latest
     build:
       context: .
       dockerfile: docker/frontend.Dockerfile
-    ports:
-      - "5000:5000"
     depends_on:
       - backend
-    command: ["npx", "serve", "-s", "dist", "-l", "5000"]
-
-  database:
-    image: alpine  # ✅ Minimal base image
-    command: sh -c "mkdir -p /database && touch /database/data.db"
+      # backend:
+      #   condition: service_healthy  # Wait until backend is ready
+    ports:
+      - "5000:80" # Serve frontend on port 5000 via Nginx
+    networks:
+      - ft_transcendence-network
     volumes:
-      - ./backend/database:/database  # ✅ Ensures the database is shared with backend
-
-volumes:
-  sqlite_data:
-
-# services:
-
-#   backend:
-#     image: ft_transcendence-backend
-#     restart: unless-stopped  # Automatically restart on failure
-#     build:
-#       context: .
-#       dockerfile: docker/backend.Dockerfile
-#     ports:
-#       - "3000:3000"
-#       - "5555:5555"  # To expose Prisma Studio
-#     env_file:
-#       - backend/.env
-#     volumes:
-#       - ./backend/database:/database
-#       # - ./database:/app/database  # ✅ Ensures SQLite DB is properly mounted
-#       - ./backend/prisma:/app/prisma  # ✅ Ensures Prisma schema is accessible
-#       - ./backend/node_modules:/app/node_modules  # ✅ Prevents reinstallation of node_modules
-
-#     depends_on:
-#       - database
-#     # command: ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node dist/server.js"]
-#     command: ["sh", "-c", "npx prisma generate && node dist/server.js"]
-
-
-#   frontend:
-#     build:
-#       context: .
-#       dockerfile: docker/frontend.Dockerfile
-#     ports:
-#       - "5000:5000"
-#     depends_on:
-#       - backend
-#     command: ["npx", "serve", "-s", "dist", "-l", "5000"]
-  
-#   database:
-#     image: alpine  # ✅ Minimal image to ensure volume exists
-#     command: sh -c "mkdir -p /database && touch /database/data.db"
-#     volumes:
-#       - ./database:/database
-
-# volumes:
-#   sqlite_data:
-
-    # command: >
-    #   sh -c "
-    #     npx prisma generate &&
-    #     npx prisma migrate deploy &&
-    #     node dist/server.js
-    #   "
-
-# services:
-#   backend:
-#     networks:
-#       - ft_transcendence_network
-
-#   frontend:
-#     networks:
-#       - ft_transcendence_network
-
-# networks:
-#   ft_transcendence_network:
-#     driver: bridge
-
-
-  # game:
-  #   build:
-  #     context: .
-  #     dockerfile: docker/game.Dockerfile
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     - backend
-
-# services:
-#   backend:
-#     build:
-#       context: ..
-#       dockerfile: docker/Dockerfile.backend
-#     ports:
-#       - "3000:3000"
-#     volumes:
-#       - ../backend:/app
-#     command: ["sh", "-c", "npx prisma migrate deploy && node server.js"]
-#     environment:
-#       - NODE_ENV=development
-#       - DATABASE_URL=file:/app/database.sqlite
-#       - JWT_SECRET=supersecret  # 🔐 Change this for production!
+    - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro # Mount custom Nginx config

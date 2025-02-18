@@ -1,19 +1,16 @@
-FROM node:18-alpine
-
+# First stage: Build
+FROM node:18-alpine AS build
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY frontend/package*.json ./
-
-# Install dependencies
-RUN npm install --only=production
-
-# Copy the frontend source code
-COPY frontend .
-
-# Build the TypeScript project
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend ./
 RUN npm run build
 
-EXPOSE 5173
+# Second stage: Serve optimized files
+FROM nginx:alpine AS production
+WORKDIR /usr/share/nginx/html
+COPY --from=build /app/dist ./
 
-CMD ["npm", "run", "preview"]
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

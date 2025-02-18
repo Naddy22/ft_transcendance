@@ -1,17 +1,130 @@
 
-# 🐳
+# # When lagging **
+# sudo pkill -9 node
+# docker stop $(docker ps -aq)
+# docker system prune -af --volumes
 
-# Docker-Related Variables
+
+# sudo lsof -i :3000  # Find any process using port 3000
+# sudo kill -9 <PID>  # Replace <PID> with the actual process ID
+
+
+# docker volume rm ft_transcendence_sqlite_data
+# docker logs ft_transcendence-backend-1 --tail 50
+
+# ==============================
+# 🐳 Docker Helper Makefile
+# ==============================
+
+# Configurable Project Variables
+PROJECT_NAME         := ft_transcendence
+BACKEND_CONTAINER    := $(PROJECT_NAME)-backend-1
+FRONTEND_CONTAINER   := $(PROJECT_NAME)-frontend-1
+DATABASE_CONTAINER   := $(PROJECT_NAME)-database-1
+
+# Docker Compose Files
 COMPOSE_FILE		:= docker-compose.yml
-COMPOSE_DEV_FILE	:= docker-compose.dev.yml
-COMPOSE_PROD_FILE	:= docker-compose.prod.yml
 DOCKER_COMPOSE		:= docker-compose -f $(COMPOSE_FILE)
-DOCKER_COMPOSE_DEV	:= docker-compose -f $(COMPOSE_DEV_FILE)
-DOCKER_COMPOSE_PROD	:= docker-compose -f $(COMPOSE_PROD_FILE)
 
 # Docker Commands
 DOCKER_CLEAN		:= $(DOCKER_COMPOSE) down --volumes --remove-orphans
 DOCKER_PRUNE		:= docker system prune -a -f
+
+# ==============================
+##@ 🐳  Docker Build & Run
+# ==============================
+
+build: ## Build all containers
+	$(DOCKER_COMPOSE) build
+
+build-no-cache: ## Build all containers without cache
+	$(DOCKER_COMPOSE) build --no-cache
+
+up: ## Start containers in detached mode
+	$(DOCKER_COMPOSE) up -d
+
+down: ## Stop and remove containers
+	$(DOCKER_COMPOSE) down
+
+restart: ## Restart all services
+	$(DOCKER_COMPOSE) down && $(DOCKER_COMPOSE) up -d --build
+
+logs: ## Show logs for all services
+	$(DOCKER_COMPOSE) logs -f
+
+.PHONY: build build-no-cache up down restart logs
+
+# ==============================
+##@ 🛠️  Container Management
+# ==============================
+
+exec-backend: ## Access backend container shell
+	docker exec -it $(BACKEND_CONTAINER) sh
+
+exec-frontend: ## Access frontend container shell
+	docker exec -it $(FRONTEND_CONTAINER) sh
+
+exec-db: ## Access database container shell
+	docker exec -it $(DATABASE_CONTAINER) sh
+
+restart-backend: ## Restart backend container
+	docker restart $(BACKEND_CONTAINER)
+
+restart-frontend: ## Restart frontend container
+	docker restart $(FRONTEND_CONTAINER)
+
+restart-db: ## Restart database container
+	docker restart $(DATABASE_CONTAINER)
+
+stop-all: ## Stop all running containers
+	docker stop $$(docker ps -q)
+
+.PHONY: exec-backend exec-frontend exec-db restart-backend restart-frontend restart-db stop-all
+
+# ==============================
+##@ 📜 Logs & Debugging
+# ==============================
+
+logs-backend: ## Show logs for backend
+	docker logs $(BACKEND_CONTAINER)
+
+logs-backend-short: ## Show last 50 lines of backend logs
+	docker logs --tail 50 $(BACKEND_CONTAINER)
+
+logs-frontend: ## Show logs for frontend
+	docker logs $(FRONTEND_CONTAINER)
+
+logs-db: ## Show logs for database
+	docker logs $(DATABASE_CONTAINER)
+
+.PHONY: logs-backend logs-backend-short logs-frontend logs-db
+
+# ==============================
+##@ 🔍 Troubleshooting & Cleanup
+# ==============================
+
+docker-cleanup: ## Remove unused Docker data
+	$(DOCKER_CLEAN)
+	$(DOCKER_PRUNE)
+
+kill-node: ## Kill all Node.js processes
+	pkill -9 node || true
+
+check-port: ## Check if a port is in use
+	@if lsof -i :$(PORT); then \
+		echo "Port $(PORT) is in use"; \
+	else \
+		echo "Port $(PORT) is available"; \
+	fi
+
+kill-port: ## Kill process on a specific port
+	@if lsof -ti :$(PORT) | xargs kill -9; then \
+		echo "Killed process using port $(PORT)"; \
+	else \
+		echo "No process found on port $(PORT)"; \
+	fi
+
+.PHONY: docker-cleanup kill-node check-port kill-port
 
 # ==============================
 # Docker Related Utility Macros

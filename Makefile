@@ -35,15 +35,6 @@ include $(MK_PATH)/env.mk		# .env File Management
 ##@ 🛠  Utility
 # ==============================
 
-# # When lagging **
-# sudo pkill -9 node
-# docker stop $(docker ps -aq)
-# docker system prune -af --volumes
-
-
-# sudo lsof -i :3000  # Find any process using port 3000
-# sudo kill -9 <PID>  # Replace <PID> with the actual process ID
-
 help: ## Display available targets
 	@echo "\nAvailable targets:"
 	@awk 'BEGIN {FS = ":.*##";} \
@@ -64,38 +55,18 @@ tree: ## Show file structure (without node_modules/)
 .PHONY: help repo tree
 
 # ==============================
-##@ 🐳 Docker
+##@ 🎯 Main Targets
 # ==============================
-
-# docker volume rm ft_transcendence_sqlite_data
-# docker logs ft_transcendence-backend-1 --tail 50
 
 all: env build up ## Build and start containers
 
-build: ## Build Docker Containers
-	$(DOCKER_COMPOSE) build
-
-build-no-cache: ## Build Docker Containers
-	$(DOCKER_COMPOSE) build --no-cache
-
-up: ## Start containers in detached mode
-	$(DOCKER_COMPOSE) up -d
-
-down: ## Stop and Remove Containers
-	$(DOCKER_COMPOSE) down
-
-logs: ## Show logs
-	$(DOCKER_COMPOSE) logs -f
-
-.PHONY: all build build-no-cache up down logs
+.PHONY: all # build build-no-cache up down logs
 
 # ==============================
 ##@ 🧹 Cleanup
 # ==============================
 
-clean: ## Remove all containers, images, volumes
-	$(DOCKER_CLEAN)
-	$(DOCKER_PRUNE)
+clean: docker-cleanup ## Remove all containers, images, volumes
 
 fclean: clean ## Full Clean (currently same as `clean`)
 

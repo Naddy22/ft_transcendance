@@ -1,30 +1,33 @@
 
 FROM node:18-alpine
-
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first, then install dependencies
-COPY backend/package*.json ./
-RUN npm install
+# Install dependencies first for better caching
+COPY backend/package.json backend/package-lock.json ./
+RUN npm ci --only=production
 
-# Copy Prisma schema before generating client
+# Copy Prisma files and generate client
 COPY backend/prisma ./prisma
 RUN npx prisma generate
 
-# Now copy the rest of the app
+# Copy the rest of the application
 COPY backend ./
 
-# Ensure Prisma Client is in the correct location
-RUN ls -lah node_modules/.prisma && ls -lah node_modules/.prisma/client
-RUN cp -R node_modules/.prisma node_modules/@prisma
+# Copy necessary startup scripts
+COPY docker/entrypoint.sh /app/entrypoint.sh
+COPY docker/healthcheck.sh /app/healthcheck.sh
 
-# Build TypeScript
+# Ensure scripts are executable
+RUN chmod +x /app/entrypoint.sh /app/healthcheck.sh
+
 RUN npm run build
 
-# Expose backend port
+# Expose API port
 EXPOSE 3000
+# EXPOSE 5555
 
-# Ensure Prisma Client is generated before running the server
-CMD ["sh", "-c", "npx prisma generate && node dist/server.js"]
+# Use entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
 
+# # Start Fastify server
+# CMD ["node", "dist/server.js"]

@@ -28,10 +28,12 @@ export ENV_CONTENT
 # ==============================
 
 env:
-	@echo "$$ENV_CONTENT" > $(ENV_FILE)
-	@echo "$(ENV_FILE) $(GREEN)Generated!$(RESET)" 
+	@if [ ! -f $(ENV_FILE) ]; then \
+		echo "$$ENV_CONTENT" > $(ENV_FILE); \
+		echo "$(ENV_FILE) $(GREEN)Generated!$(RESET)"; \
+	fi
 
-env-create: ## Generate the .env file at backend/.env
+env-create: ## Generate the .env with prompt for overwrite
 	@if [ ! -f $(ENV_FILE) ]; then \
 		echo "$(YELLOW)Creating $(RESET)$(ENV_FILE) $(YELLOW)file...$(RESET)"; \
 		echo "$$ENV_CONTENT" > $(ENV_FILE); \
