@@ -26,8 +26,8 @@ export class Ball3D {
 
 		// Initialise la vélocité (pour la direction du mouvement)
 		this.dx = Math.random() < 0.5 ? 0.1 : -0.1;
-		this.dx = 0.1;
-		this.dy = 0.1;
+		// this.dx = 0.1;
+		this.dy = 0;
 	}
 
 	update(sceneHeight: number, leftPaddle: any, rightPaddle: any): void {
@@ -37,28 +37,60 @@ export class Ball3D {
 		
 		// Gestion du rebond sur le haut et le bas de la zone de jeu
 		const halfHeight = sceneHeight / 2;
-		if (this.mesh.position.y - this.radius <= -halfHeight -1.5 || this.mesh.position.y + this.radius >= halfHeight + 1.5) {
+		if (this.mesh.position.y - this.radius <= -halfHeight || this.mesh.position.y + this.radius >= halfHeight) {
 		  this.dy *= -1;
 		}
 		
 		// Collision avec la raquette gauche (lorsque la balle se déplace vers la gauche)
+		// if (this.dx < 0) {
+		// 	// Calcul du bord droit de la raquette gauche
+		// 	const leftPaddleRightEdge = leftPaddle.mesh.position.x + leftPaddle.width / 2;
+		// 	if (this.mesh.position.x - this.radius <= leftPaddleRightEdge) {
+		// 		// Vérifier si la balle est dans la plage verticale de la raquette
+		// 		const paddleTop = leftPaddle.mesh.position.y + leftPaddle.height / 2;
+		// 		const paddleBottom = leftPaddle.mesh.position.y - leftPaddle.height / 2;
+		// 		if (this.mesh.position.y <= paddleTop && this.mesh.position.y >= paddleBottom) {
+		// 			// Collision détectée : inverser la direction horizontale
+		// 			this.dx *= -1;
+		// 			// Ajuster la position pour éviter que la balle ne reste "collée" à la raquette
+		// 			this.mesh.position.x = leftPaddleRightEdge + this.radius;
+		// 		}
+		// 	}
+		// }
+
 		if (this.dx < 0) {
-			// Calcul du bord droit de la raquette gauche
 			const leftPaddleRightEdge = leftPaddle.mesh.position.x + leftPaddle.width / 2;
 			if (this.mesh.position.x - this.radius <= leftPaddleRightEdge) {
-				// Vérifier si la balle est dans la plage verticale de la raquette
 				const paddleTop = leftPaddle.mesh.position.y + leftPaddle.height / 2;
 				const paddleBottom = leftPaddle.mesh.position.y - leftPaddle.height / 2;
 				if (this.mesh.position.y <= paddleTop && this.mesh.position.y >= paddleBottom) {
-					// Collision détectée : inverser la direction horizontale
+					let angle = (this.mesh.position.y - leftPaddle.mesh.position.y) / (leftPaddle.height / 2);
+					this.dy = angle * 0.1;
 					this.dx *= -1;
-					// Ajuster la position pour éviter que la balle ne reste "collée" à la raquette
 					this.mesh.position.x = leftPaddleRightEdge + this.radius;
+					// // Normalisation de la vitesse
+					// const currentSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+					// const desiredSpeed = 0.15;
+					// this.dx = (this.dx / currentSpeed) * desiredSpeed;
+					// this.dy = (this.dy / currentSpeed) * desiredSpeed;
 				}
 			}
 		}
 
 		// Collision avec la raquette droite (lorsque la balle se déplace vers la droite)
+		// if (this.dx > 0) {
+		// 	// Calcul du bord gauche de la raquette droite
+		// 	const rightPaddleLeftEdge = rightPaddle.mesh.position.x - rightPaddle.width / 2;
+		// 	if (this.mesh.position.x + this.radius >= rightPaddleLeftEdge) {
+		// 		const paddleTop = rightPaddle.mesh.position.y + rightPaddle.height / 2;
+		// 		const paddleBottom = rightPaddle.mesh.position.y - rightPaddle.height / 2;
+		// 		if (this.mesh.position.y <= paddleTop && this.mesh.position.y >= paddleBottom) {
+		// 			this.dx *= -1;
+		// 			this.mesh.position.x = rightPaddleLeftEdge - this.radius;
+		// 		}
+		// 	}
+		// }
+
 		if (this.dx > 0) {
 			// Calcul du bord gauche de la raquette droite
 			const rightPaddleLeftEdge = rightPaddle.mesh.position.x - rightPaddle.width / 2;
@@ -66,20 +98,34 @@ export class Ball3D {
 				const paddleTop = rightPaddle.mesh.position.y + rightPaddle.height / 2;
 				const paddleBottom = rightPaddle.mesh.position.y - rightPaddle.height / 2;
 				if (this.mesh.position.y <= paddleTop && this.mesh.position.y >= paddleBottom) {
+					// Calcul de l'angle en fonction de l'endroit où la balle touche la raquette
+					let angle = (this.mesh.position.y - rightPaddle.mesh.position.y) / (rightPaddle.height / 2);
+					this.dy = angle * 0.1;  // Ajuster la vitesse verticale
 					this.dx *= -1;
+					 // Repositionner la balle pour éviter qu'elle ne reste collée
 					this.mesh.position.x = rightPaddleLeftEdge - this.radius;
+					// // Normalisation de la vitesse :
+					// const currentSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+					// const desiredSpeed = 0.15; // par exemple, la vitesse constante souhaitée
+					// this.dx = (this.dx / currentSpeed) * desiredSpeed;
+					// this.dy = (this.dy / currentSpeed) * desiredSpeed;
 				}
 			}
 		}
+		// Accélération progressive : augmenter légèrement la vitesse à chaque frame
+		const acceleration = 1.0005;  // augmente la vitesse de 0.1% par frame
+		this.dx *= acceleration;
+		this.dy *= acceleration;
+
 		
 	}
 
 	reset(rightServes: boolean) {
 		this.mesh.position.x = this.centerX;
 		this.mesh.position.y = this.centerY;
+		this.dy = 0;
 		// Si le joueur de droite a la main, la balle repart vers la gauche (dx négatif)
-		this.dx = rightServes ? -0.2 : 0.2;
-		this.dy = 0.2;
+		this.dx = rightServes ? -0.1 : 0.1;
 	}
 }
 
