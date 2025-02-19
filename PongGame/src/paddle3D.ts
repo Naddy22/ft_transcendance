@@ -19,19 +19,16 @@ export class Paddle3D {
 	 */
 	constructor(
 	scene: BABYLON.Scene,
-	width: number,
-	height: number,
-	depth: number,
 	x: number,
 	y: number
 	) {
-		this.width = width;
-		this.height = height;
-		this.depth = depth;
-		this.dy = 0.3; // Vitesse de déplacement (en unités par frame ou par update)
+		this.width = 0.33; //largeur
+		this.height = 3.33; // hauteur
+		this.depth = 0.5; // profondeur pour rester fin
+		this.dy = 0.2; // Vitesse de déplacement (en unités par frame ou par update)
 		this.movingUp = false;
 		this.movingDown = false;
-		this.initialY = y; // On sauvegarde la position initiale
+		this.initialY = y; // On sauvegarde la position initiale (centré)
 
 		// Crée le paddle comme une boîte
 		this.mesh = BABYLON.MeshBuilder.CreateBox("paddle", { width: this.width, height: this.height, depth: this.depth }, scene);
@@ -46,11 +43,11 @@ export class Paddle3D {
 		const lowerLimit = -halfSceneHeight + (this.height / 2);
 		
 		// Si le paddle doit se déplacer vers le haut et qu'il ne dépasse pas le bord supérieur
-		if (this.movingUp && (this.mesh.position.y + this.height / 2 < halfSceneHeight + 1.5)) {
+		if (this.movingUp && (this.mesh.position.y + this.height / 2 < halfSceneHeight)) {
 			this.mesh.position.y += this.dy;
 		}
 		// Si le paddle doit se déplacer vers le bas et qu'il ne dépasse pas le bord inférieur
-		if (this.movingDown && (this.mesh.position.y - this.height / 2 > -halfSceneHeight - 1.5)) {
+		if (this.movingDown && (this.mesh.position.y - this.height / 2 > -halfSceneHeight)) {
 			this.mesh.position.y -= this.dy;
 		}
 	}

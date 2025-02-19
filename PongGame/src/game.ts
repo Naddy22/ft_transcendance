@@ -31,7 +31,6 @@ export function startPongGame(): void {
 			rightPlayerNameElement.innerText = rightPlayer.name;
 		}
 	}
-
 	updatePlayerNames();
 
 	// Fonction pour dessiner tout le jeu
@@ -71,7 +70,6 @@ export function startPongGame(): void {
 			rightPaddle.reset(canvas.height / 2 - rightPaddle.height / 2);
 			ball.reset(false);  // Le joueur droit sert
 		}
-		
 		leftPaddle.update(canvas.height);
 		rightPaddle.update(canvas.height);
 	}
@@ -169,7 +167,6 @@ export function startPongGame(): void {
 }
 
 export function stopPongGame(): void {
-	console.log('stopPongGame appelé, gameLoopId:', gameLoopId);
 	if (gameLoopId !== null) {
 		cancelAnimationFrame(gameLoopId); // Stoppe la boucle en cours
 	}
