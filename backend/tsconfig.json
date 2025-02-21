@@ -1,55 +1,39 @@
 
-/* Using CommonJs */
+/* Using ES Modules */
 {
-	"compilerOptions": {
-	  "target": "ESNext",              // Supports the latest JavaScript features
-	  "module": "CommonJS",            // Use CommonJS (require/module.exports)
-	  "moduleResolution": "Node",       // Standard Node.js resolution
-	  "outDir": "dist",                 // Compiled output directory
-	  "rootDir": "src",                 // Source files directory
-	  "strict": true,                    // Enable strict type-checking
-	  "esModuleInterop": true,           // Allow compatibility with ES modules
-	  "skipLibCheck": true,              // Skip type definition checks for speed
-	  "resolveJsonModule": true,         // Enable importing JSON files
-	  "allowSyntheticDefaultImports": true
-	},
-	"include": ["src"],                   // Only compile `src/` folder
-	"exclude": ["node_modules", "dist"]    // Ignore `node_modules` and `dist/`
+    "compilerOptions": {
+	  "module": "NodeNext",             // Enables ESM support
+      "moduleResolution": "NodeNext",   // Resolves imports using ESM rules
+      "target": "ESNext",               // Supports the latest JavaScript features
+      "outDir": "dist",                 // Compiled output directory
+      "rootDir": "src",                 // Source files directory
+      "strict": true,                   // Enable strict type-checking
+      "esModuleInterop": true,          // Ensures compatibility with ESM packages
+      "skipLibCheck": true,             // Speeds up compilation
+      "resolveJsonModule": true,        // Enables JSON imports
+      "allowSyntheticDefaultImports": true
+    },
+    "include": ["src"],                 // Only compile `src/` folder
+    "exclude": ["node_modules", "dist"]	// Ignore `node_modules` and `dist/`
 }
 
+/* Using CommonJs */
 // {
 // 	"compilerOptions": {
-// 	  "module": "CommonJS",
-// 	  "target": "ESNext",
-// 	  "rootDir": "src",
-// 	  "outDir": "dist",
-// 	  "moduleResolution": "Node",
-// 	  "esModuleInterop": true,
-// 	  "strict": true
-// 	},
-// 	"include": ["src"],
-// 	"exclude": ["node_modules", "dist"]
-// }
-  
-
-// /* Using ES Modules */
-// {
-// 	"compilerOptions": {
-// 	  "target": "ESNext",
-// 	  "module": "NodeNext",
-// 	  "moduleResolution": "NodeNext",
-// 	  "outDir": "dist",
-// 	  "rootDir": "src",
-// 	  "strict": true,
-// 	  "esModuleInterop": true,
-// 	  "skipLibCheck": true,
-// 	  "resolveJsonModule": true,
+// 	  "target": "ESNext",               // Supports the latest JavaScript features
+// 	  "module": "CommonJS",             // Use CommonJS (require/module.exports)
+// 	  "moduleResolution": "Node",       // Standard Node.js resolution
+// 	  "outDir": "dist",                 // Compiled output directory
+// 	  "rootDir": "src",                 // Source files directory
+// 	  "strict": true,                   // Enable strict type-checking
+// 	  "esModuleInterop": true,          // Allow compatibility with ES modules
+// 	  "skipLibCheck": true,             // Skip type definition checks for speed
+// 	  "resolveJsonModule": true,        // Enable importing JSON files
 // 	  "allowSyntheticDefaultImports": true
 // 	},
-// 	"include": ["src"],
-// 	"exclude": ["node_modules", "dist"]
+// 	"include": ["src"],                 // Only compile `src/` folder
+// 	"exclude": ["node_modules", "dist"]	// Ignore `node_modules` and `dist/`
 // }
-
 
 // {
 //   "compilerOptions": {

@@ -49,6 +49,8 @@ database/
 *.sqlite3
 # Generic database files
 *.db
+# Generic database journal
+*.db-journal
 # Write-ahead log for SQLite databases
 *.db-wal
 # Shared memory files for SQLite

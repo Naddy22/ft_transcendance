@@ -30,6 +30,9 @@ DOCKER_COMPOSE		:= docker-compose -f $(COMPOSE_FILE)
 DOCKER_CLEAN		:= $(DOCKER_COMPOSE) down --volumes --remove-orphans
 DOCKER_PRUNE		:= docker system prune -a -f
 
+# docker-compose down --rmi all --volumes --remove-orphans
+
+
 # ==============================
 ##@ 🐳  Docker Build & Run
 # ==============================

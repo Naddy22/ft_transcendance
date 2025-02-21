@@ -1,8 +1,7 @@
 #!/bin/sh
-set -e  # Exit immediately if a command fails
+set -e  # Exit on error
 
-echo "🚀 Running Prisma setup..."
-npx prisma generate
+echo "🚀 Running Prisma Migrations..."
 npx prisma migrate deploy  # Ensures database is up-to-date
 
 echo "✅ Starting Fastify server..."

@@ -55,3 +55,35 @@ env-clean: ## Remove .env file
 env-reset: env-clean env-create ## Overwrite .env file
 
 .PHONY: env env-create env-clean env-reset
+
+# ==============================
+# ==============================
+
+# # Backend
+# BACKEND_PORT=3000
+# DB_PATH=/database/sqlite.db
+
+# # Authentication
+# JWT_SECRET=your_super_secret_key
+# SESSION_TIMEOUT=3600
+
+# # Frontend
+
+
+# 
+# 
+# # Check if .env exists, otherwise create it with default values
+# backend/.env:
+# 	@echo "⚠️  .env file missing, creating default .env..."
+# 	@echo "DATABASE_URL=sqlite:///database/data.db" > backend/.env
+# 	@echo "JWT_SECRET=default_secret" >> backend/.env
+# 	@echo "NODE_ENV=development" >> backend/.env
+
+# # Ensure .env is always generated before running Docker Compose
+# docker-up: backend/.env
+# 	docker-compose up --build
+
+
+# echo "DATABASE_URL=sqlite:///database/data.db" > backend/.env
+# echo "JWT_SECRET=default_secret" >> backend/.env
+# echo "NODE_ENV=development" >> backend/.env

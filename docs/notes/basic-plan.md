@@ -4,113 +4,114 @@
 ## **File Structure**
 ```bash
 ft_transcendence/
-│── backend/                 # Fastify backend with Node.js
+│── backend/                # Fastify backend with Node.js
 │   ├── src/
-│   │   ├── controllers/     # Business logic
-│   │   ├── models/          # Database schemas (SQLite)
-│   │   ├── routes/          # API route definitions
-│   │   ├── middlewares/     # Authentication, logging, error handling
-│   │   ├── services/        # Helper functions, matchmaking, tournament logic
-│   │   ├── game/            # Pong game logic
-│   │   ├── config/          # Configurations (DB, environment variables)
-│   │   ├── utils/           # Utility functions (e.g., password hashing)
-│   │   ├── app.ts           # Fastify setup & initialization
-│   │   ├── server.ts        # Main entry point for backend
-│   ├── prisma/              # SQLite setup with Prisma ORM
-│   │   ├── schema.prisma    # Prisma database schema
-│   ├── .env                 # Environment variables
-│   ├── package.json         # Backend dependencies
-│   ├── tsconfig.json        # TypeScript configuration
+│   │   ├── controllers/    # Business logic for routes
+│   │   ├── routes/         # API route definitions
+│   │   ├── middlewares/    # Authentication, logging, error handling
+│   │   ├── services/       # Helper functions, matchmaking, tournament logic /?/ Database interaction, business logic
+│   │   ├── game/           # Pong game logic (for backend features)
+│   │   ├── config/         # Configurations (DB, environment variables)
+│   │   ├── utils/          # Utility functions (e.g., JWT, password hashing)
+│   │   ├── prisma/         # Prisma ORM setup
+│   │   │   ├── prisma.ts   # Centralized Prisma client
+│   │   │   ├── schema.prisma # Prisma database schema
+│   │   ├── app.ts          # Fastify setup & initialization
+│   │   ├── server.ts       # Main entry point for backend (calls app.ts)
+│   ├── .env                # Environment variables
+│   ├── package.json        # Backend dependencies
+│   ├── tsconfig.json       # TypeScript configuration
 │
-│── frontend/                # Frontend (React with Tailwind CSS)
+│── frontend/               # Frontend (React with Tailwind CSS)
 │   ├── src/
-│   │   ├── assets/          # Images, fonts, etc.
-│   │   ├── components/      # Reusable UI components
-│   │   ├── pages/           # Pages (Home, Game, Profile, etc.)
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── context/         # Global state management
-│   │   ├── services/        # API calls (e.g., Axios fetches)
-│   │   ├── utils/           # Helper functions
-│   │   ├── App.tsx          # Main React component
-│   │   ├── main.tsx         # React entry point
-│   ├── public/              # Public assets (index.html, icons)
-│   ├── package.json         # Frontend dependencies
-│   ├── tailwind.config.js   # Tailwind CSS configuration
-│   ├── vite.config.ts       # Vite configuration
+│   │   ├── assets/         # Images, fonts, etc.
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Pages (Home, Game, Profile, etc.)
+│   │   ├── context/        # Global state management
+│   │   ├── services/       # API calls
+│   │   ├── utils/          # Helper functions
+│   │   ├── App.ts          # 
+│   │   ├── main.ts         # Entry point
+│   ├── public/             # Public assets (index.html, icons)
+│   ├── package.json        # Frontend dependencies
+│   ├── tailwind.config.js  # Tailwind CSS configuration
+│   ├── vite.config.ts      # Vite configuration
 │
-│── game/                    # Pong game (Babylon.js)
+│── game/                   # Pong game (Babylon.js)
 │   ├── src/
-│   │   ├── game.ts          # Main game logic (Babylon.js)
-│   │   ├── renderer.ts      # 3D rendering logic
-│   │   ├── physics.ts       # Ball physics & paddle interactions
-│   ├── package.json         # Game-specific dependencies
+│   │   ├── game.ts         # Main game logic (Babylon.js)
+│   │   ├── renderer.ts     # 3D rendering logic
+│   │   ├── physics.ts      # Ball physics & paddle interactions
+│   ├── package.json        # Game-specific dependencies
 │
-│── database/                # SQLite Database
-│   ├── migrations/          # Prisma migrations
-│   ├── data.db              # SQLite database file
+│── database/               # SQLite Database
+│   ├── migrations/         # Prisma migrations (** Move from backend/prisma)
+│   ├── data.db             # SQLite database file
 │
-│── docs/                    # Documentation & API specs
-│   ├── API.md               # Backend API documentation
-│   ├── README.md            # General project documentation
+│── docs/                   # Documentation & API specs
+│   ├── notes/              # Notes and info (tmp, will remove if not all verified)
+│   ├── API.md              # Backend API documentation
+│   ├── README.md           # General project documentation
 │
-│── tests/                   # Testing setup
-│   ├── backend/             # Backend tests (Jest)
-│   ├── frontend/            # Frontend tests (Jest, React Testing Library)
-│   ├── e2e/                 # End-to-End tests (Playwright/Cypress)
+│── tests/                  # Testing setup
+│   ├── backend/            # Backend tests (Jest)
+│   ├── frontend/           # Frontend tests (Jest, React Testing Library)
+│   ├── e2e/                # End-to-End tests (Playwright/Cypress)
 │
-│── deployments/             # Deployment configurations
-│   ├── nginx.conf           # Reverse proxy config for production
-│   ├── ssl/                 # SSL certificates (if needed)
+│── deployments/            # Deployment configurations
+│   ├── nginx.conf          # Reverse proxy config for production
+│   ├── ssl/                # SSL certificates (if needed)
 │
-│── docker/                  # Docker-related configurations
-│   ├── backend.Dockerfile   # Dockerfile for backend
-│   ├── frontend.Dockerfile  # Dockerfile for frontend
-│   ├── game.Dockerfile      # Dockerfile for game
-│   ├── .dockerignore        # Docker ignore file
+│── docker/                 # Docker-related configurations
+│   ├── scripts/            # Docker-related scripts (entrypoints, inits, health checks, etc)
+│   ├── backend.Dockerfile  # Dockerfile for backend
+│   ├── frontend.Dockerfile # Dockerfile for frontend
+│   ├── nginx.Dockerfile  	# Dockerfile for nginx
+│   ├── game.Dockerfile     # Dockerfile for game
+
 │
-│── scripts/                 # Helper scripts
-│   ├── start.sh             # Script to start all services
-│   ├── db_migrate.sh        # Script to run DB migrations
+│── scripts/                # Helper scripts
+│   ├── start.sh            # Script to start all services
+│   ├── db_migrate.sh       # Script to run DB migrations
 │
-│── docker-compose.yml       # Main Docker Compose file
-│── docker-compose.dev.yml   # Docker Compose for development
-│── docker-compose.prod.yml  # Docker Compose for production
-│── Makefile                 # Simplified commands for running services
-│── .gitignore               # Git ignored files
-│── README.md                # Main project readme
+│── docker-compose.yml      # Main Docker Compose file (**might move it in `./docker/`)
+├── .dockerignore        	# Docker ignore file
+│── .gitignore              # Git ignored files
+│── Makefile                # Simplified commands for running services
+│── README.md               # Main project readme
 ```
 
 ### Explanation of the Structure
 - `backend/` (Fastify + SQLite)
-	- Follows MVC (Model-View-Controller) pattern.
-	- `routes/` defines API endpoints, `controllers/` handle logic, and `models/` store DB structures.
-	- `middlewares/` include authentication (JWT, OAuth), rate limiting, logging, etc.
-	- `services/` implement business logic such as matchmaking, tournament handling.
-	- Uses Prisma ORM for SQLite.
+    - Follows MVC (Model-View-Controller) pattern.
+    - `routes/` defines API endpoints, `controllers/` handle logic, and `models/` store DB structures.
+    - `middlewares/` include authentication (JWT, OAuth), rate limiting, logging, etc.
+    - `services/` implement business logic such as matchmaking, tournament handling.
+    - Uses Prisma ORM for SQLite.
 - `frontend/` (React + Tailwind CSS + TypeScript)
-	- Uses a modular component structure.
-	- `context/` handles global state (e.g., user authentication, game state).
-	- `services/` fetch API data (e.g., players, matches).
-	- `pages/` contain different views like Home, Profile, Tournament.
-	- Uses Vite for fast builds.
+    - Uses a modular component structure.
+    - `context/` handles global state (e.g., user authentication, game state).
+    - `services/` fetch API data (e.g., players, matches).
+    - `pages/` contain different views like Home, Profile, Tournament.
+    - Uses Vite for fast builds.
 - `game/` (Babylon.js)
-	- Implements the Pong game with WebGL-based rendering.
-	- `game.ts` manages game state, `renderer.ts` handles 3D rendering, and `physics.ts` contains ball and paddle physics.
+    - Implements the Pong game with WebGL-based rendering.
+    - `game.ts` manages game state, `renderer.ts` handles 3D rendering, and `physics.ts` contains ball and paddle physics.
 - `database/`
-	- Stores SQLite database and Prisma migrations.
+    - Stores SQLite database and Prisma migrations.
 - `tests/`
-	- Includes unit tests, frontend tests, and E2E tests.
+    - Includes unit tests, frontend tests, and E2E tests.
 - `deployments/`
-	- For `nginx.conf`, SSL setup, and other deployment configurations.
+    - For `nginx.conf`, SSL setup, and other deployment configurations.
 - `docker/`
-	- Stores separate Dockerfiles for backend, frontend, and game.
-	- Includes .dockerignore to optimize builds.
+    - Stores separate Dockerfiles for backend, frontend, and game.
+    - Includes .dockerignore to optimize builds.
 - `scripts/`
-	- Holds helpful shell scripts like:
-		- start.sh → Start all services.
-		- db_migrate.sh → Run Prisma migrations.
+    - Holds helpful shell scripts like:
+        - start.sh → Start all services.
+        - db_migrate.sh → Run Prisma migrations.
 - **Makefile**
-	- Automates commands like:
+    - Automates commands like:
 ```bash
 make run             # Start everything
 make stop            # Stop services
@@ -121,9 +122,9 @@ make db_migrate      # Run database migrations
 make test            # Run all tests
 ```
 - Separate `docker-compose` files
-	- `docker-compose.yml` → General file for all services.
-	- `docker-compose.dev.yml` → Uses volumes for hot reloading.
-	- `docker-compose.prod.yml` → Optimized for production.
+    - `docker-compose.yml` → General file for all services.
+    - `docker-compose.dev.yml` → Uses volumes for hot reloading.
+    - `docker-compose.prod.yml` → Optimized for production.
 
 
 ---
@@ -133,16 +134,16 @@ make test            # Run all tests
 ### Multiple `docker-compose.yml` files
 
 1. `docker-compose.yml` (Main file)
-	- Defines the core services (backend, frontend, database).
+    - Defines the core services (backend, frontend, database).
 
 2. `docker-compose.dev.yml` (Development setup)
-	- Includes volumes for hot-reloading.
-	- Uses `nodemon` (for backend) and `Vite dev server` (for frontend).
-	- Mounts the local source code for development.
+    - Includes volumes for hot-reloading.
+    - Uses `nodemon` (for backend) and `Vite dev server` (for frontend).
+    - Mounts the local source code for development.
 
 3. `docker-compose.prod.yml` (Production setup)
-	- Uses `multi-stage builds` to create optimized containers.
-	- Ensures security best practices.
+    - Uses `multi-stage builds` to create optimized containers.
+    - Ensures security best practices.
 
 To specify which file to use:
 ```bash
@@ -183,9 +184,9 @@ This keeps our Docker images lightweight and prevents accidental inclusion of se
 
 ✅ 1.2 Database Configuration (Prisma & SQLite)
 - Define schema.prisma to create tables for:
-	- Users (for authentication & matchmaking).
-	- Matches (for game results).
-	- Tournaments (for organizing the matchmaking).
+    - Users (for authentication & matchmaking).
+    - Matches (for game results).
+    - Tournaments (for organizing the matchmaking).
 - Run migrations:
 ```sh
 make db-migrate
@@ -193,17 +194,17 @@ make db-migrate
 
 ✅ 1.3 Implement Authentication (JWT)
 - Secure user authentication using:
-	- Password hashing (e.g., bcrypt).
-	- JWT-based authentication.
-	- Secure login and registration API.
+    - Password hashing (e.g., bcrypt).
+    - JWT-based authentication.
+    - Secure login and registration API.
 
 ✅ 1.4 API Routes
 - Implement routes inside routes/:
-	- /auth/register – Register new users.
-	- /auth/login – Authenticate users.
-	- /users/:id – Get user profile.
-	- /matches – Retrieve match history.
-	- /tournament – Organize match queue.
+    - /auth/register – Register new users.
+    - /auth/login – Authenticate users.
+    - /users/:id – Get user profile.
+    - /matches – Retrieve match history.
+    - /tournament – Organize match queue.
 
 
 ### Backend Initialization
@@ -450,13 +451,13 @@ endef
 export ENV_CONTENT
 
 env-create:
-	@if [ ! -f backend/.env ]; then \
-		echo "Creating backend/.env file..."; \
-		echo -e $$DEFINE_ENV > backend/.env; \
-		echo ".env file created!"; \
-	else \
-		echo ".env file already exists."; \
-	fi
+    @if [ ! -f backend/.env ]; then \
+        echo "Creating backend/.env file..."; \
+        echo -e $$DEFINE_ENV > backend/.env; \
+        echo ".env file created!"; \
+    else \
+        echo ".env file already exists."; \
+    fi
 ```
 
 #### Start Backend
@@ -489,20 +490,20 @@ It happens because **TypeScript is trying to use ES modules (`import ...`) in a 
 Let's fix it by updating/adding these settings in `backend/tsconfig.json`:
 ```json
 {
-	"compilerOptions": {
-	  "target": "ESNext",
-	  "module": "NodeNext",
-	  "moduleResolution": "NodeNext",
-	  "outDir": "dist",
-	  "rootDir": "src",
-	  "strict": true,
-	  "esModuleInterop": true,
-	  "skipLibCheck": true,
-	  "resolveJsonModule": true,
-	  "allowSyntheticDefaultImports": true
-	},
-	"include": ["src"],
-	"exclude": ["node_modules", "dist"]
+    "compilerOptions": {
+      "target": "ESNext",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
+      "outDir": "dist",
+      "rootDir": "src",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "resolveJsonModule": true,
+      "allowSyntheticDefaultImports": true
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
 }
 ```
 And making sure `backend/package.json` has:

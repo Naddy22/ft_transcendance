@@ -2,9 +2,9 @@
 FROM node:18-alpine AS build
 WORKDIR /app
 
-COPY frontend/package.json frontend/package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
-COPY frontend ./
+COPY . .
 RUN npm run build
 
 # Second stage: Serve optimized files

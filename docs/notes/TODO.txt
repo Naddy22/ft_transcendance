@@ -1,11 +1,8 @@
 
 
-Connect front end and back end
-
-modify .gitignore to include stuff, maybe not nested but more generalized
-
 create the docker volume inside ./docker/data ?
 
-fix makefile:
-- have a target to launch frontend only and open the web browser (using vite)
+move migrations from backend/prisma/. to database/.
+
+fix git history and ignoring of the database files that were already inside backend/prisma/ (remove them from tracking)
 

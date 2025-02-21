@@ -50,7 +50,7 @@ repo: ## Open the GitHub repository
 	@open $(REPO_LINK);
 
 tree: ## Show file structure (without node_modules/)
-	@ tree -I "node_modules"
+	tree -I "node_modules"
 
 .PHONY: help repo tree
 
@@ -163,6 +163,14 @@ game-build:  ## Build Pong game
 # ==============================
 ##@ Database Section
 # ==============================
+
+# Regenerate Prisma Client to apply changes:
+# npx prisma generate --schema=backend/src/prisma/schema.prisma
+
+# Run the Prisma migration command again to confirm it's using the correct folder
+# npx prisma migrate dev --name init --schema=backend/src/prisma/schema.prisma
+
+
 
 db-migrate:  ## Run Prisma migrations
 	cd $(BACKEND_DIR) && npx prisma migrate dev --name init
