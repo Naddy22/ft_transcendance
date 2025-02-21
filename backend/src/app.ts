@@ -8,7 +8,11 @@ import Fastify, { FastifyRequest, FastifyReply } from "fastify";
 import dotenv from "dotenv";
 import cors from "@fastify/cors";
 import formbody from "@fastify/formbody";
+import fastifyWebsocket from "@fastify/websocket";
+
 import authRoutes from "./routes/authRoutes.js";
+import { gameRoutes } from "./routes/gameRoutes.js";
+import { setupGameWebSocket } from "./game/gameGateway.js";
 
 dotenv.config(); // Load environment variables
 
@@ -17,11 +21,16 @@ const app = Fastify({ logger: true }); // Create Fastify instance
 // Register Plugins
 app.register(cors, { origin: "*" });
 app.register(formbody);
+app.register(fastifyWebsocket);
 
 // (Middlewares go here)
 
 // Register Routes
 authRoutes(app);
+app.register(gameRoutes);
+
+// Setup WebSockets for multiplayer game
+setupGameWebSocket(app);
 
 // Root route (Health Check)
 app.get("/", async (request: FastifyRequest, reply: FastifyReply) => {

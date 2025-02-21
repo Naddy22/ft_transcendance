@@ -1,13 +1,16 @@
-import prisma from "../prisma/prisma";
+/**
+ * Matchmaking & Score Tracking
+ * - Handles match creation
+ * - Updates game results in the database
+ * - Fetches leaderboard rankings
+ */
+
+import prisma from "../prisma/prisma.js";
 
 export class GameService {
     static async startGame(player1Id: string, player2Id: string) {
         return await prisma.match.create({
-            data: {
-                player1Id,
-                player2Id,
-                createdAt: new Date(),
-            },
+            data: { player1Id, player2Id, createdAt: new Date() },
         });
     }
 

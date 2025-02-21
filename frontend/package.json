@@ -1,18 +1,17 @@
 {
-  "name": "ft_transcendence",
-  "version": "1.0.0",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "babylonjs": "^7.49.0"
-  },
-  "devDependencies": {
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.5.2",
-    "tailwindcss": "^4.0.6",
-    "vite": "^6.1.0"
+	"name": "frontend",
+	"version": "1.0.0",
+	"description": "Frontend for ft_transcendance",
+	"main": "src/main.ts",
+	"scripts": {
+	  "build": "tsc && npx tailwindcss -i ./src/styles.css -o ./dist/styles.css && cp index.html dist/index.html",
+	  "dev": "npx live-server dist"
+	},
+	"devDependencies": {
+	  "tailwindcss": "^3.0.0",
+	  "typescript": "^5.0.0",
+	  "postcss": "^8.0.0",
+	  "autoprefixer": "^10.0.0"
+	}
   }
-}
+  

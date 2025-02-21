@@ -13,12 +13,7 @@ COPY deployments/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Copy frontend build files to serve the static website
-COPY frontend/dist /usr/share/nginx/html
-
-# # Set file ownership and permissions
-# RUN chmod -R 644 /etc/nginx/nginx.conf && \
-#     chmod -R 755 /usr/share/nginx/html && \
-#     chmod -R 600 /etc/nginx/ssl/* || true
+COPY --from=ft_transcendence-frontend /usr/share/nginx/html /usr/share/nginx/html
 
 # Expose HTTP and HTTPS ports
 EXPOSE 80 443

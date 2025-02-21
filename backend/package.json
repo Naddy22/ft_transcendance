@@ -10,20 +10,26 @@
 	},
 	"dependencies": {
 		"fastify": "^5.2.1",
-		"@fastify/cors": "^10.0.2",
-		"@fastify/formbody": "^8.0.2",
-		"@prisma/client": "^6.3.1",
-		"cors": "^2.8.5",
-		"dotenv": "^16.4.7",
-		"bcrypt": "^5.1.1",
-		"jsonwebtoken": "^9.0.2"
+		"@fastify/websocket": "^10.0.0",
+    	"@fastify/cors": "^10.0.2",
+    	"@fastify/formbody": "^8.0.2",
+    	"@prisma/client": "^6.3.1",
+    	"ws": "^8.16.0",
+    	"cors": "^2.8.5",
+    	"dotenv": "^16.4.7",
+    	"bcrypt": "^5.1.1",
+    	"jsonwebtoken": "^9.0.2"
 	},
 	"devDependencies": {
+		"@types/ws": "^8.5.5",
 		"@types/bcrypt": "^5.0.2",
 		"@types/jsonwebtoken": "^9.0.8",
 		"@types/node": "^22.13.4",
 		"prisma": "^6.3.1",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.7.3"
+	},
+	"prisma": {
+		"schema": "prisma/schema.prisma"
 	}
 }

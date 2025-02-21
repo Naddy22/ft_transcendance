@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "outDir": "./dist",  // Ensures build files go to /app/dist
+      "target": "ES2020",		// Ensures TypeScript compiles for modern JavaScript.
+      "lib": ["ES2020", "DOM"],	// Enables BigInt64Array and BigUint64Array support.
+      "module": "ESNext",
+      "moduleResolution": "Node",	// Ensures TypeScript correctly resolves modules.
+      "strict": true,
+      "baseUrl": "./src",
+      "paths": {
+        "*": ["node_modules/*"]	// Helps locate external dependencies.
+      },
+      "esModuleInterop": true	//  Allows imports to work smoothly.
+    }
+}

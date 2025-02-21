@@ -69,6 +69,8 @@ all: env build up ## Build and start containers
 clean: docker-cleanup ## Remove all containers, images, volumes
 
 fclean: clean ## Full Clean (currently same as `clean`)
+# remove dist/ where they are (todo)
+# remove node_modules also ? (todo)
 
 ffclean: fclean ## Remove all generated files and folders
 	@$(MAKE) pdf-clean $(NPD)

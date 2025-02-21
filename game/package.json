@@ -1,0 +1,16 @@
+{
+	"name": "game",
+	"version": "1.0.0",
+	"description": "Game logic for ft_transcendance",
+	"main": "src/main.ts",
+	"scripts": {
+		"build": "tsc",
+		"dev": "npx live-server"
+	},
+	"devDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"babylonjs": "^7.50.0"
+	}
+}

@@ -62,14 +62,6 @@ ft_transcendence/
 │   ├── nginx.conf          # Reverse proxy config for production
 │   ├── ssl/                # SSL certificates (if needed)
 │
-│── docker/                 # Docker-related configurations
-│   ├── scripts/            # Docker-related scripts (entrypoints, inits, health checks, etc)
-│   ├── backend.Dockerfile  # Dockerfile for backend
-│   ├── frontend.Dockerfile # Dockerfile for frontend
-│   ├── nginx.Dockerfile  	# Dockerfile for nginx
-│   ├── game.Dockerfile     # Dockerfile for game
-
-│
 │── scripts/                # Helper scripts
 │   ├── start.sh            # Script to start all services
 │   ├── db_migrate.sh       # Script to run DB migrations
