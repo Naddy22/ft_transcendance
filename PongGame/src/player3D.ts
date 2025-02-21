@@ -18,8 +18,8 @@ export class Player3D {
 	// Méthode pour placer le score sur l'interface GUI
  	// x et y en pixels (par exemple, pour positionner le score sur le canvas)
 	drawScore(x: number, y: number, advancedTexture: GUI.AdvancedDynamicTexture): void {
-		this.scoreText.left = x + "px";
-		this.scoreText.top = y + "px";
+		this.scoreText.left = x + "%";
+		this.scoreText.top = y + "%";
 		
 		// On vérifie si le contrôle a déjà été ajouté à l'advancedTexture
 		if (!advancedTexture.getControlByName(this.name + "scoreMessage")) {

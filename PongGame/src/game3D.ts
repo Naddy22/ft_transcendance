@@ -67,41 +67,44 @@ export function startPongGame3D(): void {
 			BABYLON.Vector3.Zero(), // cible au centre
 			scene
 		);
-		// On n'attache pas les contrôles si on veut garder la vue fixe
+		// // On n'attache pas les contrôles si on veut garder la vue fixe
 		// camera.attachControl(canvas, false);
 		
-		const scale = 23.7;
+		const desiredSceneWidthUnits = 25.3;
+		let scale = canvas.width / desiredSceneWidthUnits;
+		// const scale = 23.7; //(fonctionne pour 600px par 400px)
+		// const scale = 35.5; //fonctionne pour 900px par 600px
 		// Pour une zone de jeu de 20 unités de large (de -10 à 10)
 		const sceneWidthUnits = canvas.width / scale;
 		const sceneHeightUnits = canvas.height / scale;
 
-		// // pour mettre des bordures
-		// const halfWidth = sceneWidthUnits / 2;
-		// const halfHeight = sceneHeightUnits / 2;
-		// const borderPoints = [
-		// 	new BABYLON.Vector3(-halfWidth, -halfHeight, 0),
-		// 	new BABYLON.Vector3(halfWidth, -halfHeight, 0),
-		// 	new BABYLON.Vector3(halfWidth, halfHeight, 0),
-		// 	new BABYLON.Vector3(-halfWidth, halfHeight, 0),
-		// 	new BABYLON.Vector3(-halfWidth, -halfHeight, 0)
-		// ];
-		// const border = BABYLON.MeshBuilder.CreateLines("border", { points: borderPoints }, scene);
-		// border.color = new BABYLON.Color3(1, 0, 0); // rouge
+		// pour mettre des bordures pour test
+		const halfWidth = sceneWidthUnits / 2;
+		const halfHeight = sceneHeightUnits / 2;
+		const borderPoints = [
+			new BABYLON.Vector3(-halfWidth, -halfHeight, 0),
+			new BABYLON.Vector3(halfWidth, -halfHeight, 0),
+			new BABYLON.Vector3(halfWidth, halfHeight, 0),
+			new BABYLON.Vector3(-halfWidth, halfHeight, 0),
+			new BABYLON.Vector3(-halfWidth, -halfHeight, 0)
+		];
+		const border = BABYLON.MeshBuilder.CreateLines("border", { points: borderPoints }, scene);
+		border.color = new BABYLON.Color3(1, 0, 0); // rouge
 	
 		// Ajouter une lumière
 		const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 0, -1), scene);
 	
-		// Création de la balle au centre
+		// Création de la balle au centre et attends chargement
 		const ball = new Ball3D(scene, 0.5, 0, 0);
 
 		const offset = 0.5; // Pour ecarter un peu mes raquettes du bord
-		const leftPaddle = new Paddle3D(scene, -sceneWidthUnits / 2 + offset, 0);
-		const rightPaddle = new Paddle3D(scene, sceneWidthUnits / 2 - offset, 0);
+		const leftPaddle = new Paddle3D(scene, -sceneWidthUnits / 2 + offset, 0, "left");
+		const rightPaddle = new Paddle3D(scene, sceneWidthUnits / 2 - offset, 0, "right");
 
 
 		// Placer les scores sur l'interface GUI (les positions en pixels sont à ajuster selon ton design)
-		leftPlayer.drawScore(-260, -170, guiTexture);  // par exemple, à gauche
-		rightPlayer.drawScore(260, -170, guiTexture);  // par exemple, à droite
+		leftPlayer.drawScore(-45, -45, guiTexture); // à gauche
+		rightPlayer.drawScore(45, -45, guiTexture); // à droite
 
 		// 6. Gestion des entrées clavier pour les paddles et pour démarrer le jeu
 		window.addEventListener("keydown", (event: KeyboardEvent) => {
@@ -109,7 +112,7 @@ export function startPongGame3D(): void {
 			if (event.key === "s") leftPaddle.movingDown = true;
 			if (event.key === "ArrowUp") rightPaddle.movingUp = true;
 			if (event.key === "ArrowDown") rightPaddle.movingDown = true;
-			if (event.code === "Space" && !gameStarted) {
+			if (event.code === "Space" && !gameStarted && ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
 			gameStarted = true;
 		  }
 		});
@@ -121,6 +124,7 @@ export function startPongGame3D(): void {
 		});
 
 		function update(): void {
+			if (!ball.mesh) return; // Sécurité avant chargement
 			ball.update(sceneHeightUnits, leftPaddle, rightPaddle);
 			// Ici, tu pourras ajouter ta logique de détection des buts, réinitialisation, etc.
 			
@@ -215,13 +219,19 @@ export function startPongGame3D(): void {
 		// 7. La boucle de jeu : ici, on met à jour la logique avant chaque rendu de la scène
 		scene.registerBeforeRender(() => {
 			const startMsg = guiTexture.getControlByName("startMessage") as GUI.TextBlock;
-			if (!gameStarted) {
+			if (!ball.mesh || !leftPaddle.mesh || !rightPaddle.mesh)
+			{
+				startMsg.isVisible = false;
+				return;
+			}	
+			else if (!gameStarted) {
 				if (startMsg) {
 					startMsg.isVisible = true;
 				}
 				return;
 			}
-			startMsg.isVisible = false;
+			else
+				startMsg.isVisible = false;
 			update();
 		});
 		return scene;
