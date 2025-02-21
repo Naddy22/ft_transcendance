@@ -55,12 +55,15 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro # Serve frontend from the frontend container's output
     networks:
       - ft_transcendence-network
     depends_on:
       - frontend
       - backend
     restart: unless-stopped
+    # command: sh -c "mkdir -p /usr/share/nginx/html && npm run build && nginx -g 'daemon off;'"
 
 
 # TOCHOOSE: (backend would then depend on this container)
