@@ -18,15 +18,14 @@ services:
     # env_file:
       # - backend/.env
     environment:
-      # DATABASE_URL: ${DATABASE_URL:-sqlite://./database/data.db}
-      DATABASE_URL: "file:/database/data.db"
+      DATABASE_URL: "file:/app/database/data.db"
       JWT_SECRET: ${JWT_SECRET:-default_secret}
       NODE_ENV: ${NODE_ENV:-development}
     ports:
       - "3000:3000"
       - "5555:5555" # Prisma Studio
     volumes:
-      - sqlite_data:/database
+      - sqlite_data:/app/database
     networks:
       - ft_transcendence-network
     restart: unless-stopped

@@ -1,11 +1,10 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../../node_modules/.prisma/client"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:/database/data.db"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -15,8 +14,8 @@ model User {
   password         String
   avatar           String?
   createdAt        DateTime                @default(now())
-  matchesAsPlayer2 Match[]                 @relation("Player2Match")
   matchesAsPlayer1 Match[]                 @relation("Player1Match")
+  matchesAsPlayer2 Match[]                 @relation("Player2Match")
   tournaments      TournamentParticipant[]
 }
 
@@ -26,8 +25,8 @@ model Match {
   player2Id String
   winnerId  String?
   createdAt DateTime @default(now())
-  player2   User     @relation("Player2Match", fields: [player2Id], references: [id])
   player1   User     @relation("Player1Match", fields: [player1Id], references: [id])
+  player2   User     @relation("Player2Match", fields: [player2Id], references: [id])
 }
 
 model Tournament {
@@ -41,6 +40,6 @@ model TournamentParticipant {
   id           String     @id @default(uuid())
   userId       String
   tournamentId String
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
   user         User       @relation(fields: [userId], references: [id])
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
 }

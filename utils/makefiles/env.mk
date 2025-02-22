@@ -5,7 +5,7 @@ ENV_FILE = backend/.env
 # Define multi-line variable for the .env content
 define ENV_CONTENT
 ## Database Configuration
-DATABASE_URL="file:/database/data.db"
+DATABASE_URL="file:./database/data.db"
 # (Path to the SQLite database file)
 
 # Authentication

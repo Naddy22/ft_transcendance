@@ -50,7 +50,7 @@ repo: ## Open the GitHub repository
 	@open $(REPO_LINK);
 
 tree: ## Show file structure (without node_modules/)
-	tree -I "node_modules"
+	tree -I "node_modules" -I "_local" -I "docs"
 
 .PHONY: help repo tree
 
@@ -74,7 +74,7 @@ fclean: clean ## Full Clean (currently same as `clean`)
 
 ffclean: fclean ## Remove all generated files and folders
 	@$(MAKE) pdf-clean $(NPD)
-	@$(MAKE) env-clean $(NPD)
+# @$(MAKE) env-clean $(NPD)
 
 re: down build-no-cache up ## Restart all services
 

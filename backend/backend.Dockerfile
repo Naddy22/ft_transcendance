@@ -1,4 +1,4 @@
-
+# Build Stage
 FROM node:18-alpine AS build
 WORKDIR /app
 
@@ -8,6 +8,8 @@ RUN npm ci --only=production
 
 # Copy Prisma schema and migrations and generate client
 COPY prisma ./prisma
+
+# Use explicit path to Prisma Client generation
 RUN npx prisma generate
 
 # Copy the application source code
@@ -17,18 +19,20 @@ COPY . .
 RUN npm run build
 
 # 
+# Runtime Stage
 FROM node:18-alpine AS runtime
 WORKDIR /app
 
 # Copy built files from build stage
 COPY --from=build /app /app
 
+# Ensure production dependencies are installed
+RUN npm install --omit=dev
+
 # Copy necessary startup scripts
 COPY entrypoint.sh /app/entrypoint.sh
 COPY healthcheck.sh /app/healthcheck.sh
 RUN chmod +x /app/entrypoint.sh /app/healthcheck.sh
-
-RUN npm run build
 
 # Expose API port
 EXPOSE 3000
