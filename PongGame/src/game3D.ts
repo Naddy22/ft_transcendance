@@ -8,15 +8,15 @@ let engine: BABYLON.Engine;
 let guiTexture: GUI.AdvancedDynamicTexture;
 let gameStarted: boolean = false; // Variable pour savoir si le jeu a commencé
 
-export function startPongGame3D(): void {
+export function startPongGame3D(leftPlayerName: string, rightPlayerName: string, onGameEnd: (winner: string) => void): void {
 	// 1. Récupère le canvas et crée le moteur BabylonJS
 	const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 	// const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 	
 	engine = new BABYLON.Engine(canvas, true);
 
-	const leftPlayer = new Player3D("Player 1");
-	const rightPlayer = new Player3D("Player 2");
+	const leftPlayer = new Player3D(leftPlayerName);
+	const rightPlayer = new Player3D(rightPlayerName);
 
 	const MAX_SCORE = 3;
 
@@ -78,21 +78,21 @@ export function startPongGame3D(): void {
 		const sceneWidthUnits = canvas.width / scale;
 		const sceneHeightUnits = canvas.height / scale;
 
-		// pour mettre des bordures pour test
-		const halfWidth = sceneWidthUnits / 2;
-		const halfHeight = sceneHeightUnits / 2;
-		const borderPoints = [
-			new BABYLON.Vector3(-halfWidth, -halfHeight, 0),
-			new BABYLON.Vector3(halfWidth, -halfHeight, 0),
-			new BABYLON.Vector3(halfWidth, halfHeight, 0),
-			new BABYLON.Vector3(-halfWidth, halfHeight, 0),
-			new BABYLON.Vector3(-halfWidth, -halfHeight, 0)
-		];
-		const border = BABYLON.MeshBuilder.CreateLines("border", { points: borderPoints }, scene);
-		border.color = new BABYLON.Color3(1, 0, 0); // rouge
+		// // pour mettre des bordures pour test
+		// const halfWidth = sceneWidthUnits / 2;
+		// const halfHeight = sceneHeightUnits / 2;
+		// const borderPoints = [
+		// 	new BABYLON.Vector3(-halfWidth, -halfHeight, 0),
+		// 	new BABYLON.Vector3(halfWidth, -halfHeight, 0),
+		// 	new BABYLON.Vector3(halfWidth, halfHeight, 0),
+		// 	new BABYLON.Vector3(-halfWidth, halfHeight, 0),
+		// 	new BABYLON.Vector3(-halfWidth, -halfHeight, 0)
+		// ];
+		// const border = BABYLON.MeshBuilder.CreateLines("border", { points: borderPoints }, scene);
+		// border.color = new BABYLON.Color3(1, 0, 0); // rouge
 	
 		// Ajouter une lumière
-		const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 0, -1), scene);
+		const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(-1, 0, -1), scene);
 	
 		// Création de la balle au centre et attends chargement
 		const ball = new Ball3D(scene, 0.5, 0, 0);
@@ -103,8 +103,8 @@ export function startPongGame3D(): void {
 
 
 		// Placer les scores sur l'interface GUI (les positions en pixels sont à ajuster selon ton design)
-		leftPlayer.drawScore(-45, -45, guiTexture); // à gauche
-		rightPlayer.drawScore(45, -45, guiTexture); // à droite
+		leftPlayer.drawScore(-42, -45, guiTexture); // à gauche
+		rightPlayer.drawScore(42, -45, guiTexture); // à droite
 
 		// 6. Gestion des entrées clavier pour les paddles et pour démarrer le jeu
 		window.addEventListener("keydown", (event: KeyboardEvent) => {
@@ -179,42 +179,48 @@ export function startPongGame3D(): void {
 				endMessage.height = "100px";
 				endPanel.addControl(endMessage);
 				
-				// Créer un bouton pour rejouer
-				const restartButton = GUI.Button.CreateSimpleButton("restartButton", "Rejouer");
-				restartButton.width = "200px";
-				restartButton.height = "50px";
-				restartButton.color = "white";
-				restartButton.background = "gray";
-				restartButton.onPointerUpObservable.add(() => {
-					// Lorsque le bouton est cliqué, on appelle le resetGame
-					resetGame();
-					// Masquer l'écran de fin
-					endPanel.isVisible = false;
-				});
-				endPanel.addControl(restartButton);
+				// // Créer un bouton pour rejouer
+				// const restartButton = GUI.Button.CreateSimpleButton("restartButton", "Rejouer");
+				// restartButton.width = "200px";
+				// restartButton.height = "50px";
+				// restartButton.color = "white";
+				// restartButton.background = "gray";
+				// restartButton.onPointerUpObservable.add(() => {
+				// 	// Lorsque le bouton est cliqué, on appelle le resetGame
+				// 	resetGame();
+				// 	// Masquer l'écran de fin
+				// 	endPanel.isVisible = false;
+				// });
+				// endPanel.addControl(restartButton);
 			}
 			// Rendre visible l'écran de fin
 			endPanel.isVisible = true;
+
+			// Arrête complètement le jeu
+			stopPongGame3D();
+
+			// Appelle le callback ici pour informer du gagnant
+			onGameEnd(winner);
 		}
 
-		// Fonction pour réinitialiser le jeu
-		function resetGame(): void {
-			const endScreen = document.getElementById('endScreen'); // Supprime l'écran de fin
-			if (endScreen)
-				endScreen.remove();
-			if (canvas)
-				canvas.style.display = 'block';
+		// // Fonction pour réinitialiser le jeu
+		// function resetGame(): void {
+		// 	const endScreen = document.getElementById('endScreen'); // Supprime l'écran de fin
+		// 	if (endScreen)
+		// 		endScreen.remove();
+		// 	if (canvas)
+		// 		canvas.style.display = 'block';
 	
-			leftPlayer.score = 0;
-			leftPlayer.scoreText.text = leftPlayer.score.toString();
-			rightPlayer.score = 0;
-			rightPlayer.scoreText.text = rightPlayer.score.toString();
+		// 	leftPlayer.score = 0;
+		// 	leftPlayer.scoreText.text = leftPlayer.score.toString();
+		// 	rightPlayer.score = 0;
+		// 	rightPlayer.scoreText.text = rightPlayer.score.toString();
 	
-			const serves = Math.random() < 0.5;
-			ball.reset(serves);
-			leftPaddle.reset();
-			rightPaddle.reset();
-		}
+		// 	const serves = Math.random() < 0.5;
+		// 	ball.reset(serves);
+		// 	leftPaddle.reset();
+		// 	rightPaddle.reset();
+		// }
 
 		// 7. La boucle de jeu : ici, on met à jour la logique avant chaque rendu de la scène
 		scene.registerBeforeRender(() => {

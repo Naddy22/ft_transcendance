@@ -73,7 +73,7 @@ export class Ball3D {
 		// Met à jour la position en ajoutant la vélocité
 		this.mesh.position.x += this.dx;
 		this.mesh.position.y += this.dy;
-		console.log("Position mise à jour :", this.mesh.position);
+		// console.log("Position mise à jour :", this.mesh.position);
 		
 		// Gestion du rebond sur le haut et le bas de la zone de jeu
 		const halfHeight = sceneHeight / 2;
