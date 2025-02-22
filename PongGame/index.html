@@ -17,6 +17,7 @@
 		}
 		#menu {
 			text-align: center;
+			display: block;
 		}
 		#game {
 			display: none; /* On cache le jeu au début */
@@ -28,6 +29,20 @@
 			height: 80vh; */
 			background-color: black;
 			position: relative; /* Pour positionner les noms à l'intérieur du jeu */
+		}
+		#endScreen {
+			display: none;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			text-align: center;
+			color: white;
+			background-color: rgba(0, 0, 0, 0.8);
+			width: 400px;
+			padding: 20px;
+			border-radius: 10px;
+			z-index: 10;
 		}
 		/* Pour la section playerNames */
 		#playerNames {
@@ -54,13 +69,29 @@
 			right: 10px;             /* Espacement à droite */
 			text-align: right;       /* Alignement à droite */
 		}
+		button {
+			display: block;
+			width: 200px;
+			padding: 10px;
+			margin: 10px auto;
+			background-color: gray;
+			color: white;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+		button:hover {
+			background-color: #555;
+		}
 	</style>
 </head>
 <body>
 	<!-- Menu -->
 	<div id="menu">
-		<h1>Menu Principal</h1>
+		<h1>Cat Pong Game</h1>
 		<button id="startButton">Démarrer le jeu</button>
+		<!-- <button id="startButton">Match 1v1</button>
+		<button id="tournament4">Tournoi 4 joueurs</button> -->
 	</div>
 	
 	<!-- Jeu -->
