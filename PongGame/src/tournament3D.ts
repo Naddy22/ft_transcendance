@@ -1,4 +1,4 @@
-import { startPongGame3D, stopPongGame3D, resetForNewGame } from './game3D.js';
+import { startPongGame3D, stopPongGame3D } from './game3D.js';
 
 export class Tournament {
 	players: string[];

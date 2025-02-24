@@ -171,6 +171,14 @@ export class Ball3D {
 		// Si le joueur de droite a la main, la balle repart vers la gauche (dx négatif)
 		this.dx = rightServes ? -0.1 : 0.1;
 	}
+
+	clearMesh():void {
+		console.log("Vidage du mesh de la balle");
+		if (this.mesh) {
+			this.mesh.dispose(); // Supprime le mesh actuel
+			this.mesh = null;
+		}
+	}
 }
 
 // export class Ball3D {
