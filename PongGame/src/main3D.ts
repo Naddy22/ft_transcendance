@@ -14,18 +14,21 @@ endScreen.innerHTML = `
 	<h1 id="winnerMessage"></h1>
 	<button id="replayButton">Rejouer</button>
 	<button id="returnMenu">Retour au menu</button>
+	<button id="nextMatchButton" style="display: none;">Match suivant</button>
 `;
 document.body.appendChild(endScreen);
 
 const winnerMessage = document.getElementById('winnerMessage') as HTMLElement;
 const replayButton = document.getElementById('replayButton') as HTMLButtonElement;
 const returnMenuButton = document.getElementById('returnMenu') as HTMLButtonElement;
+const nextMatchButton = document.getElementById('nextMatchButton') as HTMLButtonElement; // Nouvelle constante
 
-const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"]; // Liste dynamique plus tard
+// const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"]; // Liste dynamique plus tard
 // const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3"]; // Liste dynamique plus tard
-// const playerNames = ["Joueur 1", "Joueur 2"]; // Liste dynamique plus tard
+const playerNames = ["Joueur 1", "Joueur 2"]; // Liste dynamique plus tard
 let lastPlayers: string[] = [];
 let isTournamentMode = false;
+let currentTournament: Tournament | null = null;
 
 // Définir l'état initial pour le menu
 history.replaceState({ page: 'menu' }, 'Menu', '#menu');
@@ -43,16 +46,18 @@ function showGame(): void {
 	endScreen.style.display = 'none';
 }
 
-function showEndScreen(winner: string, isTournament: boolean = false): void {
-	winnerMessage.textContent = isTournament ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match!`;
+function showEndScreen(winner: string, isTournament: boolean = false, isFinal: boolean = false): void {
+	winnerMessage.textContent = isFinal ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match!`;
 	menu.style.display = 'none';
 	game.style.display = 'block';
 	endScreen.style.display = 'block';
 	replayButton.style.display = isTournament ? 'none' : 'block'; // Cache "Rejouer" en tournoi
+	nextMatchButton.style.display = isTournament && !isFinal ? 'block' : 'none';
 }
 
 // Vérification que l'élément startButton existe avant d'ajouter l'écouteur
 if (startButton) {
+	// startButton.disabled = true;
 	startButton.addEventListener('click', function() {
 		lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
 		showGame();
@@ -61,23 +66,42 @@ if (startButton) {
 		history.pushState({ page: 'game' }, 'Jeu', '#game');
 
 		// Démarrer le jeu
+		// if (playerNames.length === 4 || playerNames.length === 8) {
+		// 	console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
+		// 	isTournamentMode = true;
+		// 	const tournament = new Tournament(playerNames);
+		// 	tournament.start((winner) => {
+		// 		console.log("Match terminé, gagnant :", winner);
+		// 		if (tournament.isTournamentOver()) {
+		// 			console.log("Tournoi terminé ! Champion :", tournament.getWinner());
+		// 			showEndScreen(winner, true);
+		// 		}
+		// 	});
+
 		if (playerNames.length === 4 || playerNames.length === 8) {
 			console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
 			isTournamentMode = true;
-			const tournament = new Tournament(playerNames);
-			tournament.start((winner) => {
+			currentTournament = new Tournament(playerNames);
+			currentTournament.start((winner) => {
 				console.log("Match terminé, gagnant :", winner);
-				if (tournament.isTournamentOver()) {
-					console.log("Tournoi terminé ! Champion :", tournament.getWinner());
+				if (currentTournament && currentTournament.isTournamentOver()) {
+					console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
+					showEndScreen(winner, true, true);
+				} else {
 					showEndScreen(winner, true);
 				}
+			// }, () => {
+			// 	startButton.disabled = false; // Réactive après le premier match si besoin
 			});
+
 		} else if (playerNames.length === 2) {
 			console.log("Match simple entre", playerNames[0], "et", playerNames[1]);
 			isTournamentMode = false;
 			startPongGame(playerNames[0], playerNames[1], (winner) => {
 				console.log("Match terminé, gagnant :", winner);
 				showEndScreen(winner);
+			// }, () => {
+			// 	startButton.disabled = false; // Active une fois chargé
 			});
 		} else {
 			alert("Pas assez de joueurs pour jouer !");
@@ -101,6 +125,24 @@ returnMenuButton.addEventListener('click', () => {
 	stopPongGame();
 	showMenu();
 	history.pushState({ page: 'menu' }, 'Menu', '#menu');
+});
+
+nextMatchButton.addEventListener('click', () => {
+	if (currentTournament) {
+		showGame();
+		history.pushState({ page: 'game' }, 'Jeu', '#game');
+		currentTournament.nextMatch((winner) => {
+			console.log("Match terminé, gagnant :", winner);
+			if (currentTournament && currentTournament.isTournamentOver()) {
+				console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
+				showEndScreen(winner, true, true);
+			} else {
+				showEndScreen(winner, true);
+			}
+		});
+	}
+	else
+		return ;
 });
 
 // Écouter l'événement popstate pour gérer "précédent" et "suivant"
