@@ -10,6 +10,7 @@ export class Ball3D {
 	radius: number;
 	centerX: number;
 	centerY: number;
+	isLoaded: boolean = false;
 
 	/**
 	* @param scene La scène BabylonJS.
@@ -42,6 +43,7 @@ export class Ball3D {
 			this.mesh.scaling = new BABYLON.Vector3(50, 50, 50);
 			// Positionner la balle
 			this.mesh.position = new BABYLON.Vector3(x, y, 0);
+			this.isLoaded = true; // Marque comme chargé ici
 
 			meshes.forEach(mesh => {
 				if (mesh.material) {

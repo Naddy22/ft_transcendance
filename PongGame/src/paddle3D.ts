@@ -10,6 +10,8 @@ export class Paddle3D {
 	movingUp: boolean;
 	movingDown: boolean;
 	initialY: number; // On stocke la position initiale en Y
+	isLoaded: boolean = false;
+
 	/**
 	 * @param scene La scène BabylonJS.
 	 * @param width La largeur du paddle (en unités).
@@ -59,6 +61,7 @@ export class Paddle3D {
 				}
 				// Par exemple, si tu veux que l'origine (pivot) soit à la base de la raquette :
 				this.mesh.setPivotPoint(new BABYLON.Vector3(0, 0.2, 0));
+				this.isLoaded = true;
 			}
 		  );
 	  

@@ -1,4 +1,4 @@
-import { startPongGame3D, stopPongGame3D } from './game3D.js';
+import { startPongGame3D, stopPongGame3D, resetForNewGame } from './game3D.js';
 
 export class Tournament {
 	players: string[];
@@ -48,23 +48,57 @@ export class Tournament {
 	}
 
 	start(callback: (winner: string) => void): void {
-		const playNextMatch = () => {
-			const currentMatch = this.getCurrentMatch();
-			if (!currentMatch) {
-				console.log("Tournoi terminé ! Gagnant :", this.getWinner());
-				callback(this.getWinner()!); // Informe du gagnant final
-				return;
-			}
-
-			console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
-			startPongGame3D(currentMatch.player1, currentMatch.player2, (winner) => {
-				stopPongGame3D();
-				this.setMatchWinner(winner);
-				callback(winner);
-				playNextMatch();
-			});
-		};
-
-		playNextMatch();
+		const currentMatch = this.getCurrentMatch();
+		if (!currentMatch) {
+			console.log("Tournoi terminé ! Gagnant :", this.getWinner());
+			callback(this.getWinner()!);
+			return;
+		}
+	
+		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
+		startPongGame3D(currentMatch.player1, currentMatch.player2, (winner) => {
+			stopPongGame3D();
+			// resetForNewGame();
+			this.setMatchWinner(winner);
+			callback(winner);
+		});
 	}
+	
+	nextMatch(callback: (winner: string) => void): void {
+		const currentMatch = this.getCurrentMatch();
+		if (!currentMatch) {
+			console.log("Tournoi terminé ! Gagnant :", this.getWinner());
+			callback(this.getWinner()!);
+			return;
+		}
+	
+		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
+		startPongGame3D(currentMatch.player1, currentMatch.player2, (winner) => {
+			stopPongGame3D();
+			this.setMatchWinner(winner);
+			callback(winner);
+		});
+	}
+
+	// start(callback: (winner: string) => void): void {
+	// 	const playNextMatch = () => {
+	// 		const currentMatch = this.getCurrentMatch();
+	// 		if (!currentMatch) {
+	// 			console.log("Tournoi terminé ! Gagnant :", this.getWinner());
+	// 			callback(this.getWinner()!); // Informe du gagnant final
+	// 			return;
+	// 		}
+
+	// 		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
+	// 		startPongGame3D(currentMatch.player1, currentMatch.player2, (winner) => {
+	// 			stopPongGame3D();
+	// 			this.setMatchWinner(winner);
+	// 			callback(winner);
+	// 			playNextMatch();
+	// 		});
+	// 	};
+
+	// 	playNextMatch();
+	// }
+
 }

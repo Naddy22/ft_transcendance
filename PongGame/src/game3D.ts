@@ -8,15 +8,40 @@ let engine: BABYLON.Engine;
 let guiTexture: GUI.AdvancedDynamicTexture;
 let gameStarted: boolean = false; // Variable pour savoir si le jeu a commencé
 
+
+let leftPlayer = new Player3D("Player 1");
+let rightPlayer = new Player3D("Player 2");
+
+// //nettoie les ecouteurs precedents
+// let activeListeners: { type: string; listener: (event: Event) => void }[] = []; // Ajoute cette ligne au début du fichier
+
+// function removeListeners(): void {
+// 	console.log("Suppression des écouteurs existants, nombre actuel :", activeListeners.length);
+// 	activeListeners.forEach(({ type, listener }) => {
+// 		window.removeEventListener(type, listener);
+// 	});
+// 	activeListeners = [];
+// }
+
 export function startPongGame3D(leftPlayerName: string, rightPlayerName: string, onGameEnd: (winner: string) => void): void {
+	console.log("Début startPongGame3D pour", leftPlayerName, "vs", rightPlayerName, "- gameStarted:", gameStarted);
+	// removeListeners(); // Ajoute ceci pour nettoyer les anciens écouteurs
+	// gameStarted = false; // Réinitialise explicitement
+
+	// if (engine) {
+	// 	console.log("Arrêt de l’ancien engine avant réinitialisation");
+	// 	engine.stopRenderLoop();
+	// 	engine.dispose(); // Ajoute ceci pour nettoyer l’ancien engine
+	// }
+	
 	// 1. Récupère le canvas et crée le moteur BabylonJS
 	const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
 	// const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 	
 	engine = new BABYLON.Engine(canvas, true);
 
-	const leftPlayer = new Player3D(leftPlayerName);
-	const rightPlayer = new Player3D(rightPlayerName);
+	leftPlayer.name = leftPlayerName;
+	rightPlayer.name = rightPlayerName;
 
 	const MAX_SCORE = 3;
 
@@ -112,9 +137,18 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 			if (event.key === "s") leftPaddle.movingDown = true;
 			if (event.key === "ArrowUp") rightPaddle.movingUp = true;
 			if (event.key === "ArrowDown") rightPaddle.movingDown = true;
-			if (event.code === "Space" && !gameStarted && ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
-			gameStarted = true;
-		  }
+			// if (event.code === "Space" && !gameStarted && ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
+			// // if (event.code === "Space" && !gameStarted && ball.isLoaded && leftPaddle.isLoaded && rightPaddle.isLoaded) {
+			// gameStarted = true;
+			if (event.code === "Space" && !gameStarted) {
+				console.log("Tentative ESPACE - Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
+				if (ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
+					console.log("ESPACE accepté, jeu démarré");
+					gameStarted = true;
+				} else {
+					console.log("ESPACE bloqué, modèles non chargés");
+				}
+			}
 		});
 		window.addEventListener("keyup", (event: KeyboardEvent) => {
 			if (event.key === "w") leftPaddle.movingUp = false;
@@ -196,35 +230,38 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 			// Rendre visible l'écran de fin
 			endPanel.isVisible = true;
 
-			// Arrête complètement le jeu
+			// // Arrête complètement le jeu
 			stopPongGame3D();
+
+			resetGame();
 
 			// Appelle le callback ici pour informer du gagnant
 			onGameEnd(winner);
 		}
 
-		// // Fonction pour réinitialiser le jeu
-		// function resetGame(): void {
-		// 	const endScreen = document.getElementById('endScreen'); // Supprime l'écran de fin
-		// 	if (endScreen)
-		// 		endScreen.remove();
-		// 	if (canvas)
-		// 		canvas.style.display = 'block';
+		// Fonction pour réinitialiser le jeu
+		function resetGame(): void {
+			// const endScreen = document.getElementById('endScreen'); // Supprime l'écran de fin
+			// if (endScreen)
+			// 	endScreen.remove();
+			// if (canvas)
+			// 	canvas.style.display = 'block';
 	
-		// 	leftPlayer.score = 0;
-		// 	leftPlayer.scoreText.text = leftPlayer.score.toString();
-		// 	rightPlayer.score = 0;
-		// 	rightPlayer.scoreText.text = rightPlayer.score.toString();
+			leftPlayer.score = 0;
+			leftPlayer.scoreText.text = leftPlayer.score.toString();
+			rightPlayer.score = 0;
+			rightPlayer.scoreText.text = rightPlayer.score.toString();
 	
-		// 	const serves = Math.random() < 0.5;
-		// 	ball.reset(serves);
-		// 	leftPaddle.reset();
-		// 	rightPaddle.reset();
-		// }
+			const serves = Math.random() < 0.5;
+			ball.reset(serves);
+			leftPaddle.reset();
+			rightPaddle.reset();
+		}
 
 		// 7. La boucle de jeu : ici, on met à jour la logique avant chaque rendu de la scène
 		scene.registerBeforeRender(() => {
 			const startMsg = guiTexture.getControlByName("startMessage") as GUI.TextBlock;
+			console.log("Avant rendu - gameStarted:", gameStarted, "Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
 			if (!ball.mesh || !leftPaddle.mesh || !rightPaddle.mesh)
 			{
 				startMsg.isVisible = false;
@@ -240,6 +277,7 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 				startMsg.isVisible = false;
 			update();
 		});
+
 		return scene;
 	};
 	
@@ -249,6 +287,13 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 }
 
 export function stopPongGame3D(): void {
-	engine.stopRenderLoop();
 	gameStarted = false;
+	// engine.dispose(); // Ajouter ceci pour nettoyer l’ancien engine
+	engine.stopRenderLoop();
+}
+
+function resetForNewGame(leftPlayerName: string, rightPlayerName: string): void {
+	gameStarted = false;
+	leftPlayer.name = leftPlayerName;
+	rightPlayer.name = rightPlayerName;
 }
