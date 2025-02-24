@@ -8,11 +8,7 @@ let engine: BABYLON.Engine;
 let guiTexture: GUI.AdvancedDynamicTexture;
 let gameStarted: boolean = false; // Variable pour savoir si le jeu a commencé
 
-
-let leftPlayer = new Player3D("Player 1");
-let rightPlayer = new Player3D("Player 2");
-
-//nettoie les ecouteurs precedents
+//nettoie les ecouteurs precedents sinon espace garde en memoire parti d'Avant
 let activeListeners: { type: string; listener: EventListener }[] = []; // Ajoute cette ligne au début du fichier
 
 function removeListeners(): void {
@@ -42,8 +38,8 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 	
 	engine = new BABYLON.Engine(canvas, true);
 
-	leftPlayer.name = leftPlayerName;
-	rightPlayer.name = rightPlayerName;
+	const leftPlayer = new Player3D(leftPlayerName);
+	const rightPlayer = new Player3D(rightPlayerName);
 
 	const MAX_SCORE = 3;
 
@@ -118,8 +114,18 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		// const border = BABYLON.MeshBuilder.CreateLines("border", { points: borderPoints }, scene);
 		// border.color = new BABYLON.Color3(1, 0, 0); // rouge
 	
+		// Ajout du sol
+		const ground = BABYLON.MeshBuilder.CreatePlane("ground", { width: sceneWidthUnits + 5, height: sceneHeightUnits + 5}, scene);
+		ground.rotation.x = 0; // Oriente le plan horizontalement
+		ground.position.z = 0.8; // Légèrement derrière les objets pour éviter le z-fighting
+		const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
+		groundMaterial.diffuseTexture = new BABYLON.Texture("/textures/black-carpet.jpg", scene);
+		groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0); // Supprime la réflexion spéculaire
+		groundMaterial.roughness = 1.0; // Rend le matériau mat (moins de brillance)
+		ground.material = groundMaterial;
+
 		// Ajouter une lumière
-		const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(-1, 0, -1), scene);
+		const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 0, -1), scene);
 	
 		// Création de la balle au centre et attends chargement
 		const ball = new Ball3D(scene, 0.5, 0, 0);
@@ -224,70 +230,70 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 
 		// Fonction pour afficher le gagnant et arrêter le jeu
 		function endGame(winner: string) {
-			// Vérifier si l'écran de fin existe déjà
-			let endPanel = guiTexture.getControlByName("endPanel") as GUI.StackPanel;
-			if (!endPanel) {
-				// Créer un panneau pour contenir les éléments de l'écran de fin
-				endPanel = new GUI.StackPanel("endPanel");
-				endPanel.width = "400px";
-				endPanel.height = "200px";
-				endPanel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-				endPanel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-				endPanel.background = "black"; // ou une couleur avec opacité
-				guiTexture.addControl(endPanel);
+			// // Vérifier si l'écran de fin existe déjà
+			// let endPanel = guiTexture.getControlByName("endPanel") as GUI.StackPanel;
+			// if (!endPanel) {
+			// 	// Créer un panneau pour contenir les éléments de l'écran de fin
+			// 	endPanel = new GUI.StackPanel("endPanel");
+			// 	endPanel.width = "400px";
+			// 	endPanel.height = "200px";
+			// 	endPanel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+			// 	endPanel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+			// 	endPanel.background = "black"; // ou une couleur avec opacité
+			// 	guiTexture.addControl(endPanel);
 				
-				// Créer un TextBlock pour afficher le message du gagnant
-				const endMessage = new GUI.TextBlock("endMessage");
-				endMessage.text = `${winner} a gagné !`;
-				endMessage.color = "white";
-				endMessage.fontSize = 30;
-				endMessage.height = "100px";
-				endPanel.addControl(endMessage);
+			// 	// Créer un TextBlock pour afficher le message du gagnant
+			// 	const endMessage = new GUI.TextBlock("endMessage");
+			// 	endMessage.text = `${winner} a gagné !`;
+			// 	endMessage.color = "white";
+			// 	endMessage.fontSize = 30;
+			// 	endMessage.height = "100px";
+			// 	endPanel.addControl(endMessage);
 				
-				// // Créer un bouton pour rejouer
-				// const restartButton = GUI.Button.CreateSimpleButton("restartButton", "Rejouer");
-				// restartButton.width = "200px";
-				// restartButton.height = "50px";
-				// restartButton.color = "white";
-				// restartButton.background = "gray";
-				// restartButton.onPointerUpObservable.add(() => {
-				// 	// Lorsque le bouton est cliqué, on appelle le resetGame
-				// 	resetGame();
-				// 	// Masquer l'écran de fin
-				// 	endPanel.isVisible = false;
-				// });
-				// endPanel.addControl(restartButton);
-			}
-			// Rendre visible l'écran de fin
-			endPanel.isVisible = true;
+			// 	// // Créer un bouton pour rejouer
+			// 	// const restartButton = GUI.Button.CreateSimpleButton("restartButton", "Rejouer");
+			// 	// restartButton.width = "200px";
+			// 	// restartButton.height = "50px";
+			// 	// restartButton.color = "white";
+			// 	// restartButton.background = "gray";
+			// 	// restartButton.onPointerUpObservable.add(() => {
+			// 	// 	// Lorsque le bouton est cliqué, on appelle le resetGame
+			// 	// 	resetGame();
+			// 	// 	// Masquer l'écran de fin
+			// 	// 	endPanel.isVisible = false;
+			// 	// });
+			// 	// endPanel.addControl(restartButton);
+			// }
+			// // Rendre visible l'écran de fin
+			// endPanel.isVisible = true;
 
 			// // Arrête complètement le jeu
 			stopPongGame3D();
 
-			resetGame();
+			// resetGame(); // a ajouté si je veux reset avant d'Avoir msg de fin
 
 			// Appelle le callback ici pour informer du gagnant
 			onGameEnd(winner);
 		}
 
-		// Fonction pour réinitialiser le jeu
-		function resetGame(): void {
-			// const endScreen = document.getElementById('endScreen'); // Supprime l'écran de fin
-			// if (endScreen)
-			// 	endScreen.remove();
-			// if (canvas)
-			// 	canvas.style.display = 'block';
+		// // Fonction pour réinitialiser le jeu
+		// function resetGame(): void {
+		// 	// const endScreen = document.getElementById('endScreen'); // Supprime l'écran de fin
+		// 	// if (endScreen)
+		// 	// 	endScreen.remove();
+		// 	// if (canvas)
+		// 	// 	canvas.style.display = 'block';
 	
-			leftPlayer.score = 0;
-			leftPlayer.scoreText.text = leftPlayer.score.toString();
-			rightPlayer.score = 0;
-			rightPlayer.scoreText.text = rightPlayer.score.toString();
+		// 	leftPlayer.score = 0;
+		// 	leftPlayer.scoreText.text = leftPlayer.score.toString();
+		// 	rightPlayer.score = 0;
+		// 	rightPlayer.scoreText.text = rightPlayer.score.toString();
 	
-			const serves = Math.random() < 0.5;
-			ball.reset(serves);
-			leftPaddle.reset();
-			rightPaddle.reset();
-		}
+		// 	const serves = Math.random() < 0.5;
+		// 	ball.reset(serves);
+		// 	leftPaddle.reset();
+		// 	rightPaddle.reset();
+		// }
 
 		// 7. La boucle de jeu : ici, on met à jour la logique avant chaque rendu de la scène
 		scene.registerBeforeRender(() => {
@@ -319,7 +325,7 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 
 export function stopPongGame3D(): void {
 	gameStarted = false;
-	engine.dispose(); // Ajouter ceci pour nettoyer l’ancien engine
+	// engine.dispose(); // Ajouter ceci pour nettoyer l’ancien engine mais on voit plus le jeu en fond quand le message "joueur x a gagné"
 	engine.stopRenderLoop();
 	removeListeners();
 }

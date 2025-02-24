@@ -23,9 +23,9 @@ const replayButton = document.getElementById('replayButton') as HTMLButtonElemen
 const returnMenuButton = document.getElementById('returnMenu') as HTMLButtonElement;
 const nextMatchButton = document.getElementById('nextMatchButton') as HTMLButtonElement; // Nouvelle constante
 
-const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"]; // Liste dynamique plus tard
+// const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"]; // Liste dynamique plus tard
 // const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3"]; // Liste dynamique plus tard
-// const playerNames = ["Joueur 1", "Joueur 2"]; // Liste dynamique plus tard
+const playerNames = ["Joueur 1", "Joueur 2"]; // Liste dynamique plus tard
 let lastPlayers: string[] = [];
 let isTournamentMode = false;
 let currentTournament: Tournament | null = null;
