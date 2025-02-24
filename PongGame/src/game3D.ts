@@ -12,27 +12,29 @@ let gameStarted: boolean = false; // Variable pour savoir si le jeu a commencé
 let leftPlayer = new Player3D("Player 1");
 let rightPlayer = new Player3D("Player 2");
 
-// //nettoie les ecouteurs precedents
-// let activeListeners: { type: string; listener: (event: Event) => void }[] = []; // Ajoute cette ligne au début du fichier
+//nettoie les ecouteurs precedents
+let activeListeners: { type: string; listener: EventListener }[] = []; // Ajoute cette ligne au début du fichier
 
-// function removeListeners(): void {
-// 	console.log("Suppression des écouteurs existants, nombre actuel :", activeListeners.length);
-// 	activeListeners.forEach(({ type, listener }) => {
-// 		window.removeEventListener(type, listener);
-// 	});
-// 	activeListeners = [];
-// }
+function removeListeners(): void {
+	console.log("Suppression des écouteurs existants, nombre actuel :", activeListeners.length);
+	activeListeners.forEach(({ type, listener }, index) => {
+		console.log(`Suppression de l’écouteur ${index + 1} : ${type}`);
+		window.removeEventListener(type, listener);
+	});
+	activeListeners = [];
+}
 
 export function startPongGame3D(leftPlayerName: string, rightPlayerName: string, onGameEnd: (winner: string) => void): void {
 	console.log("Début startPongGame3D pour", leftPlayerName, "vs", rightPlayerName, "- gameStarted:", gameStarted);
-	// removeListeners(); // Ajoute ceci pour nettoyer les anciens écouteurs
-	// gameStarted = false; // Réinitialise explicitement
+	removeListeners(); // Ajoute ceci pour nettoyer les anciens écouteurs
+	console.log("Écouteurs supprimés, activeListeners devrait être vide :", activeListeners.length);
+	gameStarted = false; // Réinitialise explicitement
 
-	// if (engine) {
-	// 	console.log("Arrêt de l’ancien engine avant réinitialisation");
-	// 	engine.stopRenderLoop();
-	// 	engine.dispose(); // Ajoute ceci pour nettoyer l’ancien engine
-	// }
+	if (engine) {
+		console.log("Arrêt de l’ancien engine avant réinitialisation");
+		engine.stopRenderLoop();
+		engine.dispose(); // Ajoute ceci pour nettoyer l’ancien engine
+	}
 	
 	// 1. Récupère le canvas et crée le moteur BabylonJS
 	const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
@@ -131,15 +133,38 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		leftPlayer.drawScore(-42, -45, guiTexture); // à gauche
 		rightPlayer.drawScore(42, -45, guiTexture); // à droite
 
-		// 6. Gestion des entrées clavier pour les paddles et pour démarrer le jeu
-		window.addEventListener("keydown", (event: KeyboardEvent) => {
+		// // 6. Gestion des entrées clavier pour les paddles et pour démarrer le jeu
+		// window.addEventListener("keydown", (event: KeyboardEvent) => {
+		// 	if (event.key === "w") leftPaddle.movingUp = true;
+		// 	if (event.key === "s") leftPaddle.movingDown = true;
+		// 	if (event.key === "ArrowUp") rightPaddle.movingUp = true;
+		// 	if (event.key === "ArrowDown") rightPaddle.movingDown = true;
+		// 	// if (event.code === "Space" && !gameStarted && ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
+		// 	// // if (event.code === "Space" && !gameStarted && ball.isLoaded && leftPaddle.isLoaded && rightPaddle.isLoaded) {
+		// 	// gameStarted = true;
+		// 	if (event.code === "Space" && !gameStarted) {
+		// 		console.log("Tentative ESPACE - Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
+		// 		if (ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
+		// 			console.log("ESPACE accepté, jeu démarré");
+		// 			gameStarted = true;
+		// 		} else {
+		// 			console.log("ESPACE bloqué, modèles non chargés");
+		// 		}
+		// 	}
+		// });
+		// window.addEventListener("keyup", (event: KeyboardEvent) => {
+		// 	if (event.key === "w") leftPaddle.movingUp = false;
+		// 	if (event.key === "s") leftPaddle.movingDown = false;
+		// 	if (event.key === "ArrowUp") rightPaddle.movingUp = false;
+		// 	if (event.key === "ArrowDown") rightPaddle.movingDown = false;
+		// });
+
+
+		const keydownHandler = ((event: KeyboardEvent) => {
 			if (event.key === "w") leftPaddle.movingUp = true;
 			if (event.key === "s") leftPaddle.movingDown = true;
 			if (event.key === "ArrowUp") rightPaddle.movingUp = true;
 			if (event.key === "ArrowDown") rightPaddle.movingDown = true;
-			// if (event.code === "Space" && !gameStarted && ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
-			// // if (event.code === "Space" && !gameStarted && ball.isLoaded && leftPaddle.isLoaded && rightPaddle.isLoaded) {
-			// gameStarted = true;
 			if (event.code === "Space" && !gameStarted) {
 				console.log("Tentative ESPACE - Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
 				if (ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
@@ -149,13 +174,19 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 					console.log("ESPACE bloqué, modèles non chargés");
 				}
 			}
-		});
-		window.addEventListener("keyup", (event: KeyboardEvent) => {
+		}) as EventListener;
+		const keyupHandler = ((event: KeyboardEvent) => {
 			if (event.key === "w") leftPaddle.movingUp = false;
 			if (event.key === "s") leftPaddle.movingDown = false;
 			if (event.key === "ArrowUp") rightPaddle.movingUp = false;
 			if (event.key === "ArrowDown") rightPaddle.movingDown = false;
-		});
+		}) as EventListener;
+
+		window.addEventListener("keydown", keydownHandler);
+		window.addEventListener("keyup", keyupHandler);
+		activeListeners.push({ type: "keydown", listener: keydownHandler });
+		activeListeners.push({ type: "keyup", listener: keyupHandler });
+		console.log("Écouteurs ajoutés, total actuel :", activeListeners.length);
 
 		function update(): void {
 			if (!ball.mesh) return; // Sécurité avant chargement
@@ -288,12 +319,7 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 
 export function stopPongGame3D(): void {
 	gameStarted = false;
-	// engine.dispose(); // Ajouter ceci pour nettoyer l’ancien engine
+	engine.dispose(); // Ajouter ceci pour nettoyer l’ancien engine
 	engine.stopRenderLoop();
-}
-
-function resetForNewGame(leftPlayerName: string, rightPlayerName: string): void {
-	gameStarted = false;
-	leftPlayer.name = leftPlayerName;
-	rightPlayer.name = rightPlayerName;
+	removeListeners();
 }
