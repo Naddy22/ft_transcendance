@@ -3,7 +3,7 @@
 
 ## Key Differences Between `.ts` and `.js`
 
-✅ TypeScript (`.ts`)
+TypeScript (`.ts`)
 - Static Typing: Allows defining types (`string`, `number`, `boolean`, etc.), reducing runtime errors.
 - Better IDE Support: Provides autocomplete, inline documentation, and type checking.
 - Interface & Type Definitions: Enables defining structured objects (`interface`, `type`).
@@ -13,7 +13,7 @@
 - Explicit Module Imports: Ensures proper handling of dependencies (`import { ... } from '...'`).
 - Strict Mode (`strict: true`): Helps catch errors early.
 
-❌ JavaScript (`.js`)
+JavaScript (`.js`)
 - Dynamically Typed: No type enforcement; errors might occur at runtime.
 - Runs Immediately: No compilation required, making development faster in simple projects.
 - Less Strict: Allows flexible coding but increases chances of unexpected bugs.
@@ -23,7 +23,7 @@
 
 ## Key Differences Between CommonJS (`require`) and ES Modules (`import`)
 
-✅ CommonJS (CJS)
+CommonJS (CJS)
 - Uses `require()` and `module.exports`.
 - Synchronous loading (executes modules immediately).
 - Default in Node.js (before ES modules support).
@@ -39,7 +39,7 @@ const app = express();
 module.exports = app;
 ```
 
-✅ ES Modules (ESM)
+ES Modules (ESM)
 
 - Uses `import` and `export` instead of `require()`.
 - Asynchronous loading (uses `import()` for dynamic imports).
@@ -59,7 +59,7 @@ export default app;
 - Use ESM (`import/export`) if you're working on a modern project, using TypeScript, or need better compatibility with frontend frameworks.
 - Use CommonJS (`require/module.exports`) if you're working with older Node.js versions or using dependencies that don’t support ESM.
 
-🚀 For TypeScript, it's best to use ESM unless you're working with legacy code.
+For TypeScript, it's best to use ESM unless you're working with legacy code.
 
 ---
 

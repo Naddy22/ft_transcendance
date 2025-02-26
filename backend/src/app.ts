@@ -34,7 +34,12 @@ setupGameWebSocket(app);
 
 // Root route (Health Check)
 app.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
-  return { message: "Backend is running!" };
+	return { message: "Backend is running!" };
+});
+
+// Ping
+app.get("/ping", async (request, reply) => {
+	return "pong/n";
 });
 
 // Global error handler

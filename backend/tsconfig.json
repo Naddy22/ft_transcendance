@@ -4,7 +4,7 @@
     "compilerOptions": {
 	  "module": "NodeNext",             // Enables ESM support
       "moduleResolution": "NodeNext",   // Resolves imports using ESM rules
-      "target": "ESNext",               // Supports the latest JavaScript features
+      "target": "ESNext",               // https://www.typescriptlang.org/tsconfig/#target
       "outDir": "dist",                 // Compiled output directory
       "rootDir": "src",                 // Source files directory
       "strict": true,                   // Enable strict type-checking
