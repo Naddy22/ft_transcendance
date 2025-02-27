@@ -27,9 +27,9 @@ const replayButton = document.getElementById('replayButton') as HTMLButtonElemen
 const returnMenuButton = document.getElementById('returnMenu') as HTMLButtonElement;
 const nextMatchButton = document.getElementById('nextMatchButton') as HTMLButtonElement; // Nouvelle constante
 
-// const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"]; // Liste dynamique plus tard
+const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3", "Joueur 4"]; // Liste dynamique plus tard
 // const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3"]; // Liste dynamique plus tard
-const playerNames = ["Joueur 1", "Joueur 2"]; // Liste dynamique plus tard
+// const playerNames = ["Joueur 1", "Joueur 2"]; // Liste dynamique plus tard
 let lastPlayers: string[] = [];
 let isTournamentMode: boolean = false;
 let currentTournament: Tournament | null = null;
@@ -50,13 +50,36 @@ function showGame(): void {
 	endScreen.style.display = 'none';
 }
 
+// function showEndScreen(winner: string, isTournament: boolean = false, isFinal: boolean = false): void {
+// 	winnerMessage.textContent = isFinal ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match!`;
+// 	menu.style.display = 'none';
+// 	game.style.display = 'block';
+// 	endScreen.style.display = 'block';
+// 	replayButton.style.display = isTournament ? 'none' : 'block'; // Cache "Rejouer" en tournoi
+// 	nextMatchButton.style.display = isTournament && !isFinal ? 'block' : 'none';
+// }
+
 function showEndScreen(winner: string, isTournament: boolean = false, isFinal: boolean = false): void {
-	winnerMessage.textContent = isFinal ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match!`;
+	winnerMessage.textContent = isFinal ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match !`;
 	menu.style.display = 'none';
 	game.style.display = 'block';
 	endScreen.style.display = 'block';
 	replayButton.style.display = isTournament ? 'none' : 'block'; // Cache "Rejouer" en tournoi
 	nextMatchButton.style.display = isTournament && !isFinal ? 'block' : 'none';
+
+	if (isTournament && currentTournament) {
+		const currentMatch = currentTournament.getCurrentMatch();
+		const nextMatch = currentTournament.getNextMatch();
+		currentMatchInfo.textContent = currentMatch 
+			? `Match en cours : ${currentMatch.player1} vs ${currentMatch.player2}` 
+			: "Dernier match terminé";
+		nextMatchInfo.textContent = nextMatch 
+			? `Prochain match : ${nextMatch.player1} vs ${nextMatch.player2}` 
+			: isFinal ? "Tournoi terminé !" : "Préparation de la prochaine ronde...";
+	} else {
+		currentMatchInfo.textContent = "";
+		nextMatchInfo.textContent = "";
+	}
 }
 
 // Vérification que l'élément startButton existe avant d'ajouter l'écouteur
