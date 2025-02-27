@@ -12,6 +12,8 @@ const endScreen = document.createElement('div');
 endScreen.id = 'endScreen';
 endScreen.innerHTML = `
 	<h1 id="winnerMessage"></h1>
+	<p id="currentMatchInfo"></p>
+	<p id="nextMatchInfo"></p>
 	<button id="replayButton">Rejouer</button>
 	<button id="returnMenu">Retour au menu</button>
 	<button id="nextMatchButton" style="display: none;">Match suivant</button>
@@ -19,6 +21,8 @@ endScreen.innerHTML = `
 document.body.appendChild(endScreen);
 
 const winnerMessage = document.getElementById('winnerMessage') as HTMLElement;
+const currentMatchInfo = document.getElementById('currentMatchInfo') as HTMLElement;
+const nextMatchInfo = document.getElementById('nextMatchInfo') as HTMLElement;
 const replayButton = document.getElementById('replayButton') as HTMLButtonElement;
 const returnMenuButton = document.getElementById('returnMenu') as HTMLButtonElement;
 const nextMatchButton = document.getElementById('nextMatchButton') as HTMLButtonElement; // Nouvelle constante
@@ -27,7 +31,7 @@ const nextMatchButton = document.getElementById('nextMatchButton') as HTMLButton
 // const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3"]; // Liste dynamique plus tard
 const playerNames = ["Joueur 1", "Joueur 2"]; // Liste dynamique plus tard
 let lastPlayers: string[] = [];
-let isTournamentMode = false;
+let isTournamentMode: boolean = false;
 let currentTournament: Tournament | null = null;
 
 // Définir l'état initial pour le menu

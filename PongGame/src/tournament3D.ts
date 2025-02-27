@@ -24,6 +24,11 @@ export class Tournament {
 		return this.matches[this.currentMatchIndex];
 	}
 
+	getNextMatch(): { player1: string; player2: string } | null {
+		if (this.currentMatchIndex + 1 >= this.matches.length) return null;
+		return this.matches[this.currentMatchIndex + 1];
+	}
+
 	setMatchWinner(winner: string): void {
 		if (this.currentMatchIndex < this.matches.length) {
 			this.matches[this.currentMatchIndex].winner = winner;

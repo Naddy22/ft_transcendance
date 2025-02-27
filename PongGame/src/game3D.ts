@@ -63,13 +63,31 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		
 		const startMessage = new GUI.TextBlock("startMessage");
 		startMessage.text = "Appuyez sur ESPACE pour commencer";
-		startMessage.color = "white";
+		startMessage.color = "#f9d3d9"; //rose pastel
 		startMessage.fontSize = 20;
+		startMessage.fontFamily = "Mochiy Pop P One"; // Police kawaii
 		startMessage.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
 		startMessage.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
 		startMessage.top = "-75px";
-		
+		startMessage.outlineWidth = 4; // Contour noir pour contraste
+		startMessage.outlineColor = "#333"; // Contour sombre
 		advancedTexture.addControl(startMessage);
+
+		// Écran de chargement
+		const loadingBackground = new GUI.Rectangle("loadingBackground");
+		loadingBackground.width = 1.0;
+		loadingBackground.height = 1.0;
+		loadingBackground.background = "rgb(229, 251, 201)"; // Fond sombre semi-transparent
+		advancedTexture.addControl(loadingBackground);
+	
+		const loadingText = new GUI.TextBlock("loadingText");
+		loadingText.text = "Chargement en cours...";
+		loadingText.color = "black";
+		loadingText.fontSize = 30;
+		loadingText.fontFamily = "Mochiy Pop P One";
+		loadingText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+		loadingText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
+		loadingBackground.addControl(loadingText);
 		
 		return advancedTexture;
 	}
@@ -114,14 +132,14 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		// const border = BABYLON.MeshBuilder.CreateLines("border", { points: borderPoints }, scene);
 		// border.color = new BABYLON.Color3(1, 0, 0); // rouge
 	
-		// Ajout du sol
+		// Ajout du sol grace a photo importer
 		const ground = BABYLON.MeshBuilder.CreatePlane("ground", { width: sceneWidthUnits + 5, height: sceneHeightUnits + 5}, scene);
 		ground.rotation.x = 0; // Oriente le plan horizontalement
 		ground.position.z = 0.8; // Légèrement derrière les objets pour éviter le z-fighting
 		const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-		groundMaterial.diffuseTexture = new BABYLON.Texture("/textures/black-carpet.jpg", scene);
-		groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0); // Supprime la réflexion spéculaire
-		groundMaterial.roughness = 1.0; // Rend le matériau mat (moins de brillance)
+		groundMaterial.diffuseTexture = new BABYLON.Texture("/textures/grass-draw.jpg", scene);
+		groundMaterial.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15); // Supprime la réflexion spéculaire
+		// groundMaterial.roughness = 1.0; // Rend le matériau mat (moins de brillance)
 		ground.material = groundMaterial;
 
 		// Ajouter une lumière
@@ -298,20 +316,24 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		// 7. La boucle de jeu : ici, on met à jour la logique avant chaque rendu de la scène
 		scene.registerBeforeRender(() => {
 			const startMsg = guiTexture.getControlByName("startMessage") as GUI.TextBlock;
+			const loadingBg = guiTexture.getControlByName("loadingBackground") as GUI.Rectangle;
 			console.log("Avant rendu - gameStarted:", gameStarted, "Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
 			if (!ball.mesh || !leftPaddle.mesh || !rightPaddle.mesh)
 			{
-				startMsg.isVisible = false;
+				if (startMsg) startMsg.isVisible = false; // Cache le message de départ
+				if (loadingBg) loadingBg.isVisible = true; // Affiche l’écran de chargement
 				return;
-			}	
-			else if (!gameStarted) {
+			}
+			// Une fois chargé, masque l’écran de chargement
+			if (loadingBg) loadingBg.isVisible = false;
+			if (!gameStarted) {
 				if (startMsg) {
 					startMsg.isVisible = true;
 				}
 				return;
 			}
-			else
-				startMsg.isVisible = false;
+			startMsg.isVisible = false;
+
 			update();
 		});
 
