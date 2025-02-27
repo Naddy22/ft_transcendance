@@ -4,86 +4,9 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>ft_transcendance</title>
-	<style>
-		/* voir si on doit mettre d'autre style avant */
-		body {
-			font-family: Arial, sans-serif;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100vh;
-			margin: 0;
-			background-color: #f0f0f0;
-		}
-		#menu {
-			text-align: center;
-			display: block;
-		}
-		#game {
-			display: none; /* On cache le jeu au début */
-			width: 900px;
-			height: 600px;
-			/* width: 600px;
-			height: 400px; */
-			/* width: 80vw;
-			height: 80vh; */
-			background-color: black;
-			position: relative; /* Pour positionner les noms à l'intérieur du jeu */
-		}
-		#endScreen {
-			display: none;
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			text-align: center;
-			color: white;
-			background-color: rgba(0, 0, 0, 0.8);
-			width: 400px;
-			padding: 20px;
-			border-radius: 10px;
-			z-index: 10;
-		}
-		/* Pour la section playerNames */
-		#playerNames {
-			position: absolute;       /* Positionner le titre au-dessus du canvas */
-			top: -30px;                /* Espacement du haut du jeu */
-			left: 0;                   /* Coller à gauche */
-			width: 100%;               /* Largeur à 100% */
-			text-align: center;        /* Centrer horizontalement */
-			font-size: 24px;           /* Taille de police */
-			font-family: sans-serif;   /* Police simple */
-			color: black;              /* Couleur du texte */
-			z-index: 1;                /* S'assurer que le texte est au-dessus du canvas */
-		}
-
-		/* Pour le leftPlayerName et rightPlayerName */
-		#leftPlayerName {
-			position: absolute;      /* On positionne le nom à gauche */
-			left: 10px;              /* Espacement à gauche */
-			text-align: left;        /* Alignement à gauche */
-		}
-
-		#rightPlayerName {
-			position: absolute;      /* On positionne le nom à droite */
-			right: 10px;             /* Espacement à droite */
-			text-align: right;       /* Alignement à droite */
-		}
-		button {
-			display: block;
-			width: 200px;
-			padding: 10px;
-			margin: 10px auto;
-			background-color: gray;
-			color: white;
-			border: none;
-			border-radius: 5px;
-			cursor: pointer;
-		}
-		button:hover {
-			background-color: #555;
-		}
-	</style>
+	<link rel="stylesheet" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Klee+One&display=swap" rel="stylesheet">
 </head>
 <body>
 	<!-- Menu -->

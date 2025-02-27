@@ -52,14 +52,14 @@ export class Ball3D {
 						// Optionnel : si tu veux ajouter une teinte, modifie albedoColor
 						// Si je veux que la texture apparaisse telle quelle, mettre albedoColor à blanc (0,0,0):
 						pbrMat.albedoColor = new BABYLON.Color3(10, 10.75, 30.8); //fait un rose
-					  } else if (mesh.material instanceof BABYLON.StandardMaterial) {
+					} else if (mesh.material instanceof BABYLON.StandardMaterial) {
 						const stdMat = mesh.material as BABYLON.StandardMaterial;
 						// De même, laisse la texture intacte
 						// stdMat.diffuseTexture = null;
 						stdMat.diffuseColor = new BABYLON.Color3(1, 1, 1);
-					  }
+					}
 				}
-			  });
+			});
 		}, null, (scene, message, exception) => {
 			console.error("Erreur lors du chargement du modèle :", message, exception);
 		});

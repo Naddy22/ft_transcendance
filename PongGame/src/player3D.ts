@@ -11,8 +11,11 @@ export class Player3D {
 		// Crée le TextBlock pour afficher le score
 		this.scoreText = new GUI.TextBlock(name + "scoreMessage");
 		this.scoreText.text = this.score.toString();
-		this.scoreText.color = "white";
+		this.scoreText.color = "#f9d3d9";
 		this.scoreText.fontSize = 30;
+		this.scoreText.fontFamily = "Mochiy Pop P One"; // Police kawaii
+		this.scoreText.outlineWidth = 4; // Contour pour contraste
+        this.scoreText.outlineColor = "#333"; // Contour sombre
 	}
 
 	// Méthode pour placer le score sur l'interface GUI
