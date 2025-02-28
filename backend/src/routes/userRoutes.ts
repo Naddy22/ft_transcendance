@@ -1,68 +1,129 @@
 // File: backend/src/routes/userRoutes.ts
 
-import bcrypt from "bcrypt";
-import { FastifyInstance, FastifySchema } from 'fastify';
-// import { userSchema, User } from '../schemas/userSchema.js';
-import { userSchema, userResponseSchema, loginSchema, User, LoginRequest } from "../schemas/userSchema.js";
+import { FastifyInstance } from 'fastify';
+import fastifyStatic from "@fastify/static";
+import { userSchema, PublicUser } from "../schemas/userSchema.js";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from 'url';
+
+// Fix `__dirname` in ESModules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Avatar storage setup
+const AVATAR_DIR = path.join(__dirname, "../../uploads/avatars");
+if (!fs.existsSync(AVATAR_DIR)) {
+  fs.mkdirSync(AVATAR_DIR, { recursive: true });
+}
 
 export async function userRoutes(fastify: FastifyInstance) {
 
-	// Register Route
-	fastify.post<{ Body: User }>("/register", {
-		schema: { body: userSchema, response: { 201: userResponseSchema } }
-	}, async (req, reply) => {
-		try {
-			const { username, email, password } = req.body;
+  /**
+   * Serve uploaded avatars
+   * This allows users to access their uploaded avatars vis `/avatars/filename`
+   */
+  fastify.register(fastifyStatic, {
+    root: AVATAR_DIR,
+    prefix: "/avatars/",
+  });
 
-			// Hash password
-			const saltRounds = 10;
-			const hashedPassword = await bcrypt.hash(password, saltRounds);
+  /**
+   * Upload User Avatar
+   * - Validates file type (JPEG, PNG, WEBP)
+   * - Saves avatar in `/uploads/avatars/`
+   * - Returns the avatar URL
+   */
+  fastify.post("/avatar", async (req, reply) => {
+    const data = await req.file();
+    if (!data) return reply.status(400).send({ error: "No file uploaded" });
 
-			// Store user in database
-			const stmt = fastify.sqlite.prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-			const result = stmt.run(username, email, hashedPassword);
+    // Validate file type (only allow images)
+    const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedMimeTypes.includes(data.mimetype)) {
+      return reply.status(400).send({ error: "Invalid file type" });
+    }
 
-			reply.status(201).send({ id: result.lastInsertRowid, username, email });
-		} catch (error) {
-			console.error("Error during registration:", error);
-			reply.status(500).send({ error: "Internal Server Error" });
-		}
-	});
+    // Generate a unique filename
+    const fileName = `${Date.now()}-${data.filename}`;
+    const filePath = path.join(AVATAR_DIR, fileName);
 
-	// Login Route
-	fastify.post<{ Body: LoginRequest }>("/login", {
-		schema: { body: loginSchema }
-	},	async (req, reply) => {
-		try {
-		  const { email, password } = req.body;
-	
-		  // 🔍 Check if user exists
-		  const user = fastify.sqlite.prepare("SELECT * FROM users WHERE email = ?").get(email);
-		  if (!user)
-			return reply.status(401).send({ error: "User not found" });
-	
-		  // 🔒 Compare hashed password
-		  const passwordMatch = await bcrypt.compare(password, user.password);
-		  if (!passwordMatch)
-			return reply.status(401).send({ error: "Invalid credentials" });
-	
-		  reply.send({ message: "Login successful", userId: user.id });
-		} catch (error) {
-		  console.error("Error during login:", error);
-		  reply.status(500).send({ error: "Internal Server Error" });
-		}
-	});
-	
-	  // List Users Route (EXCLUDES PASSWORDS)
-	  fastify.get("/list", {
-		schema: { response: { 200: { type: "array", items: userResponseSchema } } }
-	  }, async (req, reply) => {
-		try {
-		  const users = fastify.sqlite.prepare("SELECT id, username, email FROM users").all();
-		  reply.send(users);
-		} catch (error) {
-		  console.error("Error fetching users:", error);
-		  reply.status(500).send({ error: "Internal Server Error" });
-		}
-	});
+    // Save the file
+    await fs.promises.writeFile(filePath, await data.toBuffer());
+
+    // Return the public URL of the uploaded avatar
+    reply.send({ avatarUrl: `/avatars/${fileName}` });
+    // const avatarUrl = `/avatars/${fileName}`;
+    // reply.send({ avatarUrl });
+  });
+
+  /**
+   * Update User Avatar in Database
+   */
+    fastify.put<{ Body: { userId: number; avatarUrl: string } }>("/avatar", async (req, reply) => {
+    const { userId, avatarUrl } = req.body;
+
+    if (!userId || !avatarUrl) {
+      return reply.status(400).send({ error: "Missing userId or avatarUrl" });
+    }
+
+    const stmt = await fastify.db.prepare("UPDATE users SET avatar = ? WHERE id = ?");
+    await stmt.run(avatarUrl, userId);
+
+    reply.send({ message: "Avatar updated successfully", avatarUrl });
+  });
+
+  /**
+   * Get all users (Excludes passwords)
+   */
+  fastify.get("/", async (req, reply) => {
+    try {
+      const stmt = await fastify.db.prepare("SELECT id, username, email, avatar, status FROM users");
+      const users: PublicUser[] = await stmt.all();
+
+      reply.send(users);
+    } catch (error) {
+      console.error("❌ Error fetching users:", error);
+      reply.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  /**
+   * Get a specific user's profile (Excludes password)
+   */
+  fastify.get<{ Params: { id: string } }>("/:id", async (req, reply) => {
+    try {
+      const { id } = req.params;
+      const stmt = await fastify.db.prepare("SELECT id, username, email, avatar, status FROM users WHERE id = ?");
+      stmt.bind(id);
+      const user = await stmt.get() as PublicUser | undefined;
+
+      if (!user) return reply.status(404).send({ error: "User not found" });
+
+      reply.send(user);
+    } catch (error) {
+      console.error("❌ Error fetching user:", error);
+      reply.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  /**
+   * Get a specific user's match stats
+   */
+  fastify.get<{ Params: { id: string } }>("/:id/stats", async (req, reply) => {
+    try {
+      const { id } = req.params;
+      const stmt = await fastify.db.prepare("SELECT wins, losses, matchesPlayed FROM users WHERE id = ?");
+      stmt.bind(id);
+      const stats = await stmt.get();
+
+      if (!stats) return reply.status(404).send({ error: "User not found" });
+      
+      reply.send(stats);
+    } catch (error) {
+      console.error("❌ Error fetching user stats:", error);
+      reply.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
 }

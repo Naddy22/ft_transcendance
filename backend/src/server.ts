@@ -1,32 +1,36 @@
-
-// TOCHECK:
-// https://fastify.dev/docs/latest/Reference/Server/#ignoretrailingslash
-
-// https://github.com/yoav0gal/fastify-sqlite-typed
-
 // File: backend/src/server.ts
+// Main Fastify server setup, including routes, database, and shutdown handling.
 
 import Fastify from 'fastify';
 import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
-import { fpSqlitePlugin } from 'fastify-sqlite-typed';
+import fastifyMultipart from "@fastify/multipart";
+import helmet from '@fastify/helmet';
 import dotenv from "dotenv";
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { fpSqlitePlugin } from 'fastify-sqlite-typed';
+
 import { setupRoutes } from './routes/setupRoutes.js';
 import { setupDatabase } from './database.js';
 import { closeGracefully } from './shutdown.js';
+
 import { userSchema } from './schemas/userSchema.js';
 import { matchSchema } from './schemas/matchSchema.js';
 import { tournamentSchema } from './schemas/tournamentSchema.js';
 import { wsSchema } from './schemas/wsSchema.js';
 
+// ────────────────────────────────────────────────────────────────────────────────
+// Load environment variables
+dotenv.config();
+
 // Resolve __dirname and paths correctly in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// SSL Certificate Paths
+// ────────────────────────────────────────────────────────────────────────────────
+// Setup SSL Certificates
 const certPath = path.join(__dirname, '../certs/cert.pem');
 const keyPath = path.join(__dirname, '../certs/key.pem');
 
@@ -38,23 +42,23 @@ if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
     console.log('SSL certificates generated.');
 }
 
-// Ensure `data/` directory exists before initializing the database
+// ────────────────────────────────────────────────────────────────────────────────
+// Ensure data directory exists before initializing the database
 const dataDir = path.join(__dirname, '../data');
 if (!fs.existsSync(dataDir)) {
     console.log('Creating data directory...');
     fs.mkdirSync(dataDir, { recursive: true });
 }
 
-// Set database path for SQLite
+// Setup SQLite database
 const dbPath = path.join(dataDir, 'database.sqlite');
-// if (!fs.existsSync(dbPath)) {
-//     console.log('🆕 Creating new SQLite database at:', dbPath);
-//     fs.writeFileSync(dbPath, ''); // Ensure the file exists
-// }
+if (!fs.existsSync(dbPath)) {
+    console.log('🆕 Creating new SQLite database at:', dbPath);
+    fs.writeFileSync(dbPath, ''); // Ensure the file exists
+}
+console.log(`🗄️ Using SQLite database at: ${dbPath}`); // debug
 
-// Load environment variables
-dotenv.config();
-
+// ────────────────────────────────────────────────────────────────────────────────
 // Initialize Fastify Server
 const fastify = Fastify({
   logger: true,
@@ -64,45 +68,46 @@ const fastify = Fastify({
   }
 });
 
-// 🔍 Debugging - Print the resolved path before registering the plugin
-console.log(`🗄️ Using SQLite database at: ${dbPath}`);
-
-// Register SQLite Plugin
-await fastify.register(fpSqlitePlugin, {
-	dbFilename: dbPath
-	// connectionString: `sqlite://${dbPath}`
-	// connectionString: dbPath
-});
-
-// Register Fastify Plugins
+// ────────────────────────────────────────────────────────────────────────────────
+// Register plugins
+await fastify.register(helmet);
+await fastify.register(fpSqlitePlugin, { dbFilename: dbPath });
+await fastify.register(fastifyMultipart);
 await fastify.register(fastifyWebsocket);
 await fastify.register(fastifyStatic, {
   root: path.join(__dirname, '../../frontend/dist'),
   prefix: '/',
 });
 
-// Register Schemas
-fastify.addSchema(userSchema);
-fastify.addSchema(matchSchema);
-fastify.addSchema(tournamentSchema);
-fastify.addSchema(wsSchema);
+// ────────────────────────────────────────────────────────────────────────────────
+// Register JSON Schemas
+// fastify.addSchema(userSchema);
+// fastify.addSchema(matchSchema);
+// fastify.addSchema(tournamentSchema);
+// fastify.addSchema(wsSchema);
+const schemas = [userSchema, matchSchema, tournamentSchema, wsSchema];
+schemas.forEach(schema => fastify.addSchema(schema));
 
+// ────────────────────────────────────────────────────────────────────────────────
 // Register routes
 setupRoutes(fastify);
 
-// Ensure all plugins are ready
-await fastify.ready();
+// Health check endpoint
+fastify.get('/health', (req, reply) => reply.send({ status: 'ok' }));
 
-// 
-console.log("🛠️ Fastify Decorators:", Object.keys(fastify)); // debug
-// 
+// ────────────────────────────────────────────────────────────────────────────────
+// Ensure plugins are ready
+await fastify.ready();
 
 // Setup database
 await setupDatabase(fastify);
 
-// Handle shutdown
+// Handle graceful shutdown
 closeGracefully(fastify);
 
+// console.log("🛠️ Fastify Decorators:", Object.keys(fastify)); // debug
+
+// ────────────────────────────────────────────────────────────────────────────────
 // Start Server
 const start = async () => {
   try {
@@ -124,3 +129,7 @@ start();
 //     fastify.log.error(err);
 //     process.exit(1);
 // });
+
+
+// TOCHECK:
+// https://fastify.dev/docs/latest/Reference/Server/#ignoretrailingslash

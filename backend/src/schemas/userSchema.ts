@@ -29,12 +29,12 @@ export const userSchema = {
     "password": {
       "type": "string",
       "minLength": 8,
-      "description": "Hashed password"
+      "description": "Hashed password (only stored internally"
     },
     "avatar": {
-      "type": "string",
+      "type": ["string", "null"],
       "format": "uri",
-      "description": "User avatar image URL"
+      "description": "User avatar image URL (null if not set)"
     },
     "friends": {
       "type": "array",
@@ -46,54 +46,45 @@ export const userSchema = {
       "enum": ["online", "offline", "in-game"],
       "description": "User's online status"
     },
-    "stats": {
-      "type": "object",
-      "properties": {
-        "wins": { "type": "integer", "minimum": 0 },
-        "losses": { "type": "integer", "minimum": 0 },
-        "matchesPlayed": { "type": "integer", "minimum": 0 }
-      },
-      "description": "User match statistics"
-    }
+	"wins": {
+		"type": "integer",
+		"minimum": 0,
+		"description": "Total matches won"
+	},
+	"losses": {
+		"type": "integer",
+		"minimum": 0,
+		"description": "Total matches lost"
+	},
+	"matchesPlayed": {
+		"type": "integer",
+		"minimum": 0,
+		"description": "Total matches played"
+	}
   },
   "required": ["username", "email", "password"]
 } as const;
 
-export const userResponseSchema = {
-	"$id": "userResponseSchema",
-	"title": "User Response",
-	"description": "Schema for user data in responses (excludes password)",
-	"type": "object",
-	"properties": {
-	  "id": { "type": "integer" },
-	  "username": { "type": "string" },
-	  "email": { "type": "string" },
-	  "avatar": { "type": "string", "format": "uri" },
-	  "status": { "type": "string", "enum": ["online", "offline", "in-game"] },
-	  "stats": {
-		"type": "object",
-		"properties": {
-		  "wins": { "type": "integer", "minimum": 0 },
-		  "losses": { "type": "integer", "minimum": 0 },
-		  "matchesPlayed": { "type": "integer", "minimum": 0 }
-		}
-	  }
-	},
-	"required": ["id", "username", "email"]
-  } as const;
+export type User = FromSchema<typeof userSchema>;
+export type PublicUser = Omit<User, "password">;
 
-  export const loginSchema = {
+// Login Schema
+export const loginSchema = {
 	"$id": "loginSchema",
 	"title": "User Login",
 	"description": "Schema for user login",
 	"type": "object",
 	"properties": {
-	  "email": { "type": "string", "format": "email" },
-	  "password": { "type": "string", "minLength": 8 }
+		"email": {
+			"type": "string",
+			"format": "email"
+		},
+		"password": {
+			"type": "string",
+			"minLength": 8
+		}
 	},
 	"required": ["email", "password"]
-  } as const;
+} as const;
 
-export type User = FromSchema<typeof userSchema>;
-export type UserResponse = FromSchema<typeof userResponseSchema>;
 export type LoginRequest = FromSchema<typeof loginSchema>;
