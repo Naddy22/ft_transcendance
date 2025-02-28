@@ -7,12 +7,12 @@ import { FastifyInstance } from 'fastify';
  * Creates required tables if they don't exist.
  */
 export async function setupDatabase(fastify: FastifyInstance) {
-	// if (!fastify.db) {
-	//   throw new Error("SQLite database is not available in Fastify instance.");
-	// }
-	
-	const db = fastify.db;
-	// console.log("🔍 Fastify database instance:", fastify.db); // debug
+  // if (!fastify.db) {
+  //   throw new Error("SQLite database is not available in Fastify instance.");
+  // }
+
+  const db = fastify.db;
+  // console.log("🔍 Fastify database instance:", fastify.db); // debug
 
   await db.exec(`
 	CREATE TABLE IF NOT EXISTS users (
@@ -55,7 +55,7 @@ export async function setupDatabase(fastify: FastifyInstance) {
 	);
   `);
 
-  console.log("✅ Database setup complete.");
+  // console.log("✅ Database setup complete.");
 }
 
 // Now the database is ready before any API calls are made.

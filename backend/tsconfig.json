@@ -1,41 +1,27 @@
 /* Using ES Modules */
-// {
-//     "compilerOptions": {
-// 	  "module": "NodeNext",             // Enables ESM support
-//       "moduleResolution": "NodeNext",   // Resolves imports using ESM rules
-//       "target": "ESNext",               // https://www.typescriptlang.org/tsconfig/#target
-//       "outDir": "dist",                 // Compiled output directory
-//       "rootDir": "src",                 // Source files directory
-//       "strict": true,                   // Enable strict type-checking
-//       "esModuleInterop": true,          // Ensures compatibility with ESM packages
-//       "skipLibCheck": true,             // Speeds up compilation
-//       "resolveJsonModule": true,        // Enables JSON imports
-//     },
-//     "include": ["src"],                 // Only compile `src/` folder
-//     "exclude": ["node_modules", "dist"]	// Ignore `node_modules` and `dist/`
-// }
 {
 	"compilerOptions": {
-		"module": "NodeNext",
-		"target": "ES2022",
-		"moduleResolution": "NodeNext",
-		"esModuleInterop": true,
-		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"strict": true,
+		"target": "ES2022", // https://www.typescriptlang.org/tsconfig/#target
+		"module": "NodeNext", // Enables ESM support
+		"moduleResolution": "NodeNext", // Resolves imports using ESM rules
+		"esModuleInterop": true, // Ensures compatibility with ESM packages
+		"resolveJsonModule": true, // Enables JSON imports
+		"skipLibCheck": true, // Speeds up compilation
+		"strict": true, // Enable strict type-checking
 		"forceConsistentCasingInFileNames": true,
-		"outDir": "dist",
-		"rootDir": "src"
+		"outDir": "dist", // Compiled output directory
+		"rootDir": "src" // Source files directory
 		// "rootDir": "."
 	},
 	"include": [
 		"src"
-	],
+	], // Only compile `src/` folder
 	"exclude": [
 		"node_modules",
 		"dist"
-	]
+	] // Ignore `node_modules` and `dist/`
 }
+
 /* Using CommonJs */
 // {
 // 	"compilerOptions": {
@@ -53,6 +39,7 @@
 // 	"include": ["src"],                 // Only compile `src/` folder
 // 	"exclude": ["node_modules", "dist"]	// Ignore `node_modules` and `dist/`
 // }
+
 // {
 //   "compilerOptions": {
 //     /* Visit https://aka.ms/tsconfig to read more about this file */

@@ -20,6 +20,10 @@ BCRYPT_SALT_ROUNDS=10
 PORT=3000
 # (The port Fastify will run on)
 
+# Allow HTTP for local development
+# USE_HTTPS=false
+USE_HTTPS=true
+
 # CORS Configuration
 # CORS_ORIGIN="http://localhost:5173"
 # (Frontend URL during development)

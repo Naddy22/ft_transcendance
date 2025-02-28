@@ -26,7 +26,15 @@ export async function userRoutes(fastify: FastifyInstance) {
   fastify.register(fastifyStatic, {
     root: AVATAR_DIR,
     prefix: "/avatars/",
+    decorateReply: false, // Ensure it doesn't conflict with other responses
   });
+
+  // // If the issue persists, try setting the prefix at the global level
+  // fastify.register(fastifyStatic, {
+  //   root: path.join(__dirname, "../../uploads"),
+  //   prefix: "/users",
+  //   decorateReply: false
+  // });
 
   /**
    * Upload User Avatar
@@ -60,7 +68,7 @@ export async function userRoutes(fastify: FastifyInstance) {
   /**
    * Update User Avatar in Database
    */
-    fastify.put<{ Body: { userId: number; avatarUrl: string } }>("/avatar", async (req, reply) => {
+  fastify.put<{ Body: { userId: number; avatarUrl: string } }>("/avatar", async (req, reply) => {
     const { userId, avatarUrl } = req.body;
 
     if (!userId || !avatarUrl) {
@@ -118,7 +126,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       const stats = await stmt.get();
 
       if (!stats) return reply.status(404).send({ error: "User not found" });
-      
+
       reply.send(stats);
     } catch (error) {
       console.error("❌ Error fetching user stats:", error);
