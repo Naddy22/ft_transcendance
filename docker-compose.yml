@@ -18,14 +18,13 @@ services:
     # env_file:
       # - backend/.env
     environment:
-      DATABASE_URL: "file:/app/database/data.db"
+      DATABASE_URL: "file:/app/database/database.sqlite"
       JWT_SECRET: ${JWT_SECRET:-default_secret}
       NODE_ENV: ${NODE_ENV:-development}
     ports:
       - "3000:3000"
-      - "5555:5555" # Prisma Studio
     volumes:
-      - sqlite_data:/app/database
+      - ./backend/certs:/app/certs
     networks:
       - ft_transcendence-network
     restart: unless-stopped
@@ -47,31 +46,34 @@ services:
       # backend:
       #   condition: service_healthy  # Wait until backend is ready
 
-  game:
-    container_name: ft_transcendence-game
-    build:
-      context: ./game
-      dockerfile: game.Dockerfile
-    networks:
-      - ft_transcendence-network
-    restart: unless-stopped
-    depends_on:
-      - backend
-    ports:
-      - "8082:8082"
+  # game:
+  #   container_name: ft_transcendence-game
+  #   build:
+  #     context: ./game
+  #     dockerfile: game.Dockerfile
+  #   networks:
+  #     - ft_transcendence-network
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - backend
+  #   ports:
+  #     - "8082:8082"
 
   nginx:
     container_name: ft_transcendence-nginx
     build:
-      context: .
-      dockerfile: deployments/nginx.Dockerfile
+      context: ./nginx
+      dockerfile: nginx.Dockerfile
     ports:
-      - "80:80"
       - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./backend/certs:/etc/nginx/ssl
     networks:
       - ft_transcendence-network
     depends_on:
-      - frontend
       - backend
-      - game
+      - frontend
+      # - game
     restart: unless-stopped

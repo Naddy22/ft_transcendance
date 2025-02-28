@@ -1,4 +1,6 @@
 
+# NPM_LIST	:= npm ls --depth=0
+
 # Project Info
 NAME		:= ft_transcendence
 AUTHOR		:= cdumais

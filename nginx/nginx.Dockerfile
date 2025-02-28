@@ -1,25 +1,30 @@
 
 FROM nginx:stable-alpine
-WORKDIR /etc/nginx
+# FROM nginx:1.24.0-alpine
+# WORKDIR /etc/nginx
 
-# Install OpenSSL (required for generating SSL certificates)
-RUN apk add --no-cache openssl
+# Install dumb-init without extra recommended packages
+RUN apk add --no-cache dumb-init
 
-# Copy the custom Nginx configuration file into the container
-COPY deployments/nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Copy entrypoint script for SSL generation
-COPY deployments/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Copy built frontend files to serve the static website
+COPY --from=ft_transcendence-frontend /app/dist /usr/share/nginx/html
 
-# Copy frontend build files to serve the static website
-COPY --from=ft_transcendence-frontend /usr/share/nginx/html /usr/share/nginx/html
+# Ensure the SSL certificates are copied (assuming they're generated in backend)
+COPY --chown=nginx:nginx /backend/certs /etc/nginx/ssl
+
+# Change ownership of copied files (important for running as non-root)
+RUN chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx /var/run /etc/nginx
+
+# Switch to non-root user
+USER nginx
 
 # Expose HTTP and HTTPS ports
 EXPOSE 80 443
 
-# Run entrypoint script before starting Nginx
-ENTRYPOINT ["/entrypoint.sh"]
+# Handles signals properly
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["nginx", "-g", "daemon off;"]
 
 # ##### Generating SSL certificates at build time:

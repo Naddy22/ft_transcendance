@@ -16,6 +16,7 @@ build/
 
 # Environment variables file (contains secrets and API keys)
 .env
+certs/
 
 # ======================
 # IDE and Editor Configs
@@ -25,6 +26,8 @@ build/
 .vscode/
 # macOS system file (not needed in repositories)
 .DS_Store
+# auto-formatting file
+.prettierrc
 
 # ======================
 # Logs and Debugging
@@ -43,6 +46,7 @@ yarn-error.log
 
 # Folder for SQLite database storage
 database/
+data/
 # SQLite database files
 *.sqlite
 # SQLite v3 database files

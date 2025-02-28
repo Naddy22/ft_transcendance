@@ -164,3 +164,43 @@ server {
   }
 }
 ```
+
+## Decorators
+
+In **Fastify**, `decorate` is a built-in method that allows you to **attach custom properties, methods, or plugins** to the Fastify instance. \
+It’s a way to **extend Fastify's core functionality**.
+
+```ts
+fastify.decorate('sqlite', db);
+```
+- This adds a new property (sqlite) to the Fastify instance.
+- Now, anywhere in your app, you can access `fastify.sqlite` to interact with the database.
+
+### Why Use decorate?
+
+- ✅ Prevents polluting the global scope.
+- ✅ Makes dependencies accessible throughout Fastify.
+- ✅ Ensures proper lifecycle management (e.g., plugins load before routes).
+
+Example: Using decorate for a Custom Logger:
+```ts
+fastify.decorate('customLogger', (msg: string) => {
+  fastify.log.info(`[MyApp] ${msg}`);
+});
+
+// Now we can use it in routes!
+fastify.get('/log', async (request, reply) => {
+  fastify.customLogger('This is a test log.');
+  reply.send({ success: true });
+});
+```
+👆 Here, `fastify.customLogger()` is now available everywhere in your Fastify instance.
+
+### Important Notes
+
+- Decorators Must Be Added Before `fastify.ready()`
+	- If you try to decorate Fastify after it has fully booted, you’ll get an error.
+- You Can't Overwrite Existing Properties
+	- If Fastify already has a `log` property, you cannot do `fastify.decorate('log', myLogger)`.
+	- Instead, use `decorateRequest` or `decorateReply` if you want to extend `request` or `reply`.
+
