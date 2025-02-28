@@ -84,26 +84,4 @@ export class Tournament {
 			callback(winner);
 		});
 	}
-
-	// start(callback: (winner: string) => void): void {
-	// 	const playNextMatch = () => {
-	// 		const currentMatch = this.getCurrentMatch();
-	// 		if (!currentMatch) {
-	// 			console.log("Tournoi terminé ! Gagnant :", this.getWinner());
-	// 			callback(this.getWinner()!); // Informe du gagnant final
-	// 			return;
-	// 		}
-
-	// 		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
-	// 		startPongGame3D(currentMatch.player1, currentMatch.player2, (winner) => {
-	// 			stopPongGame3D();
-	// 			this.setMatchWinner(winner);
-	// 			callback(winner);
-	// 			playNextMatch();
-	// 		});
-	// 	};
-
-	// 	playNextMatch();
-	// }
-
 }

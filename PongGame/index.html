@@ -12,11 +12,23 @@
 	<!-- Menu -->
 	<div id="menu">
 		<h1>Cat Pong Game</h1>
-		<button id="startButton">Démarrer le jeu</button>
-		<!-- <button id="startButton">Match 1v1</button>
-		<button id="tournament4">Tournoi 4 joueurs</button> -->
+		<!-- <button id="startButton">Démarrer le jeu</button> -->
+		<button id="startButton">1 vs 1</button>
+		<button id="tournament">Tournoi</button>
 	</div>
-	
+	<!--tournament Options -->
+	<div id="tournamentOptions" style="display: none; text-align: center; margin-top: 15px;">
+		<h1>Choisissez le nombre de joueurs :</h1>
+		<button id="tournament4" class="tournament-btn">4 joueurs</button>
+		<button id="tournament8" class="tournament-btn">8 joueurs</button>
+	</div>
+	<div id="playerInputs" style="display: none; text-align: center; margin-top: 15px;">
+		<h1>Entrez les pseudos des joueurs :</h1>
+		<form id="playersForm">
+			<div id="inputsContainer"></div>
+			<button type="submit">Lancer le tournoi</button>
+		</form>
+	</div>
 	<!-- Jeu -->
 	<div id="game">
 		<!-- Noms des joueurs -->
@@ -27,5 +39,13 @@
 		<!-- <canvas id="gameCanvas" width="600" height="400"></canvas> -->
 	</div>
 	<script type="module" src="./src/main3D.ts"></script>
+	<div id="endScreen">
+		<h1 id="winnerMessage"></h1>
+		<p id="currentMatchInfo"></p>
+		<p id="nextMatchInfo"></p>
+		<button id="replayButton">Rejouer</button>
+		<button id="returnMenu">Retour au menu</button>
+		<button id="nextMatchButton" style="display: none;">Match suivant</button>
+	</div>
 </body>
 </html>
