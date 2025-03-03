@@ -100,14 +100,11 @@ await fastify.register(fpSqlitePlugin, {
 await fastify.register(fastifyMultipart);
 await fastify.register(fastifyWebsocket);
 await fastify.register(fastifyStatic, {
-  root: path.join(__dirname, '../../frontend/dist'),
+  // root: path.join(__dirname, '../../frontend/dist'),
+  root: path.join(__dirname, '../../PongGame/dist'),
   prefix: '/',
+  index: ['index.html'],
 });
-// fastify.register(fastifyStatic, {
-//   root: path.join(__dirname, "../uploads/avatars"),
-//   prefix: "/users/avatars/",
-//   decorateReply: false,
-// });
 await fastify.register(fastifyRoutes);
 
 // ────────────────────────────────────────────────────────────────────────────────
