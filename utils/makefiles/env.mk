@@ -5,19 +5,27 @@ ENV_FILE = backend/.env
 # Define multi-line variable for the .env content
 define ENV_CONTENT
 ## Database Configuration
-DATABASE_URL="file:/database/data.db"
+# DATABASE_URL="file:../database/data.db"
+DATABASE_URL=sqlite://./data/database.sqlite
 # (Path to the SQLite database file)
 
 # Authentication
-JWT_SECRET="your_super_secret_key"
+JWT_SECRET="super_secret_key"
 # (Change this to a strong secret for JWT)
+
+# Password Hashing with bcrypt
+BCRYPT_SALT_ROUNDS=10
 
 # Server Configuration
 PORT=3000
 # (The port Fastify will run on)
 
+# Allow HTTP for local development
+# USE_HTTPS=false
+USE_HTTPS=true
+
 # CORS Configuration
-CORS_ORIGIN="http://localhost:5173"
+# CORS_ORIGIN="http://localhost:5173"
 # (Frontend URL during development)
 
 endef

@@ -1,40 +1,26 @@
-
-FROM node:18-alpine AS build
+# Build Stage
+FROM node:18-slim
+# FROM node:18.17.0-slim
 WORKDIR /app
+
+RUN apt-get update && \
+	apt-get install -y --no-install-recommends dumb-init && \
+	rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash appuser
+USER appuser
 
 # Install dependencies first for better caching
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev && npm cache clean --force
 
-# Copy Prisma schema and migrations and generate client
-COPY prisma ./prisma
-RUN npx prisma generate
-
-# Copy the application source code
 COPY . .
-
-# Build the app
-RUN npm run build
-
-# 
-FROM node:18-alpine AS runtime
-WORKDIR /app
-
-# Copy built files from build stage
-COPY --from=build /app /app
-
-# Copy necessary startup scripts
-COPY entrypoint.sh /app/entrypoint.sh
-COPY healthcheck.sh /app/healthcheck.sh
-RUN chmod +x /app/entrypoint.sh /app/healthcheck.sh
-
 RUN npm run build
 
 # Expose API port
 EXPOSE 3000
 
-# Expose Prisma Studio port
-# EXPOSE 5555
-
-# Use entrypoint script
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Ensures proper process handling
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "dist/server.js"]

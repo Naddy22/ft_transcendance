@@ -69,7 +69,7 @@ which will represent only a small portion to the final grade.
 
 In this subject, you will face words that are ~~highlighted in green~~ 🔸Bordered like this🔸.\
 They represent technology choices that will evolve over time.\
-Be sure to pay close attention to the version of the subject.\
+Be sure to pay close attention to the version of the subject.
 
 <!-- <blockquote>
 	<ul>

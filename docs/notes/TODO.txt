@@ -1,8 +1,0 @@
-
-
-create the docker volume inside ./docker/data ?
-
-move migrations from backend/prisma/. to database/.
-
-fix git history and ignoring of the database files that were already inside backend/prisma/ (remove them from tracking)
-
