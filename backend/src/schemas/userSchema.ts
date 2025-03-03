@@ -67,6 +67,9 @@ export const userSchema = {
 
 export type User = FromSchema<typeof userSchema>;
 export type PublicUser = Omit<User, "password">;
+export type RegisterRequest = Pick<User, "username" | "email" | "password">;
+export type UpdateUserRequest = Partial<Pick<User, "username" | "email" | "avatar" | "status">>;
+export type LogoutRequest = Pick<User, "id">;
 
 // Login Schema
 export const loginSchema = {

@@ -31,9 +31,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // ────────────────────────────────────────────────────────────────────────────────
+// Ensure cert directory exists before initializing the certificates
+const sslDir = path.join(__dirname, '../certs');
+if (!fs.existsSync(sslDir)) {
+  console.log('Creating directory for SSL certificates...');
+  fs.mkdirSync(sslDir, { recursive: true });
+}
+
 // Setup SSL Certificates
-const certPath = path.join(__dirname, '../certs/cert.pem');
-const keyPath = path.join(__dirname, '../certs/key.pem');
+const certPath = path.join(sslDir, 'cert.pem');
+const keyPath = path.join(sslDir, 'key.pem');
 
 // Generate self-signed SSL certificates if they don't exist
 if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
@@ -87,7 +94,9 @@ const fastify = Fastify({
 // ────────────────────────────────────────────────────────────────────────────────
 // Register plugins
 await fastify.register(helmet);
-await fastify.register(fpSqlitePlugin, { dbFilename: dbPath });
+await fastify.register(fpSqlitePlugin, {
+  dbFilename: dbPath
+});
 await fastify.register(fastifyMultipart);
 await fastify.register(fastifyWebsocket);
 await fastify.register(fastifyStatic, {
@@ -115,22 +124,23 @@ schemas.forEach(schema => fastify.addSchema(schema));
 setupRoutes(fastify);
 
 // Health check endpoint
+fastify.get('/', (req, reply) => reply.send({ message: 'Backend is running!' }));
 fastify.get('/health', (req, reply) => reply.send({ status: 'ok' }));
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Ensure proper shutdown of SQLite on Fastify close
-fastify.addHook("onClose", async (instance) => {
-  if (instance.db) {
-    try {
-      console.log("🗄️ Closing SQLite database...");
-      await instance.db.exec("PRAGMA wal_checkpoint(FULL);"); // Ensure writes are finished
-      await instance.db.close();
-      console.log("✅ SQLite database closed.");
-    } catch (error) {
-      console.error("❌ Error closing SQLite database:", error);
-    }
-  }
-});
+// // Ensure proper shutdown of SQLite on Fastify close
+// fastify.addHook("onClose", async (instance) => {
+//   if (instance.db) {
+//     try {
+//       console.log("🗄️ Closing SQLite database...");
+//       await instance.db.exec("PRAGMA wal_checkpoint(FULL);"); // Ensure writes are finished
+//       await instance.db.close();
+//       console.log("✅ SQLite database closed.");
+//     } catch (error) {
+//       console.error("❌ Error closing SQLite database:", error);
+//     }
+//   }
+// });
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register `fastify-graceful-exit` AFTER `onClose` hook
@@ -162,3 +172,11 @@ const start = async () => {
 };
 
 start();
+
+
+
+
+// // Reset all users to "offline" on server restart
+// await fastify.db.exec("UPDATE users SET status = 'offline'");
+// console.log("🛠️ Reset all users to offline on server startup.");
+
