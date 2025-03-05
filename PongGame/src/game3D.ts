@@ -20,7 +20,7 @@ function removeListeners(): void {
 	activeListeners = [];
 }
 
-export function startPongGame3D(leftPlayerName: string, rightPlayerName: string, onGameEnd: (winner: string) => void): void {
+export function startPongGame3D(leftPlayerName: string, rightPlayerName: string, isVsAI: boolean, onGameEnd: (winner: string) => void): void {
 	console.log("Début startPongGame3D pour", leftPlayerName, "vs", rightPlayerName, "- gameStarted:", gameStarted);
 	removeListeners(); // Ajoute ceci pour nettoyer les anciens écouteurs
 	console.log("Écouteurs supprimés, activeListeners devrait être vide :", activeListeners.length);
@@ -150,45 +150,22 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 
 		const offset = 0.5; // Pour ecarter un peu mes raquettes du bord
 		const leftPaddle = new Paddle3D(scene, -sceneWidthUnits / 2 + offset, 0, "left");
-		const rightPaddle = new Paddle3D(scene, sceneWidthUnits / 2 - offset, 0, "right");
+		const rightPaddle = new Paddle3D(scene, sceneWidthUnits / 2 - offset, 0, "right", isVsAI);
 
 
 		// Placer les scores sur l'interface GUI (les positions en pixels sont à ajuster selon ton design)
 		leftPlayer.drawScore(-42, -45, guiTexture); // à gauche
 		rightPlayer.drawScore(42, -45, guiTexture); // à droite
 
-		// // 6. Gestion des entrées clavier pour les paddles et pour démarrer le jeu
-		// window.addEventListener("keydown", (event: KeyboardEvent) => {
-		// 	if (event.key === "w") leftPaddle.movingUp = true;
-		// 	if (event.key === "s") leftPaddle.movingDown = true;
-		// 	if (event.key === "ArrowUp") rightPaddle.movingUp = true;
-		// 	if (event.key === "ArrowDown") rightPaddle.movingDown = true;
-		// 	// if (event.code === "Space" && !gameStarted && ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
-		// 	// // if (event.code === "Space" && !gameStarted && ball.isLoaded && leftPaddle.isLoaded && rightPaddle.isLoaded) {
-		// 	// gameStarted = true;
-		// 	if (event.code === "Space" && !gameStarted) {
-		// 		console.log("Tentative ESPACE - Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
-		// 		if (ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
-		// 			console.log("ESPACE accepté, jeu démarré");
-		// 			gameStarted = true;
-		// 		} else {
-		// 			console.log("ESPACE bloqué, modèles non chargés");
-		// 		}
-		// 	}
-		// });
-		// window.addEventListener("keyup", (event: KeyboardEvent) => {
-		// 	if (event.key === "w") leftPaddle.movingUp = false;
-		// 	if (event.key === "s") leftPaddle.movingDown = false;
-		// 	if (event.key === "ArrowUp") rightPaddle.movingUp = false;
-		// 	if (event.key === "ArrowDown") rightPaddle.movingDown = false;
-		// });
-
-
+		
+		// 6. Gestion des entrées clavier pour les paddles et pour démarrer le jeu
 		const keydownHandler = ((event: KeyboardEvent) => {
 			if (event.key === "w") leftPaddle.movingUp = true;
 			if (event.key === "s") leftPaddle.movingDown = true;
-			if (event.key === "ArrowUp") rightPaddle.movingUp = true;
-			if (event.key === "ArrowDown") rightPaddle.movingDown = true;
+			if (!isVsAI) {
+				if (event.key === "ArrowUp") rightPaddle.movingUp = true;
+				if (event.key === "ArrowDown") rightPaddle.movingDown = true;
+			}
 			if (event.code === "Space" && !gameStarted) {
 				console.log("Tentative ESPACE - Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
 				if (ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
@@ -202,15 +179,114 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		const keyupHandler = ((event: KeyboardEvent) => {
 			if (event.key === "w") leftPaddle.movingUp = false;
 			if (event.key === "s") leftPaddle.movingDown = false;
-			if (event.key === "ArrowUp") rightPaddle.movingUp = false;
-			if (event.key === "ArrowDown") rightPaddle.movingDown = false;
+			if (!isVsAI) {
+				if (event.key === "ArrowUp") rightPaddle.movingUp = false;
+				if (event.key === "ArrowDown") rightPaddle.movingDown = false;
+			}
 		}) as EventListener;
-
+		
 		window.addEventListener("keydown", keydownHandler);
 		window.addEventListener("keyup", keyupHandler);
 		activeListeners.push({ type: "keydown", listener: keydownHandler });
 		activeListeners.push({ type: "keyup", listener: keyupHandler });
 		console.log("Écouteurs ajoutés, total actuel :", activeListeners.length);
+		
+		// IA pour le paddle droit si isVsAI
+		if (isVsAI) {
+			setInterval(() => {
+				if (gameStarted && ball.mesh && rightPaddle.mesh) {
+					updateAIDecision(rightPaddle, ball, sceneHeightUnits);
+				}
+			}, 1000); // Refresh toutes les secondes
+		}
+
+		function updateAIDecision(aiPaddle: Paddle3D, ball: Ball3D, sceneHeight: number): void {
+			if (!aiPaddle.isAI || !aiPaddle.mesh || !gameStarted || !ball.mesh) {
+				console.log("IA arrêtée : conditions non remplies");
+				return;
+			}
+			let ballFutureY = 0;
+			// 🛑 Vérifier si la balle va réellement vers l'IA
+			if (ball.dx <= 0) {
+				console.log("🎮 IA: La balle s'éloigne, retour à la position initiale");
+				ballFutureY = aiPaddle.initialY; // Retour à la position initiale en cas d’éloignement
+			} else {
+				// 🧠 Calculer où la balle arrivera lorsque qu'elle atteindra l'IA
+				let timeToReach = (aiPaddle.mesh.position.x - ball.mesh.position.x) / ball.dx;
+				let ballFutureY = ball.mesh.position.y + ball.dy * timeToReach;
+
+				// 🎯 Gestion des rebonds (éviter que l'IA poursuive une balle après un mur)
+				const topWall = sceneHeight / 2 - ball.radius;
+				const bottomWall = -sceneHeight / 2 + ball.radius;
+
+				while (ballFutureY > topWall || ballFutureY < bottomWall) {
+					if (ballFutureY > topWall) {
+						ballFutureY = topWall - (ballFutureY - topWall);
+					} else if (ballFutureY < bottomWall) {
+						ballFutureY = bottomWall + (bottomWall - ballFutureY);
+					}
+				}
+
+				// 🎮 Déplacement de l'IA (ajout d'une zone morte)
+				const paddleCenterY = aiPaddle.mesh.position.y;
+				const threshold = 1.5; // Zone morte pour éviter un tremblement constant
+				
+				let moveUp = false;
+				let moveDown = false;
+
+				if (ballFutureY < paddleCenterY - threshold) {
+					moveDown = true; // Descend si balle plus bas
+				} else if (ballFutureY > paddleCenterY + threshold) {
+					moveUp = true; // Monte si balle plus haut
+				}
+
+				console.log(`🎮 IA: BallY=${ballFutureY}, PaddleY=${paddleCenterY}, UP=${moveUp}, DOWN=${moveDown}`);
+				aiPaddle.simulateKeyPress(moveUp, moveDown);
+
+			// // Prédiction simplifiée
+			// let ballFutureY = ball.mesh.position.y + ball.dy * 30;
+			// let ballFutureX = ball.mesh.position.x + ball.dx * 30;
+
+			// // Limiter aux murs
+			// const topWall = sceneHeight / 2 - ball.radius;
+			// const bottomWall = -sceneHeight / 2 + ball.radius;
+			// if (ballFutureY > topWall) {
+			// 	ballFutureY = topWall - (ballFutureY - topWall);
+			// } else if (ballFutureY < bottomWall) {
+			// 	ballFutureY = bottomWall + (ballFutureY - bottomWall);
+			// }
+
+			// // Décision
+			// const paddleCenterY = aiPaddle.mesh.position.y;
+			// const threshold = 2;
+			// let moveUp = false;
+			// let moveDown = false;
+
+			// if (ballFutureX > 0) { // Balle vient vers l’IA
+			// 	if (ballFutureY < paddleCenterY - threshold) {
+			// 		moveUp = false;
+			// 		moveDown = true; // Descend si balle plus bas
+			// 	} else if (ballFutureY > paddleCenterY + threshold) {
+			// 		moveDown = false;
+			// 		moveUp = true; // Monte si balle plus haut
+			// 	}
+			// } else {
+			// 	// Revenir vers initialY quand la balle s’éloigne
+			// 	if (paddleCenterY > aiPaddle.initialY + threshold) {
+			// 		moveDown = true; // Descend vers initialY
+			// 	} else if (paddleCenterY < aiPaddle.initialY - threshold) {
+			// 		moveUp = true; // Monte vers initialY
+			// 	}
+			// }
+
+			// // Éviter les oscillations rapides
+			// if (moveUp && moveDown) {
+			// 	moveUp = false;
+			// 	moveDown = false; // Ne bouge pas si conflit
+			// }
+
+			}
+		}
 
 		function update(): void {
 			if (!ball.mesh) return; // Sécurité avant chargement
@@ -347,6 +423,9 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 
 export function stopPongGame3D(): void {
 	gameStarted = false;
+	if (!engine) {
+		return;
+	}
 	// engine.dispose(); // Ajouter ceci pour nettoyer l’ancien engine mais on voit plus le jeu en fond quand le message "joueur x a gagné"
 	engine.stopRenderLoop();
 	removeListeners();

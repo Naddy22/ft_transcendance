@@ -63,7 +63,6 @@ export class Tournament {
 		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
 		startPongGame3D(currentMatch.player1, currentMatch.player2, (winner) => {
 			stopPongGame3D();
-			// resetForNewGame();
 			this.setMatchWinner(winner);
 			callback(winner);
 		});
