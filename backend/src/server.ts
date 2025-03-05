@@ -99,20 +99,18 @@ await fastify.register(fpSqlitePlugin, {
 });
 await fastify.register(fastifyMultipart);
 await fastify.register(fastifyWebsocket);
+
+// Serve static frontend files
 await fastify.register(fastifyStatic, {
-  // root: path.join(__dirname, '../../frontend/dist'),
-  root: path.join(__dirname, '../../PongGame/dist'),
+  root: path.join(__dirname, '../../frontend/dist'),
   prefix: '/',
   index: ['index.html'],
 });
+
 await fastify.register(fastifyRoutes);
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register JSON Schemas
-// fastify.addSchema(userSchema);
-// fastify.addSchema(matchSchema);
-// fastify.addSchema(tournamentSchema);
-// fastify.addSchema(wsSchema);
 const schemas = [userSchema, matchSchema, tournamentSchema, wsSchema];
 schemas.forEach(schema => fastify.addSchema(schema));
 
@@ -121,7 +119,7 @@ schemas.forEach(schema => fastify.addSchema(schema));
 setupRoutes(fastify);
 
 // Health check endpoint
-fastify.get('/', (req, reply) => reply.send({ message: 'Backend is running!' }));
+// fastify.get('/', (req, reply) => reply.send({ message: 'Backend is running!' }));
 fastify.get('/health', (req, reply) => reply.send({ status: 'ok' }));
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -169,11 +167,3 @@ const start = async () => {
 };
 
 start();
-
-
-
-
-// // Reset all users to "offline" on server restart
-// await fastify.db.exec("UPDATE users SET status = 'offline'");
-// console.log("🛠️ Reset all users to offline on server startup.");
-

@@ -4,27 +4,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cat Pong</title>
-  <link rel="stylesheet" href="./dist/styles.css">
+  <title>API Tester</title>
+  <link rel="stylesheet" href="src/styles.css">
 </head>
 
-<body class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+<body>
+  <div id="app">
+    <h1>Backend API Tester</h1>
 
-  <div id="auth-container">
-    <h1 class="text-2xl font-bold mb-4">Authentication</h1>
-    <input type="email" id="email" placeholder="Email" class="p-2 border rounded mb-2">
-    <input type="password" id="password" placeholder="Password" class="p-2 border rounded mb-2">
-    <button id="login-btn" class="bg-green-500 text-white px-4 py-2 rounded">Login</button>
+    <button id="toggleRegister">Show Register</button>
+    <button id="toggleLogin">Show Login</button>
+    <button id="fetchUsers">Get All Users</button>
+
+    <div id="registerForm" style="display: none;">
+      <h2>Register</h2>
+      <input type="text" id="regUsername" placeholder="Username">
+      <input type="email" id="regEmail" placeholder="Email">
+      <input type="password" id="regPassword" placeholder="Password">
+      <button id="registerBtn">Register</button>
+      <p id="registerResponse"></p>
+    </div>
+
+    <div id="loginForm" style="display: none;">
+      <h2>Login</h2>
+      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <button id="loginBtn">Login</button>
+      <p id="loginResponse"></p>
+
+      <button id="logoutBtn">Logout</button>
+      <p id="logoutResponse"></p>
+    </div>
+
+    <div id="userInfo" style="display: none;">
+      <h2>Logged-in User</h2>
+      <p><strong>ID:</strong> <span id="userId"></span></p>
+      <p><strong>Username:</strong> <span id="userName"></span></p>
+      <p><strong>Email:</strong> <span id="userEmail"></span></p>
+      <p><strong>Status:</strong> <span id="userStatus"></span></p>
+    </div>
+
+
+    <h2>API Response:</h2>
+    <pre id="apiResponse"></pre>
+
   </div>
 
-  <div id="game-container" style="display: none;">
-    <h1 class="text-2xl font-bold mb-4">Pong Game</h1>
-    <button id="startGame" class="bg-blue-500 text-white px-4 py-2 rounded">Start Game</button>
-    <button id="back-btn" class="bg-red-500 text-white px-4 py-2 rounded">Back</button>
-    <div id="game"></div>
-  </div>
-
-  <script type="module" src="./dist/main.js"></script>
+  <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>
