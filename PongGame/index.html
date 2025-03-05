@@ -9,11 +9,27 @@
 	<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Klee+One&display=swap" rel="stylesheet">
 </head>
 <body>
+	<!-- Menu Button-->
+	<button id="menuButton" class="menu-button">
+		☰
+	</button>
+	<div id="menuDropdown" class="menu-dropdown">
+		<a href="#" data-action="profile">Profil</a>
+		<a href="#" data-action="history">Historiques</a>
+		<a href="#" data-action="statistics">Statistiques</a>
+	</div>	
+	<!-- Home button -->
+	<button id="homeButton" class="home-button">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="32px" height="32px">
+			<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+		</svg>
+	</button>
 	<!-- Menu -->
 	<div id="menu">
 		<h1>Cat Pong Game</h1>
 		<!-- <button id="startButton">Démarrer le jeu</button> -->
 		<button id="startButton">1 vs 1</button>
+		<button id="playVsAI">1 vs IA</button>
 		<button id="tournament">Tournoi</button>
 	</div>
 	<!--tournament Options -->
