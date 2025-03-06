@@ -153,7 +153,7 @@ export class Ball3D {
 			}
 		}
 		// Accélération progressive : augmenter légèrement la vitesse à chaque frame
-		const acceleration = 1.0005;  // augmente la vitesse de 0.1% par frame
+		const acceleration = 1.00025;  // augmente la vitesse de 0.1% par frame
 		this.dx *= acceleration;
 		this.dy *= acceleration;
 
