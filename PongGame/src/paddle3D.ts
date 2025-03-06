@@ -11,6 +11,7 @@ export class Paddle3D {
 	movingDown: boolean;
 	initialY: number; // On stocke la position initiale en Y
 	isAI: boolean;
+	targetY: number | null = null; // Nouvelle propriété pour stocker la cible
 
 	/**
 	 * @param scene La scène BabylonJS.
@@ -74,24 +75,32 @@ export class Paddle3D {
 			return; // Sécurité avant chargement
 		}
 		const halfSceneHeight = sceneHeight / 2;
-		// Calculer les limites en fonction de la hauteur du paddle
-		const upperLimit = halfSceneHeight - (this.height / 2);
-		const lowerLimit = -halfSceneHeight + (this.height / 2);
 
 		// Si le paddle doit se déplacer vers le haut et qu'il ne dépasse pas le bord supérieur
 		if (this.movingUp && (this.mesh.position.y + this.height / 2 < halfSceneHeight)) {
 			this.mesh.position.y += this.dy;
+			// Arrêter si proche de initialY en montant
+			if (this.isAI && this.targetY !== null && this.mesh.position.y >= this.targetY - 0.1) {
+				this.mesh.position.y = this.targetY; // Aligner précisément
+				this.movingUp = false; //simuler keyup
+			}
 		}
 		// Si le paddle doit se déplacer vers le bas et qu'il ne dépasse pas le bord inférieur
 		if (this.movingDown && (this.mesh.position.y - this.height / 2 > -halfSceneHeight)) {
 			this.mesh.position.y -= this.dy;
+			// Arrêter si proche de initialY en descendant
+			if (this.isAI && this.targetY !== null && this.mesh.position.y <= this.targetY + 0.1) {
+				this.mesh.position.y = this.targetY;
+				this.movingDown = false; // Simuler un "keyup"
+			}
 		}
 	}
 
 	// simuler pour que l'ia agisse comme un humain
-	simulateKeyPress(up: boolean, down: boolean): void {
+	simulateKeyPress(up: boolean, down: boolean, targetY?: number): void {
 		this.movingUp = up;
 		this.movingDown = down;
+		if (this.isAI) this.targetY = targetY !== undefined ? targetY : null; // Stocker la cible pour l’IA
 	}
 
 	/**

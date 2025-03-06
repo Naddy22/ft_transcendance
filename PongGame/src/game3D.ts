@@ -195,97 +195,108 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		if (isVsAI) {
 			setInterval(() => {
 				if (gameStarted && ball.mesh && rightPaddle.mesh) {
-					updateAIDecision(rightPaddle, ball, sceneHeightUnits);
+					updateAIDecision(rightPaddle, ball, sceneWidthUnits, sceneHeightUnits);
 				}
 			}, 1000); // Refresh toutes les secondes
 		}
 
-		function updateAIDecision(aiPaddle: Paddle3D, ball: Ball3D, sceneHeight: number): void {
+		// Calcule la position finale de la balle sur l’axe Y quand elle atteint le paddle droit
+		function calculateFuturBallY(ball: Ball3D, paddleL: Paddle3D, paddleR: Paddle3D, sceneHeight: number): number {
+			if (!ball.mesh || !paddleL.mesh || !paddleR.mesh)
+				return 0;
+			let futurBallX = ball.mesh.position.x;
+			let futurBallY = ball.mesh.position.y;
+			let velocityX = ball.dx;
+			let velocityY = ball.dy;
+			const ballRadius = ball.radius;
+			const paddleWidth = 1; // Suppose une largeur approximative du paddle (ajuste selon ton modèle)
+			const acceleration = 1.00025; // Même accélération que dans Ball3D
+
+			while (futurBallX < (paddleR.mesh.position.x - paddleWidth / 2)) {
+				// Rebond sur le paddle gauche
+				if (futurBallX - velocityX <= (paddleL.mesh.position.x + paddleWidth / 2) && velocityX < 0) {
+					velocityX *= -1; // Inversion simple (pas de boost comme 1.075 pour simplicité)
+					
+					// ⚠️ Modifier l'angle en fonction du point d'impact
+					const impact = futurBallY - paddleL.mesh.position.y;
+					const maxAngle = Math.PI / 4; // Max 45° de déviation
+					const angleFactor = (impact / (paddleL.height / 2)) * maxAngle;
+					velocityY += Math.sin(angleFactor) * Math.abs(velocityX); // Ajuste l'effet
+					console.log(`🎯 Rebond gauche : impact=${impact.toFixed(2)}, nouvel angle=${angleFactor.toFixed(2)}`);
+				}
+	
+				// Rebond sur les murs haut/bas
+				const topWall = sceneHeight / 2 - ballRadius;
+				const bottomWall = -sceneHeight / 2 + ballRadius;
+				if (futurBallY + velocityY > topWall && velocityY > 0) {
+					velocityY *= -1;
+					futurBallY = topWall - (futurBallY + velocityY - topWall);
+				} else if (futurBallY + velocityY < bottomWall && velocityY < 0) {
+					velocityY *= -1;
+					futurBallY = bottomWall + (futurBallY + velocityY - bottomWall);
+				}
+
+				// Accélération progressive
+				velocityX *= acceleration;
+				velocityY *= acceleration;
+			
+				futurBallX += velocityX;
+				futurBallY += velocityY;
+			}
+	
+			return futurBallY; // Position finale en Y
+		}
+
+		function updateAIDecision(aiPaddle: Paddle3D, ball: Ball3D, sceneWidth: number, sceneHeight: number): void {
 			if (!aiPaddle.isAI || !aiPaddle.mesh || !gameStarted || !ball.mesh) {
 				console.log("IA arrêtée : conditions non remplies");
 				return;
 			}
-			let ballFutureY = 0;
-			// 🛑 Vérifier si la balle va réellement vers l'IA
+			let ballFutureY: number;
+			const paddleCenterY = aiPaddle.mesh.position.y;
+			const threshold = 1; // Zone morte plus large pour stabilité
+
+			// // Vérifier si la balle va réellement vers l'IA
+			// if (ball.dx <= 0) {
+			// 	console.log("🎮 IA: La balle s'éloigne, retour à la position initiale");
+			// 	ballFutureY = aiPaddle.initialY; // Retour à la position initiale en cas d’éloignement
+			// } else {
+			// 	// Calculer où la balle arrivera lorsque qu'elle atteindra l'IA
+			// 	let timeToReach = (aiPaddle.mesh.position.x - ball.mesh.position.x) / ball.dx;
+			// 	if (timeToReach < 0 || !isFinite(timeToReach)) {
+			// 		ballFutureY = ball.mesh.position.y
+			// 	} else {
+			// 		ballFutureY = calculateFuturBallY(ball, leftPaddle, aiPaddle, sceneHeight);
+			// 	}
+
+			const closeDistance = sceneWidth / 10;
 			if (ball.dx <= 0) {
-				console.log("🎮 IA: La balle s'éloigne, retour à la position initiale");
-				ballFutureY = aiPaddle.initialY; // Retour à la position initiale en cas d’éloignement
+				console.log("IA: La balle s’éloigne, retour à initialY");
+				ballFutureY = aiPaddle.initialY;
+			} else if (Math.abs(aiPaddle.mesh.position.x - ball.mesh.position.x) < closeDistance) {
+				console.log("IA: Balle proche, suivi direct");
+				ballFutureY = ball.mesh.position.y;
 			} else {
-				// 🧠 Calculer où la balle arrivera lorsque qu'elle atteindra l'IA
-				let timeToReach = (aiPaddle.mesh.position.x - ball.mesh.position.x) / ball.dx;
-				let ballFutureY = ball.mesh.position.y + ball.dy * timeToReach;
-
-				// 🎯 Gestion des rebonds (éviter que l'IA poursuive une balle après un mur)
-				const topWall = sceneHeight / 2 - ball.radius;
-				const bottomWall = -sceneHeight / 2 + ball.radius;
-
-				while (ballFutureY > topWall || ballFutureY < bottomWall) {
-					if (ballFutureY > topWall) {
-						ballFutureY = topWall - (ballFutureY - topWall);
-					} else if (ballFutureY < bottomWall) {
-						ballFutureY = bottomWall + (bottomWall - ballFutureY);
-					}
-				}
-
-				// 🎮 Déplacement de l'IA (ajout d'une zone morte)
-				const paddleCenterY = aiPaddle.mesh.position.y;
-				const threshold = 1.5; // Zone morte pour éviter un tremblement constant
+				console.log("IA: Calcul de la trajectoire");
+				ballFutureY = calculateFuturBallY(ball, leftPaddle, aiPaddle, sceneHeight);
+			}
 				
 				let moveUp = false;
 				let moveDown = false;
 
-				if (ballFutureY < paddleCenterY - threshold) {
-					moveDown = true; // Descend si balle plus bas
-				} else if (ballFutureY > paddleCenterY + threshold) {
-					moveUp = true; // Monte si balle plus haut
+				if (ballFutureY > paddleCenterY + threshold) {
+					moveUp = true;
+				} else if (ballFutureY < paddleCenterY - threshold) {
+					moveDown = true;
+				} else {
+					// Explicitement arrêter si proche de la cible
+					moveUp = false;
+					moveDown = false;
 				}
 
 				console.log(`🎮 IA: BallY=${ballFutureY}, PaddleY=${paddleCenterY}, UP=${moveUp}, DOWN=${moveDown}`);
-				aiPaddle.simulateKeyPress(moveUp, moveDown);
-
-			// // Prédiction simplifiée
-			// let ballFutureY = ball.mesh.position.y + ball.dy * 30;
-			// let ballFutureX = ball.mesh.position.x + ball.dx * 30;
-
-			// // Limiter aux murs
-			// const topWall = sceneHeight / 2 - ball.radius;
-			// const bottomWall = -sceneHeight / 2 + ball.radius;
-			// if (ballFutureY > topWall) {
-			// 	ballFutureY = topWall - (ballFutureY - topWall);
-			// } else if (ballFutureY < bottomWall) {
-			// 	ballFutureY = bottomWall + (ballFutureY - bottomWall);
+				aiPaddle.simulateKeyPress(moveUp, moveDown, ballFutureY);
 			// }
-
-			// // Décision
-			// const paddleCenterY = aiPaddle.mesh.position.y;
-			// const threshold = 2;
-			// let moveUp = false;
-			// let moveDown = false;
-
-			// if (ballFutureX > 0) { // Balle vient vers l’IA
-			// 	if (ballFutureY < paddleCenterY - threshold) {
-			// 		moveUp = false;
-			// 		moveDown = true; // Descend si balle plus bas
-			// 	} else if (ballFutureY > paddleCenterY + threshold) {
-			// 		moveDown = false;
-			// 		moveUp = true; // Monte si balle plus haut
-			// 	}
-			// } else {
-			// 	// Revenir vers initialY quand la balle s’éloigne
-			// 	if (paddleCenterY > aiPaddle.initialY + threshold) {
-			// 		moveDown = true; // Descend vers initialY
-			// 	} else if (paddleCenterY < aiPaddle.initialY - threshold) {
-			// 		moveUp = true; // Monte vers initialY
-			// 	}
-			// }
-
-			// // Éviter les oscillations rapides
-			// if (moveUp && moveDown) {
-			// 	moveUp = false;
-			// 	moveDown = false; // Ne bouge pas si conflit
-			// }
-
-			}
 		}
 
 		function update(): void {
