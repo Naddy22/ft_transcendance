@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
   const fetchUsersBtn = document.getElementById("fetchUsers") as HTMLButtonElement;
   const logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement;
+  const deleteAccountBtn = document.getElementById("deleteAccountBtn") as HTMLButtonElement;
 
   const regUsername = document.getElementById("regUsername") as HTMLInputElement;
   const regEmail = document.getElementById("regEmail") as HTMLInputElement;
@@ -20,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const apiResponse = document.getElementById("apiResponse") as HTMLPreElement;
   const logoutResponse = document.getElementById("logoutResponse") as HTMLParagraphElement;
+  const deleteResponse = document.getElementById("deleteResponse") as HTMLParagraphElement;
 
   const userInfo = document.getElementById("userInfo") as HTMLDivElement;
   const userIdElem = document.getElementById("userId") as HTMLSpanElement;
@@ -34,7 +36,42 @@ document.addEventListener("DOMContentLoaded", () => {
   registerForm.style.display = "none";
   loginForm.style.display = "none";
   logoutBtn.style.display = "none";
+  deleteAccountBtn.style.display = "none";
   userInfo.style.display = "none";
+
+  // Fetch All Users
+  function fetchUsers() {
+    fetch("/users")
+      .then(response => response.json())
+      .then(data => {
+        apiResponse.textContent = JSON.stringify(data, null, 2);
+      })
+      .catch(() => {
+        apiResponse.textContent = "❌ Error fetching users.";
+      });
+  }
+
+  // // ??
+  // function fetchUsers() {
+  //   try {
+  //     const response = await fetch("/users");
+  //     const data = await response.json();
+  //     apiResponse.textContent = JSON.stringify(data, null, 2);
+  //   } catch (error) {
+  //     apiResponse.textContent = "❌ Error fetching users.";
+  //   }
+  // }
+
+  // // Fetch All Users
+  // fetchUsersBtn.addEventListener("click", async () => {
+  //   try {
+  //     const response = await fetch("/users");
+  //     const data = await response.json();
+  //     apiResponse.textContent = JSON.stringify(data, null, 2);
+  //   } catch (error) {
+  //     apiResponse.textContent = "❌ Error fetching users.";
+  //   }
+  // });
 
   // Toggle Register: Show form if hidden, hide if visible
   toggleRegister.addEventListener("click", () => {
@@ -43,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loginForm.style.display = "none"; // Hide login form
       toggleRegister.textContent = "Hide Register";
       toggleLogin.textContent = "Show Login";
+      // fetchUsers();
     } else {
       registerForm.style.display = "none";
       toggleRegister.textContent = "Show Register";
@@ -68,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
       registerForm.style.display = "none"; // Hide register form
       toggleLogin.textContent = "Hide Login";
       toggleRegister.textContent = "Show Register";
+      // fetchUsers();
     } else {
       loginForm.style.display = "none";
       toggleLogin.textContent = "Show Login";
@@ -85,18 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
   //   loginForm.style.display = loginForm.style.display === "none" ? "block" : "none";
   //   registerForm.style.display = "none";
   // });
-
-
-  // Fetch All Users
-  fetchUsersBtn.addEventListener("click", async () => {
-    try {
-      const response = await fetch("/users");
-      const data = await response.json();
-      apiResponse.textContent = JSON.stringify(data, null, 2);
-    } catch (error) {
-      apiResponse.textContent = "❌ Error fetching users.";
-    }
-  });
 
   // Register API Call
   registerBtn.addEventListener("click", async () => {
@@ -118,6 +145,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const data = await response.json();
       registerResponse.textContent = response.ok ? `✅ Success: ${data.message}` : `❌ Error: ${data.error}`;
+
+      // // Refresh users list if registration was successful
+      // if (response.ok)
+      // fetchUsers();
+
     } catch (error) {
       registerResponse.textContent = "❌ Network error.";
       console.error("Registration error:", error);
@@ -154,10 +186,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         loginResponse.textContent = `✅ Success: ${data.message}`;
         logoutBtn.style.display = "block"; // Show Logout button
+        deleteAccountBtn.style.display = "block";
         userInfo.style.display = "block";
 
         // Fetch & Display User Info
         await fetchUserInfo(loggedInUserId);
+
+        // // Refresh users list if registration was successful
+        // if (response.ok)
+        //   fetchUsers();
+
       } else {
         loginResponse.textContent = `❌ Error: ${data.error}`;
       }
@@ -187,19 +225,62 @@ document.addEventListener("DOMContentLoaded", () => {
         loggedInUserId = null; // Clear logged-in user ID
         loggedInUserStatus = null; // Reset user status
         logoutBtn.style.display = "none"; // Hide Logout button
+        deleteAccountBtn.style.display = "none";
         userInfo.style.display = "none";
 
         // Clear login fields
         loginEmail.value = "";
         loginPassword.value = "";
 
-        loginResponse.textContent = "🔓 Logged out. You can log in again.";
+        loginResponse.textContent = "🔓 Logged out. You can  log in again.";
+
+        // // Refresh users list if registration was successful
+        // if (response.ok)
+        // fetchUsers();
+
       } else {
         logoutResponse.textContent = `❌ Error: ${data.error}`;
       }
     } catch (error) {
       logoutResponse.textContent = "❌ Network error.";
       console.error("Logout error:", error);
+    }
+  });
+
+  // Delete Account API Call
+  deleteAccountBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) {
+      deleteResponse.textContent = "❌ No user is logged in.";
+      return;
+    }
+
+    if (!confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone!")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/users/${loggedInUserId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        deleteResponse.textContent = "✅ Account deleted successfully.";
+        logoutBtn.style.display = "none";
+        deleteAccountBtn.style.display = "none";
+        userInfo.style.display = "none";
+
+        loggedInUserId = null;
+        loggedInUserStatus = null;
+
+        loginEmail.value = "";
+        loginPassword.value = "";
+
+        loginResponse.textContent = "🔓 Account deleted. You can register again.";
+      } else {
+        deleteResponse.textContent = "❌ Failed to delete account.";
+      }
+    } catch (error) {
+      deleteResponse.textContent = "❌ Network error.";
     }
   });
 
@@ -221,4 +302,11 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error fetching user info:", error);
     }
   }
+
+  // "Get All Users" button now calls the reusable function
+  fetchUsersBtn.addEventListener("click", fetchUsers);
+
+  // // Auto-fetch users on page load
+  // fetchUsers();
+
 });
