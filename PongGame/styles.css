@@ -35,8 +35,8 @@ body::before {
 
 #menu h1 {
 	color: #333;
-	font-size: 60px;
-	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+	font-size: 80px;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* Jeu */
@@ -119,7 +119,8 @@ button {
 	border: none;
 	border-radius: 25px;
 	cursor: pointer;
-	font-size: 20px;
+	font-size: 17.5px;
+	font-family: 'Mochiy Pop P One', sans-serif;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -150,7 +151,7 @@ button:hover {
 	position: absolute;
 	top: 10px;
 	left: 25px;
-	background-color: #fdc2d8; /* Rose pastel */
+	background-color: #f9d3d9; /* Rose pastel */
 	border: none;
 	border-radius: 50%;
 	width: 50px;
@@ -167,13 +168,13 @@ button:hover {
 	position: absolute;
 	top: 10px;
 	right: 25px; /* Il sera à droite */
-	background-color: #fdc2d8; /* Rose pastel */
+	background-color: #f9d3d9; /* Rose pastel */
 	border: none;
 	border-radius: 50%;
 	width: 50px;
 	height: 50px;
 	/* font-size: 24px; */
-	color: white; /* Couleur du texte blanc */
+	color: #333; /* Couleur du texte */
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -192,7 +193,9 @@ button:hover {
 	border-radius: 10px;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	padding: 10px;
-	width: 150px;
+	width: 185px;
+	border: 5px solid #f9d3d9; /* Bordure kawaii */
+	border-radius: 15px;
 }
 
 .menu-dropdown a {
@@ -222,22 +225,24 @@ button:hover {
 	top: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
-	display: flex;
+	background-color: #e5fbc991; /* Fond semi-transparent */
 	justify-content: center;
 	align-items: center;
 }
 
 /* Contenu de la fenêtre */
 .modal-content {
-	background-color: #fff;
+	background-color: #e5fbc9;
 	padding: 20px;
 	border-radius: 10px;
-	width: 300px;
+	width: 370px;
 	text-align: center;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
 	font-family: 'Mochiy Pop P One', sans-serif;
+	color: rgb(4, 0, 8);
 	position: relative;
+	border: 5px solid #f9d3d9; /* Bordure kawaii */
+	border-radius: 15px;
 }
 
 /* Bouton de fermeture */
@@ -251,5 +256,9 @@ button:hover {
 }
 
 .close:hover {
-	color: red;
+	color: rgb(255, 0, 217);
+}
+
+.text-outline {
+	text-shadow: 2px 2px 2px rgb(147, 145, 145);
 }
