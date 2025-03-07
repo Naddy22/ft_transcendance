@@ -146,6 +146,7 @@ export async function userRoutes(fastify: FastifyInstance) {
   fastify.delete<{ Params: { id: string } }>('/:id', async (req, reply) => {
     try {
       const { id } = req.params;
+      console.log(`🔍 Received request to delete user with ID: ${id}`); // Debug log
 
       if (!id) {
         return reply.status(400).send({ error: "Missing user Id" });
@@ -153,6 +154,8 @@ export async function userRoutes(fastify: FastifyInstance) {
 
       const stmt = await fastify.db.prepare("DELETE FROM users WHERE id = ?");
       const result = await stmt.run(id);
+
+      console.log(`✅ Deleted Rows: ${result.changes}`); // Debug log
 
       if (result.changes === 0) return reply.status(404).send({ error: "User not found" });
 

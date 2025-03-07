@@ -1,4 +1,8 @@
+
+import { API } from "./api.js"
+
 document.addEventListener("DOMContentLoaded", () => {
+
   const toggleRegister = document.getElementById("toggleRegister") as HTMLButtonElement;
   const toggleLogin = document.getElementById("toggleLogin") as HTMLButtonElement;
   const toggleAllUsers = document.getElementById("toggleAllUsers") as HTMLButtonElement;
@@ -50,117 +54,89 @@ document.addEventListener("DOMContentLoaded", () => {
   userInfo.style.display = "none";
 
   // ────────────────────────────────────────────────────────────────────────────────
-  // Function to set dark mode
+  // DARK MODE HANDLING
   function setDarkMode(enabled: boolean) {
-    if (enabled) {
-      document.body.classList.add("dark-mode");
-      localStorage.setItem("darkMode", "enabled");
-      darkModeBtn.textContent = "☀️ Light Mode";
-    } else {
-      document.body.classList.remove("dark-mode");
-      localStorage.setItem("darkMode", "disabled");
-      darkModeBtn.textContent = "🌙 Dark Mode";
-    }
+    document.body.classList.toggle("dark-mode", enabled);
+    localStorage.setItem("darkMode", enabled ? "enabled" : "disabled");
+    darkModeBtn.textContent = enabled ? "☀️ Light Mode" : "🌙 Dark Mode";
   }
 
-  // Check for existing dark mode preference
-  const darkModePreference = localStorage.getItem("darkMode");
-  if (darkModePreference === "enabled") {
-    setDarkMode(true);
-  } else {
-    setDarkMode(false);
-  }
+  // Load dark mode preference
+  setDarkMode(localStorage.getItem("darkMode") === "enabled");
 
   // Event listener for toggling dark mode
   darkModeBtn.addEventListener("click", () => {
-    const isDarkMode = document.body.classList.contains("dark-mode");
-    setDarkMode(!isDarkMode);
+    setDarkMode(!document.body.classList.contains("dark-mode"));
   });
 
   // ────────────────────────────────────────────────────────────────────────────────
-  // Fetch User Info by ID
+  // Fetch & Display User Info
   async function fetchUserInfo(userId: number | null) {
-    if (userId === null)
+    if (!userId)
       return; // Exit if no user is logged in
 
-    try {
-      const response = await fetch(`/users/${userId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch user info.");
-      }
-
-      const userData = await response.json();
-
-      // Update user info display
+    const userData = await API.fetchUserInfo(userId);
+    if (userData) {
       userIdElem.textContent = userData.id.toString();
       userNameElem.textContent = userData.username;
       userEmailElem.textContent = userData.email;
       userStatusElem.textContent = userData.status;
-    } catch (error) {
-      console.error("Error fetching user info:", error);
     }
   }
 
-  // Fetch All Users
+  // Fetch & Display All Users
   async function fetchUsers() {
-    try {
-      const response = await fetch("/users");
-      if (!response.ok) {
-        throw new Error("Failed to fetch users.");
-      }
-
-      const data = await response.json();
-      allUsersResponse.textContent = JSON.stringify(data, null, 2);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      allUsersResponse.textContent = "❌ Error fetching users.";
-    }
+    const data = await API.fetchUsers();
+    allUsersResponse.textContent = data ? JSON.stringify(data, null, 2) : "❌ Error fetching users.";
   }
 
   // Auto-fetch users on page load
   fetchUsers();
 
+  // ────────────────────────────────────────────────────────────────────────────────
+  // Event Listeners
+
   // Toggle All Users: Show data if hidden, hide if visible
   toggleAllUsers.addEventListener("click", async () => {
     const isHidden = allUsersResponse.style.display === "none";
-
     if (isHidden) {
       toggleAllUsers.textContent = "Loading...";
-
-      try {
-        await fetchUsers();
-        allUsersResponse.style.display = "block"; // show users
-        toggleAllUsers.textContent = "Show All Users"; // Reset button on failure
-      } catch (error) {
-        toggleAllUsers.textContent = "Show All Users"; // Reset button on failure
-        console.error("Error fetching users:", error);
-      }
-
+      await fetchUsers();
+      allUsersResponse.style.display = "block"; // show users
+      toggleAllUsers.textContent = "Show All Users"; // Reset button on failure
     } else {
       allUsersResponse.style.display = "none";
-      allUsersResponse.textContent = "Show All Users";
     }
   });
 
   // Toggle Register: Show form if hidden, hide if visible
+  // toggleRegister.addEventListener("click", () => {
+  //   const isHidden = registerForm.style.display === "none";
+  //   registerForm.style.display = isHidden ? "block" : "none";
+  //   loginForm.style.display = "none";
+  //   toggleRegister.textContent = isHidden ? "Hide Register" : "Show Register";
+  //   toggleLogin.textContent = "Show Login";
+  // });
   toggleRegister.addEventListener("click", () => {
-    const isHidden = registerForm.style.display === "none";
-    registerForm.style.display = isHidden ? "block" : "none";
+    registerForm.style.display = registerForm.style.display === "none" ? "block" : "none";
     loginForm.style.display = "none";
-    toggleRegister.textContent = isHidden ? "Hide Register" : "Show Register";
-    toggleLogin.textContent = "Show Login";
   });
 
   // Toggle Login: Show form if hidden, hide if visible
+  // toggleLogin.addEventListener("click", () => {
+  //   const isHidden = loginForm.style.display === "none";
+  //   loginForm.style.display = isHidden ? "block" : "none";
+  //   registerForm.style.display = "none";
+  //   toggleLogin.textContent = isHidden ? "Hide Login" : "Show Login";
+  //   toggleRegister.textContent = "Show Register";
+  // });
   toggleLogin.addEventListener("click", () => {
-    const isHidden = loginForm.style.display === "none";
-    loginForm.style.display = isHidden ? "block" : "none";
+    loginForm.style.display = loginForm.style.display === "none" ? "block" : "none";
     registerForm.style.display = "none";
-    toggleLogin.textContent = isHidden ? "Hide Login" : "Show Login";
-    toggleRegister.textContent = "Show Register";
   });
 
-  // Register API Call
+  // ────────────────────────────────────────────────────────────────────────────────
+
   registerBtn.addEventListener("click", async () => {
     const username = regUsername.value;
     const email = regEmail.value;
@@ -171,28 +147,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    try {
-      const response = await fetch("/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
-      });
+    const response = await API.registerUser(username, email, password);
+    registerResponse.textContent = response ? `✅ Success: ${response.message}` : "❌ Error registering.";
 
-      const data = await response.json();
-      registerResponse.textContent = response.ok ? `✅ Success: ${data.message}` : `❌ Error: ${data.error}`;
-
-      // Refresh users list if registration was successful
-      if (response.ok) {
-        fetchUsers();
-      }
-
-    } catch (error) {
-      registerResponse.textContent = "❌ Network error.";
-      console.error("Registration error:", error);
-    }
+    // Refresh users list if registration was successful
+    if (response) fetchUsers();
   });
 
-  // Login API Call
   loginBtn.addEventListener("click", async () => {
     const identifier = loginIdentifier.value;
     const password = loginPassword.value;
@@ -208,409 +169,116 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    try {
-      const response = await fetch("/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, password }),
-      });
+    const response = await API.loginUser(identifier, password)
+    if (response) {
+      loggedInUserId = response.user.id; // Store user ID for logout
+      loggedInUserStatus = response.user.status; // Store user status
 
-      const data = await response.json();
-      if (response.ok) {
-        loggedInUserId = data.user.id; // Store user ID for logout
-        loggedInUserStatus = data.user.status; // Store user status
-
-        loginResponse.textContent = `✅ Success: ${data.message}`;
-        logoutBtn.style.display = "block"; // Show Logout button
-        deleteAccountBtn.style.display = "block";
-        userInfo.style.display = "block";
-
-        // Fetch & Display User Info
-        await fetchUserInfo(loggedInUserId);
-
-      } else {
-        loginResponse.textContent = `❌ Error: ${data.error}`;
-      }
-
-      // Refresh users list if registration was successful
-      if (response.ok)
-        fetchUsers();
-
-    } catch (error) {
-      loginResponse.textContent = "❌ Network error.";
-      console.error("Login error:", error);
+      loginResponse.textContent = `✅ Success: ${response.message}`;
+      logoutBtn.style.display = "block"; // Show Logout button
+      deleteAccountBtn.style.display = "block";
+      userInfo.style.display = "block";
+      fetchUserInfo(loggedInUserId);
+      fetchUsers();
+    } else {
+      loginResponse.textContent = "❌ Login failed.";
     }
   });
 
-  // Logout API Call
   logoutBtn.addEventListener("click", async () => {
     if (!loggedInUserId) {
       logoutResponse.textContent = "❌ No user is logged in.";
       return;
     }
 
-    try {
-      const response = await fetch("/auth/logout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: loggedInUserId }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        logoutResponse.textContent = `✅ Success: ${data.message}`;
-        loggedInUserId = null; // Clear logged-in user ID
-        loggedInUserStatus = null; // Reset user status
-        logoutBtn.style.display = "none"; // Hide Logout button
-        deleteAccountBtn.style.display = "none";
-        userInfo.style.display = "none";
-
-        // Clear login fields
-        loginIdentifier.value = "";
-        loginPassword.value = "";
-
-        loginResponse.textContent = "🔓 Logged out. You can  log in again.";
-
-        fetchUsers(); // Auto-refresh users list ✅
-
-      } else {
-        logoutResponse.textContent = `❌ Error: ${data.error}`;
-      }
-    } catch (error) {
-      logoutResponse.textContent = "❌ Network error.";
-      console.error("Logout error:", error);
+    const response = await API.logoutUser(loggedInUserId);
+    if (response) {
+      logoutResponse.textContent = "✅ Successfully logged out.";
+    } else {
+      logoutResponse.textContent = "❌ Logout failed.";
     }
+  
+    // Ensure UI resets regardless of API response
+    loggedInUserId = null;
+    loggedInUserStatus = null;
+  
+    logoutBtn.style.display = "none";
+    deleteAccountBtn.style.display = "none";
+    userInfo.style.display = "none";
+  
+    loginIdentifier.value = "";
+    loginPassword.value = "";
+  
+    loginResponse.textContent = "🔓 Logged out. You can log in again.";
+  
+    fetchUsers(); // Refresh users list
   });
 
   // Delete Account API Call
   deleteAccountBtn.addEventListener("click", async () => {
-    if (!loggedInUserId) {
-      deleteResponse.textContent = "❌ No user is logged in.";
-      return;
-    }
+    if (!loggedInUserId || !confirm("⚠️ Are you sure you want to delete your account?")) return;
 
-    if (!confirm("⚠️ Are you sure you want to delete your account? This action cannot be undone!")) {
-      return;
-    }
+    const response = await API.deleteAccount(loggedInUserId);
+    if (response) {
+      loggedInUserId = null;
+      loggedInUserStatus = null;
+      deleteResponse.textContent = "✅ Account deleted successfully.";
+      logoutBtn.style.display = "none";
+      deleteAccountBtn.style.display = "none";
+      userInfo.style.display = "none";
 
-    try {
-      const response = await fetch(`/users/${loggedInUserId}`, {
-        method: "DELETE",
-      });
+      // Clear login fields
+      loginIdentifier.value = "";
+      loginPassword.value = "";
 
-      if (response.ok) {
-        deleteResponse.textContent = "✅ Account deleted successfully.";
-        logoutBtn.style.display = "none";
-        deleteAccountBtn.style.display = "none";
-        userInfo.style.display = "none";
+      loginResponse.textContent = "🔓 Account deleted. You can register again.";
 
-        loggedInUserId = null;
-        loggedInUserStatus = null;
-
-        loginIdentifier.value = "";
-        loginPassword.value = "";
-
-        loginResponse.textContent = "🔓 Account deleted. You can register again.";
-
-        fetchUsers();
-
-      } else {
-        deleteResponse.textContent = "❌ Failed to delete account.";
-      }
-    } catch (error) {
-      deleteResponse.textContent = "❌ Network error.";
+      fetchUsers();
     }
   });
 
   // Update Username
   updateUsernameBtn.addEventListener("click", async () => {
-    if (!loggedInUserId) return;
-    const username = newUsername.value.trim();
-    if (!username) {
+    if (!loggedInUserId)
+      return;
+
+    if (!newUsername.value.trim()) {
       updateResponse.textContent = "❌ Please enter a new username.";
       return;
     }
 
-    try {
-      const response = await fetch(`/users/${loggedInUserId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        updateResponse.textContent = "✅ Username updated successfully.";
-        await fetchUserInfo(loggedInUserId);
-        fetchUsers();
-      } else {
-        updateResponse.textContent = `❌ Error: ${data.error}`;
-      }
-    } catch (error) {
-      updateResponse.textContent = "❌ Network error.";
-    }
+    const response = await API.updateUser(loggedInUserId, { username: newUsername.value });
+    updateResponse.textContent = response ? "✅ Username updated." : "❌ Update failed.";
+    if (response)
+      fetchUserInfo(loggedInUserId);
   });
 
   // Update Email
   updateEmailBtn.addEventListener("click", async () => {
-    if (!loggedInUserId) return;
-    const email = newEmail.value.trim();
-    if (!email) {
+    if (!loggedInUserId)
+      return;
+
+    if (!newEmail.value.trim()) {
       updateResponse.textContent = "❌ Please enter a new email.";
       return;
     }
 
-    try {
-      const response = await fetch(`/users/${loggedInUserId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        updateResponse.textContent = "✅ Email updated successfully.";
-        await fetchUserInfo(loggedInUserId);
-        fetchUsers();
-      } else {
-        updateResponse.textContent = `❌ Error: ${data.error}`;
-      }
-    } catch (error) {
-      updateResponse.textContent = "❌ Network error.";
+    const response = await API.updateUser(loggedInUserId, { email: newEmail.value });
+    updateResponse.textContent = response ? "✅ Email updated." : "❌ Update failed.";
+    if (response) {
+      updateResponse.textContent = "✅ Email updated successfully.";
+      fetchUserInfo(loggedInUserId);
     }
   });
 
   // Update Status
   updateStatusBtn.addEventListener("click", async () => {
-    if (!loggedInUserId) return;
-    const status = newStatus.value;
+    if (!loggedInUserId)
+      return;
 
-    try {
-      const response = await fetch(`/users/${loggedInUserId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        updateResponse.textContent = "✅ Status updated successfully.";
-        await fetchUserInfo(loggedInUserId);
-        fetchUsers();
-      } else {
-        updateResponse.textContent = `❌ Error: ${data.error}`;
-      }
-    } catch (error) {
-      updateResponse.textContent = "❌ Network error.";
-    }
+    const response = await API.updateUser(loggedInUserId, { status: newStatus.value });
+    updateResponse.textContent = response ? "✅ Status updated." : "❌ Update failed.";
+    if (response) fetchUserInfo(loggedInUserId);
   });
 
-  // Hook Into Login (Modify login function to store user ID)
-  async function loginUser(email: string, password: string) {
-    try {
-      const response = await fetch("/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        loggedInUserId = data.user.id; // Store user ID
-        userInfo.style.display = "block";
-        await fetchUserInfo(loggedInUserId); // Fetch and display user data
-        fetchUsers();
-      } else {
-        updateResponse.textContent = `❌ Error: ${data.error}`;
-      }
-    } catch (error) {
-      updateResponse.textContent = "❌ Network error.";
-    }
-  };
-
 });
-
-// document.addEventListener("DOMContentLoaded", () => {
-//   // UI Elements
-//   const toggleRegister = document.getElementById("toggleRegister") as HTMLButtonElement;
-//   const toggleLogin = document.getElementById("toggleLogin") as HTMLButtonElement;
-//   const toggleAllUsers = document.getElementById("toggleAllUsers") as HTMLButtonElement;
-//   const darkModeBtn = document.getElementById("toggleDarkMode") as HTMLButtonElement;
-
-//   const registerForm = document.getElementById("registerForm") as HTMLDivElement;
-//   const loginForm = document.getElementById("loginForm") as HTMLDivElement;
-
-//   const registerBtn = document.getElementById("registerBtn") as HTMLButtonElement;
-//   const loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
-//   const logoutBtn = document.getElementById("logoutBtn") as HTMLButtonElement;
-//   const deleteAccountBtn = document.getElementById("deleteAccountBtn") as HTMLButtonElement;
-
-//   const regUsername = document.getElementById("regUsername") as HTMLInputElement;
-//   const regEmail = document.getElementById("regEmail") as HTMLInputElement;
-//   const regPassword = document.getElementById("regPassword") as HTMLInputElement;
-//   const registerResponse = document.getElementById("registerResponse") as HTMLParagraphElement;
-
-//   const loginIdentifier = document.getElementById("loginIdentifier") as HTMLInputElement;
-//   const loginPassword = document.getElementById("loginPassword") as HTMLInputElement;
-//   const loginResponse = document.getElementById("loginResponse") as HTMLParagraphElement;
-
-//   const allUsersResponse = document.getElementById("allUsersResponse") as HTMLPreElement;
-//   const logoutResponse = document.getElementById("logoutResponse") as HTMLParagraphElement;
-//   const deleteResponse = document.getElementById("deleteResponse") as HTMLParagraphElement;
-
-//   const userInfo = document.getElementById("userInfo") as HTMLDivElement;
-//   const userIdElem = document.getElementById("userId") as HTMLSpanElement;
-//   const userNameElem = document.getElementById("userName") as HTMLSpanElement;
-//   const userEmailElem = document.getElementById("userEmail") as HTMLSpanElement;
-//   const userStatusElem = document.getElementById("userStatus") as HTMLSpanElement;
-
-//   const newUsername = document.getElementById("newUsername") as HTMLInputElement;
-//   const updateUsernameBtn = document.getElementById("updateUsernameBtn") as HTMLButtonElement;
-//   const newEmail = document.getElementById("newEmail") as HTMLInputElement;
-//   const updateEmailBtn = document.getElementById("updateEmailBtn") as HTMLButtonElement;
-//   const newStatus = document.getElementById("newStatus") as HTMLSelectElement;
-//   const updateStatusBtn = document.getElementById("updateStatusBtn") as HTMLButtonElement;
-//   const updateResponse = document.getElementById("updateResponse") as HTMLParagraphElement;
-
-//   let loggedInUserId: number | null = null;
-
-//   // Ensure forms are hidden at the start
-//   registerForm.style.display = "none";
-//   loginForm.style.display = "none";
-//   logoutBtn.style.display = "none";
-//   deleteAccountBtn.style.display = "none";
-//   userInfo.style.display = "none";
-//   allUsersResponse.style.display = "none";
-
-//   // ────────────────────────────────────────────────────────────────────────────────
-//   // DARK MODE HANDLING
-//   function setDarkMode(enabled: boolean) {
-//     if (enabled) {
-//       document.body.classList.add("dark-mode");
-//       localStorage.setItem("darkMode", "enabled");
-//       darkModeBtn.textContent = "☀️ Light Mode";
-//     } else {
-//       document.body.classList.remove("dark-mode");
-//       localStorage.setItem("darkMode", "disabled");
-//       darkModeBtn.textContent = "🌙 Dark Mode";
-//     }
-//   }
-
-//   // Load dark mode preference
-//   setDarkMode(localStorage.getItem("darkMode") === "enabled");
-
-//   darkModeBtn.addEventListener("click", () => {
-//     setDarkMode(!document.body.classList.contains("dark-mode"));
-//   });
-
-//   // ────────────────────────────────────────────────────────────────────────────────
-//   // FETCH USERS LIST
-//   async function fetchUsers() {
-//     try {
-//       const response = await fetch("/users");
-//       if (!response.ok) throw new Error("Failed to fetch users.");
-
-//       const data = await response.json();
-//       allUsersResponse.textContent = JSON.stringify(data, null, 2);
-//       allUsersResponse.style.display = "block";
-//     } catch (error) {
-//       allUsersResponse.textContent = "❌ Error fetching users.";
-//     }
-//   }
-
-//   // Auto-fetch users on page load
-//   fetchUsers();
-
-//   // ────────────────────────────────────────────────────────────────────────────────
-//   // TOGGLE ALL USERS
-//   toggleAllUsers.addEventListener("click", async () => {
-//     const isHidden = allUsersResponse.style.display === "none";
-
-//     if (isHidden) {
-//       toggleAllUsers.textContent = "Loading...";
-//       await fetchUsers();
-//       toggleAllUsers.textContent = "Hide All Users";
-//     } else {
-//       allUsersResponse.style.display = "none";
-//       toggleAllUsers.textContent = "Show All Users";
-//     }
-//   });
-
-//   // ────────────────────────────────────────────────────────────────────────────────
-//   // USER MANAGEMENT API CALLS
-//   async function apiRequest(url: string, method: string, body: object | null = null) {
-//     return fetch(url, {
-//       method,
-//       headers: { "Content-Type": "application/json" },
-//       body: body ? JSON.stringify(body) : null,
-//     });
-//   }
-
-//   async function registerUser(username: string, email: string, password: string) {
-//     const response = await apiRequest("/auth/register", "POST", { username, email, password });
-//     if (response.ok) fetchUsers();
-//   }
-
-//   async function loginUser(identifier: string, password: string) {
-//     const response = await apiRequest("/auth/login", "POST", { identifier, password });
-//     if (response.ok) {
-//       const data = await response.json();
-//       loggedInUserId = data.user.id;
-//       await fetchUsers();
-//     }
-//   }
-
-//   async function logoutUser() {
-//     if (!loggedInUserId) return;
-//     const response = await apiRequest("/auth/logout", "POST", { id: loggedInUserId });
-//     if (response.ok) {
-//       loggedInUserId = null;
-//       await fetchUsers();
-//     }
-//   }
-
-//   async function deleteUser() {
-//     if (!loggedInUserId) return;
-//     const response = await apiRequest(`/users/${loggedInUserId}`, "DELETE");
-//     if (response.ok) {
-//       loggedInUserId = null;
-//       await fetchUsers();
-//     }
-//   }
-
-//   async function updateUser(field: string, value: string) {
-//     if (!loggedInUserId) return;
-//     const response = await apiRequest(`/users/${loggedInUserId}`, "PUT", { [field]: value });
-//     if (response.ok) await fetchUsers();
-//   }
-
-//   // ────────────────────────────────────────────────────────────────────────────────
-//   // EVENT LISTENERS
-//   registerBtn.addEventListener("click", async () => {
-//     await registerUser(regUsername.value, regEmail.value, regPassword.value);
-//   });
-
-//   loginBtn.addEventListener("click", async () => {
-//     await loginUser(loginIdentifier.value, loginPassword.value);
-//   });
-
-//   logoutBtn.addEventListener("click", async () => {
-//     await logoutUser();
-//   });
-
-//   deleteAccountBtn.addEventListener("click", async () => {
-//     await deleteUser();
-//   });
-
-//   updateUsernameBtn.addEventListener("click", async () => {
-//     await updateUser("username", newUsername.value);
-//   });
-
-//   updateEmailBtn.addEventListener("click", async () => {
-//     await updateUser("email", newEmail.value);
-//   });
-
-//   updateStatusBtn.addEventListener("click", async () => {
-//     await updateUser("status", newStatus.value);
-//   });
-// });

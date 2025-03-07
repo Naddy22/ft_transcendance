@@ -15,6 +15,9 @@
 	},
 	"include": [
 		"src/**/*.ts" // Inclut tous les fichiers .ts dans src
+		,
+		"../_local/ui.ts",
+		"src/api.ts"
 	],
 	"exclude": [
 		"node_modules" // Exclut le répertoire node_modules

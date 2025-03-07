@@ -655,7 +655,7 @@ The chosen technology for this module is 🔸Babylon.js🔸.\
 These tools will be used to create the 3D graphics, ensuring compatibility and optimal performance.
 
 This major module aims to revolutionize the Pong game’s visual elements by introducing advanced 3D techniques.\
-Through the utilization of 🔸TreeJS/WebGL🔸, 
+Through the utilization of 🔸Babylon.js🔸, 
 we aim to provide players with an immersive and visually stunning gaming experience.
 
 ---
