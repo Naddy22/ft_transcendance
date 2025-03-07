@@ -1,7 +1,88 @@
 
-.env
+# ======================
+# Environment Variables
+# ======================
 
+# Environment variables file (contains secrets and API keys)
+.env
+certs/
+
+# ======================
+# Node.js & Fastify
+# ======================
+
+# Dependencies installed via npm or yarn
 node_modules/
 
-# Local folder for notes, tests, etc.
+# Compiled and minified files
+dist/
+
+# Build artifacts generated for deployment
+build/
+
+# ======================
+# IDE and Editor Configs
+# ======================
+
+# VSCode editor settings and extensions
+.vscode/
+# macOS system file (not needed in repositories)
+.DS_Store
+# auto-formatting file
+.prettierrc
+
+# ======================
+# Logs and Debugging
+# ======================
+
+# Logs folder for application logs
+logs/
+*.log
+
+# Log file generated when npm encounters an issue
+npm-debug.log
+
+# ======================
+# SQLite Database
+# ======================
+
+# Folder for SQLite database storage
+database/
+data/
+# SQLite database files
+*.sqlite
+
+# ======================
+# Docker
+# ======================
+
+# Docker ignore file
+.dockerignore
+
+# Local override for docker-compose setup
+docker-compose.override.yml
+
+# Init scripts for database setup in Docker
+**/docker-entrypoint-initdb.d/
+
+# ======================
+# Babylon.js / WebGL Artifacts
+# ======================
+
+# Binary GLTF files for 3D assets
+*.glb
+# GLTF 3D model files
+*.gltf
+# Binary files used with GLTF
+*.bin
+# Babylon.js-specific 3D model format
+*.babylon
+
+# ======================
+# Temporary & Local Files
+# ======================
+
+# Local folder for personal notes, tests, or temp files
 _local/
+# Temporary files (wildcard to match any file prefixed with tmp)
+tmp*
