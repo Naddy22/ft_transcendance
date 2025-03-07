@@ -1,78 +1,219 @@
+// frontend/src/api.ts
 
-/**
- * API class for handling backend communication.
- * Uses a helper function `request` to simplify fetch operations.
- */
+// ─── Type Definitions ──────────────────────────────────────────────
+
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginRequest {
+  identifier: string;
+  password: string;
+}
+
+export interface LogoutRequest {
+  id: number;
+}
+
+export type UserStatus = "online" | "offline" | "in-game";
+
+export interface PublicUser {
+  id: number;
+  username: string;
+  email: string;
+  avatar?: string | null;
+  status: UserStatus;
+  wins: number;
+  losses: number;
+  matchesPlayed: number;
+}
+
+export interface UpdateUserRequest {
+  username?: string;
+  email?: string;
+  avatar?: string;
+  status?: UserStatus;
+}
+
+export interface MatchScore {
+  player1: number;
+  player2: number;
+}
+
+export interface Match {
+  matchId: number;
+  player1: number;
+  player2: number;
+  winner?: number | null;
+  score: MatchScore;
+  startTime: string;
+  endTime?: string | null;
+  tournamentId?: number | null;
+}
+
+export interface MatchmakingRequest {
+  userId: number;
+  username: string;
+}
+
+export interface MatchmakingResponse {
+  matchId: number;
+  player1: { id: number; username: string };
+  player2: { id: number; username: string };
+  status: "waiting" | "started";
+}
+
+export interface Tournament {
+  tournamentId: number;
+  name: string;
+  players: number[];
+  matches: Match[];
+  winner?: number | null;
+  status: "pending" | "in-progress" | "completed";
+}
+
+export interface HealthResponse {
+  status: string;
+}
+
+// ─── API Client Class ──────────────────────────────────────────────
+
 export class API {
-  /**
-   * Generic helper function for making API requests.
-   * @param endpoint - API endpoint (e.g., "/users")
-   * @param method - HTTP method (GET, POST, PUT, DELETE)
-   * @param body - Request body (optional)
-   * @returns Parsed JSON response or null in case of an error.
-   */
-  private static async request(endpoint: string, method: string = "GET", body?: any): Promise<any> {
-    try {
-      const options: RequestInit = {
-        method,
-        headers: { "Content-Type": "application/json" },
-        ...(body && { body: JSON.stringify(body) }), // Only add body if it's provided
-      };
+  private baseUrl: string;
 
-      const response = await fetch(endpoint, options);
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Unknown error occurred.");
-      }
+  constructor(baseUrl: string = "") {
+    // The baseUrl should be set to the backend URL. For example, "https://localhost:3000"
+    this.baseUrl = baseUrl;
+  }
 
-      return response.json();
-    } catch (error) {
-      console.error(`API Error (${method} ${endpoint}):`, error.message);
-      return null;
+  // Generic request method with centralized error handling.
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      headers: { "Content-Type": "application/json" },
+      ...options,
+    });
+
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      // Preserve detailed error messages from the backend
+      const errorMessage = responseData.error || response.statusText;
+      throw new Error(`Error ${response.status}: ${errorMessage}`);
     }
+
+    return responseData;
   }
 
-  // ────────────────────────────────────────────────────────────────────────────────
-  // API Endpoints
+  // ── Health Check ──────────────────────────────────────────────
 
-  /** Fetch all users */
-  static fetchUsers() {
-    return this.request("/users");
+  async healthCheck(): Promise<HealthResponse> {
+    return this.request<HealthResponse>("/health");
   }
 
-  /** Fetch user info by ID */
-  static fetchUserInfo(userId: number) {
-    return this.request(`/users/${userId}`);
+  // ── Auth Endpoints ──────────────────────────────────────────────
+
+  async registerUser(data: RegisterRequest): Promise<PublicUser> {
+    return this.request<PublicUser>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 
-  /** Register a new user */
-  static registerUser(username: string, email: string, password: string) {
-    return this.request("/auth/register", "POST", { username, email, password });
+  async loginUser(
+    data: LoginRequest
+  ): Promise<{ message: string; user: PublicUser }> {
+    return this.request<{ message: string; user: PublicUser }>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 
-  /** Login user */
-  static loginUser(identifier: string, password: string) {
-    return this.request("/auth/login", "POST", { identifier, password });
+  async logoutUser(data: LogoutRequest): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/auth/logout", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 
-  /** Logout user */
-  static logoutUser(userId: number) {
-    return this.request("/auth/logout", "POST", { id: userId });
+  // ── User Endpoints ──────────────────────────────────────────────
+
+  async getUsers(): Promise<PublicUser[]> {
+    return this.request<PublicUser[]>("/users");
   }
 
-  /** Delete user account */
-  static deleteAccount(userId: number) {
-    return this.request(`/users/${userId}`, "DELETE");
+  async getUser(id: number): Promise<PublicUser> {
+    return this.request<PublicUser>(`/users/${id}`);
   }
 
-  /** Update user profile (username, email, status) */
-  static updateUser(userId: number, data: Record<string, any>) {
-    return this.request(`/users/${userId}`, "PUT", data);
+  async updateUser(
+    id: number,
+    data: UpdateUserRequest
+  ): Promise<{ message: string; user: PublicUser }> {
+    return this.request<{ message: string; user: PublicUser }>(`/users/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteUser(id: number): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/users/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  // ── Matches Endpoints ──────────────────────────────────────────────
+
+  async getMatches(): Promise<Match[]> {
+    return this.request<Match[]>("/matches");
+  }
+
+  async getMatch(matchId: number): Promise<Match> {
+    return this.request<Match>(`/matches/${matchId}`);
+  }
+
+  // ── Matchmaking Endpoint ──────────────────────────────────────────────
+
+  async joinMatchmaking(
+    data: MatchmakingRequest
+  ): Promise<MatchmakingResponse> {
+    return this.request<MatchmakingResponse>("/matchmaking/join", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  // ── Tournament Endpoints ──────────────────────────────────────────────
+
+  async getTournaments(): Promise<Tournament[]> {
+    return this.request<Tournament[]>("/tournaments");
+  }
+
+  async getTournament(id: number): Promise<Tournament> {
+    return this.request<Tournament>(`/tournaments/${id}`);
   }
 }
 
-// To call an API, you can just do:
+/*
+// Example usage in a frontend component or module
 
-// const users = await API.fetchUsers();
-// const user = await API.fetchUserInfo(1);
-// await API.registerUser("JohnDoe", "john@example.com", "password123");
+import { API } from "./api";
+
+const API = new API("https://your-backend-url.com");
+
+async function handleLogin() {
+  try {
+    const loginData = { identifier: "user@example.com", password: "secret123" };
+    const response = await API.loginUser(loginData);
+    console.log("Logged in user:", response.user);
+  } catch (error: any) {
+    console.error("Login failed:", error.message);
+  }
+}
+
+handleLogin();
+*/

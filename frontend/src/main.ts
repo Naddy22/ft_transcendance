@@ -1,5 +1,5 @@
 
-import { API } from "./api.js"
+import { API } from "./api"
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -197,20 +197,20 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       logoutResponse.textContent = "❌ Logout failed.";
     }
-  
+
     // Ensure UI resets regardless of API response
     loggedInUserId = null;
     loggedInUserStatus = null;
-  
+
     logoutBtn.style.display = "none";
     deleteAccountBtn.style.display = "none";
     userInfo.style.display = "none";
-  
+
     loginIdentifier.value = "";
     loginPassword.value = "";
-  
+
     loginResponse.textContent = "🔓 Logged out. You can log in again.";
-  
+
     fetchUsers(); // Refresh users list
   });
 
