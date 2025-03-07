@@ -69,14 +69,14 @@ docker-compose.override.yml
 # Babylon.js / WebGL Artifacts
 # ======================
 
-# Binary GLTF files for 3D assets
-*.glb
-# GLTF 3D model files
-*.gltf
-# Binary files used with GLTF
-*.bin
-# Babylon.js-specific 3D model format
-*.babylon
+# # Binary GLTF files for 3D assets
+# *.glb
+# # GLTF 3D model files
+# *.gltf
+# # Binary files used with GLTF
+# *.bin
+# # Babylon.js-specific 3D model format
+# *.babylon
 
 # ======================
 # Temporary & Local Files
