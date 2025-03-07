@@ -2,10 +2,11 @@
 
 import { FastifyInstance } from 'fastify';
 // import fastifyStatic from "@fastify/static";
-import { userSchema, PublicUser, UpdateUserRequest } from "../schemas/userSchema.js";
+import { PublicUser, UpdateUserRequest } from "../schemas/userSchema.js";
 // import path from "path";
 // import fs from "fs";
 // import { fileURLToPath } from 'url';
+import sanitizeHtml from 'sanitize-html';
 
 // // Fix `__dirname` in ESModules
 // const __filename = fileURLToPath(import.meta.url);
@@ -27,10 +28,6 @@ export async function userRoutes(fastify: FastifyInstance) {
       // const stmt = await fastify.db.prepare("SELECT id, username, email, avatar, status FROM users");
       // const users: PublicUser[] = await stmt.all();
 
-      // const stmt = await fastify.db.prepare("SELECT * FROM users");
-      // const users: PublicUser[] = await stmt.all();
-
-      // const users: PublicUser[] = await fastify.db.all("SELECT * FROM users");
       const users: PublicUser[] = await fastify.db.all("SELECT id, username, email, avatar, status, wins, losses, matchesPlayed FROM users");
 
       reply.send(users);
@@ -60,7 +57,7 @@ export async function userRoutes(fastify: FastifyInstance) {
   });
 
   /**
-   * Update a user
+   * Update a user (Username, Email, Status)
    */
   fastify.put<{ Params: { id: string }, Body: UpdateUserRequest }>('/:id', async (req, reply) => {
     try {
@@ -71,16 +68,47 @@ export async function userRoutes(fastify: FastifyInstance) {
         return reply.status(400).send({ error: "Missing user ID" });
       }
 
+      // Check if user exists
+      const userCheck = await fastify.db.prepare("SELECT * FROM users WHERE id = ?");
+      const user = await userCheck.get(id);
+      if (!user) return reply.status(404).send({ error: "User not found" });
+
+      // Check if new username already exists (if updating username)
+      if (username) {
+        const usernameCheck = await fastify.db.prepare("SELECT id FROM users WHERE username = ?");
+        const existingUser = await usernameCheck.get(username);
+        if (existingUser && existingUser.id !== parseInt(id)) {
+          return reply.status(400).send({ error: "Username is already taken." });
+        }
+      }
+
+      // Check if new email already exists (if updating email)
+      if (email) {
+        const emailCheck = await fastify.db.prepare("SELECT id FROM users WHERE email = ?");
+        const existingEmailUser = await emailCheck.get(email);
+        if (existingEmailUser && existingEmailUser.id !== parseInt(id)) {
+          return reply.status(400).send({ error: "Email is already registered." });
+        }
+      }
+
+      // Update the user in the database
       const updates: string[] = [];
       const values: any[] = [];
 
+
+      // 🛡️ Sanitize and validate input before updating
       if (username) {
+        const sanitizedUsername = sanitizeHtml(username, { allowedTags: [], allowedAttributes: {} });
+        if (!sanitizedUsername.match(/^[a-zA-Z0-9_-]+$/)) {
+          return reply.status(400).send({ error: "Invalid username format." });
+        }
         updates.push("username = ?");
-        values.push(username);
+        values.push(sanitizedUsername);
       }
       if (email) {
+        const sanitizedEmail = sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} });
         updates.push("email = ?");
-        values.push(email);
+        values.push(sanitizedEmail);
       }
       if (avatar) {
         updates.push("avatar = ?");
@@ -99,7 +127,13 @@ export async function userRoutes(fastify: FastifyInstance) {
       const stmt = await fastify.db.prepare(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`);
       await stmt.run(...values);
 
-      reply.send({ message: "User updated" });
+      // Fetch updated user data
+      const updatedUserStmt = await fastify.db.prepare(
+        "SELECT id, username, email, status FROM users WHERE id = ?"
+      );
+      const updatedUser = await updatedUserStmt.get(id);
+
+      reply.send({ message: "User updated", user: updatedUser });
     } catch (error) {
       console.error("❌ Error updating user:", error);
       reply.status(500).send({ error: "Internal Server Error" });

@@ -9,49 +9,73 @@
 </head>
 
 <body>
-  <div id="app">
+  <div class="container">
     <h1>Backend API Tester</h1>
 
-    <button id="toggleRegister">Show Register</button>
-    <button id="toggleLogin">Show Login</button>
-    <button id="fetchUsers">Get All Users</button>
+    <!-- Navigation -->
+    <div class="nav-buttons">
+      <button id="toggleRegister">Show Register</button>
+      <button id="toggleLogin">Show Login</button>
+      <button id="toggleAllUsers">Show All Users</button>
+      <button id="toggleDarkMode">🌙 Toggle Dark Mode</button>
+    </div>
 
-    <div id="registerForm" style="display: none;">
+    <!-- Register Form -->
+    <section id="registerForm" class="hidden">
       <h2>Register</h2>
       <input type="text" id="regUsername" placeholder="Username">
       <input type="email" id="regEmail" placeholder="Email">
       <input type="password" id="regPassword" placeholder="Password">
       <button id="registerBtn">Register</button>
       <p id="registerResponse"></p>
-    </div>
+    </section>
 
-    <div id="loginForm" style="display: none;">
+    <!-- Login Form -->
+    <section id="loginForm" class="hidden">
       <h2>Login</h2>
-      <input type="email" id="loginEmail" placeholder="Email">
+      <input type="text" id="loginIdentifier" placeholder="Email or Username">
       <input type="password" id="loginPassword" placeholder="Password">
       <button id="loginBtn">Login</button>
       <p id="loginResponse"></p>
+    </section>
 
-      <button id="logoutBtn">Logout</button>
-      <p id="logoutResponse"></p>
-    </div>
-
-    <div id="userInfo" style="display: none;">
+    <!-- Logged-in User Info -->
+    <section id="userInfo" class="hidden">
       <h2>Logged-in User</h2>
       <p><strong>ID:</strong> <span id="userId"></span></p>
       <p><strong>Username:</strong> <span id="userName"></span></p>
       <p><strong>Email:</strong> <span id="userEmail"></span></p>
       <p><strong>Status:</strong> <span id="userStatus"></span></p>
 
-      <button id="deleteAccountBtn" style="background-color: red; color: white;">Delete Account</button>
+      <!-- Update Profile -->
+      <h3>Update Profile</h3>
+      <input type="text" id="newUsername" placeholder="New Username">
+      <button id="updateUsernameBtn">Update Username</button>
+
+      <input type="email" id="newEmail" placeholder="New Email">
+      <button id="updateEmailBtn">Update Email</button>
+
+      <div class="form-group">
+        <select id="newStatus">
+          <option value="online">Online</option>
+          <option value="offline">Offline</option>
+          <option value="in-game">In-Game</option>
+        </select>
+        <button id="updateStatusBtn">Update Status</button>
+      </div>
+
+      <p id="updateResponse"></p>
+
+      <button id="logoutBtn" class="danger-btn">Logout</button>
+      <button id="deleteAccountBtn" class="danger-btn">Delete Account</button>
       <p id="deleteResponse"></p>
+    </section>
 
-    </div>
-
-
-    <h2>API Response:</h2>
-    <pre id="apiResponse"></pre>
-
+    <!-- All Users List -->
+    <section id="allUsersSection">
+      <h2>All Users:</h2>
+      <pre id="allUsersResponse" class="hidden"></pre>
+    </section>
   </div>
 
   <script type="module" src="/src/main.ts"></script>

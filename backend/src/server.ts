@@ -7,6 +7,7 @@ import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
 import fastifyMultipart from "@fastify/multipart";
 import fastifyRoutes from '@fastify/routes';
+// import fastifyRateLimit from "@fastify/rate-limit";
 import helmet from '@fastify/helmet';
 import dotenv from "dotenv";
 import path from 'path';
@@ -93,10 +94,20 @@ const fastify = Fastify({
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register plugins
+
 await fastify.register(helmet);
+// await fastify.register(fastifyRateLimit, {
+//   max: 5, // Allow only 5 login attempts per minute per IP
+//   timeWindow: "1 minute",
+//   errorResponseBuilder: () => {
+//     return { error: "Too many requests. Please try again later." };
+//   }
+// });
+
 await fastify.register(fpSqlitePlugin, {
   dbFilename: dbPath
 });
+
 await fastify.register(fastifyMultipart);
 await fastify.register(fastifyWebsocket);
 
@@ -119,7 +130,7 @@ schemas.forEach(schema => fastify.addSchema(schema));
 setupRoutes(fastify);
 
 // Health check endpoint
-// fastify.get('/', (req, reply) => reply.send({ message: 'Backend is running!' }));
+// fastify.get('/health', (req, reply) => reply.send({ message: 'Backend is running!' }));
 fastify.get('/health', (req, reply) => reply.send({ status: 'ok' }));
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -149,7 +160,7 @@ await fastify.ready();
 await setupDatabase(fastify);
 
 // Log all registered routes
-console.log(fastify.routes);
+// console.log(fastify.routes);
 
 // console.log("🛠️ Fastify Decorators:", Object.keys(fastify)); // debug
 

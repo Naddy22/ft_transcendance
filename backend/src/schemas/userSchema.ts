@@ -79,15 +79,14 @@ export const loginSchema = {
 	"type": "object",
 	"properties": {
 		"email": {
-			"type": "string",
-			"format": "email"
+			"type": "string"
 		},
 		"password": {
 			"type": "string",
 			"minLength": 8
 		}
 	},
-	"required": ["email", "password"]
+	"required": ["identifier", "password"]
 } as const;
 
 export type LoginRequest = FromSchema<typeof loginSchema>;

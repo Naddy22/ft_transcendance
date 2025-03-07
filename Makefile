@@ -8,14 +8,22 @@ TEAM		:= "namoisan & $(AUTHOR)"
 REPO_LINK	:= https://github.com/SaydRomey/ft_transcendence
 
 # Network Info
-LOCALHOST		:= http://localhost
 BACKEND_PORT	:= 3000
 FRONTEND_PORT	:= 5173
+BACKEND_URL		:= https://localhost:$(BACKEND_PORT)
+FRONTEND_URL	:= http://localhost:$(FRONTEND_PORT)
 
 # Directories
 BACKEND_DIR		:= backend
 FRONTEND_DIR	:= frontend
-GAME_DIR		:= game
+GAME_DIR		:= PongGame
+
+# Log files
+LOG_DIRS			:= $(BACKEND_DIR)/logs $(FRONTEND_DIR)/logs
+BACKEND_LOG_FILE	:= backend_$(TIMESTAMP).log
+FRONTEND_LOG_FILE	:= frontend_$(TIMESTAMP).log
+
+BACKEND_PID_FILE	:= $(BACKEND_DIR)/logs/backend.pid
 
 # Configuration Files
 MK_PATH	:= utils/makefiles
@@ -27,7 +35,8 @@ include $(MK_PATH)/doc.mk		# Documentation Targets
 include $(MK_PATH)/env.mk		# .env File Management
 
 # Default Target
-.DEFAULT_GOAL	:= all
+# .DEFAULT_GOAL	:= all
+.DEFAULT_GOAL	:= test # **tmp
 
 .DEFAULT:
 	$(info make: *** No rule to make target '$(MAKECMDGOALS)'.  Stop.)
@@ -62,7 +71,36 @@ tree: ## Show file structure (without node_modules/)
 
 all: env build up ## Build and start containers
 
-.PHONY: all # build build-no-cache up down logs
+# Comment/Uncomment these to log outputs
+# ENABLE_BACK_LOG		:= > logs/$(BACKEND_LOG_FILE) $(STDERR_STDOUT)
+# ENABLE_FRONT_LOG	:= > logs/$(FRONTEND_LOG_FILE) $(STDERR_STDOUT)
+
+test: | $(LOG_DIRS) ## Automates frontend build and backend start process
+	@if $(call IS_PORT_IN_USE,$(BACKEND_PORT)); then \
+		$(MAKE) $(NPD) stop; \
+	fi
+
+	@$(call INFO,$(NAME),,Building frontend... (npm run build))
+	@cd $(FRONTEND_DIR) && npm run build $(ENABLE_FRONT_LOG)
+	@$(call SUCCESS,$(NAME),Frontend build complete.)
+
+	@$(call INFO,$(NAME),,Starting backend... (npm run dev))
+	@cd $(BACKEND_DIR) && npm run dev $(ENABLE_BACK_LOG) $(IN_BACKGROUND)
+	@$(call SUCCESS,$(NAME),Backend is running on port $(BACKEND_PORT).)
+
+	@sleep 1
+
+	@$(call INFO,$(NAME),🌐 Open your browser and go to: $(BACKEND_URL))
+	@$(call INFO,$(NAME),Use 'make stop' to stop the backend)
+	@$(OPEN) $(BACKEND_URL) $(STDOUT_NULL) $(STDERR_STDOUT)
+
+$(LOG_DIRS):
+	@$(MKDIR) $(LOG_DIRS)
+
+stop: ## Kill all backend running BACKEND_PORT
+	@$(call KILL_PROCESS_ON_PORT,$(BACKEND_PORT),print)
+
+.PHONY: all test stop
 
 # ==============================
 ##@ 🧹 Cleanup
@@ -70,7 +108,8 @@ all: env build up ## Build and start containers
 
 clean: docker-cleanup ## Remove all containers, images, volumes
 
-fclean: clean ## Full Clean (currently same as `clean`)
+fclean: clean ## Full Clean, including log files
+	@$(call CLEANUP,$(NAME),log files,$(LOG_DIRS),"All logs removed.","No logs to clean.")
 # remove dist/ where they are (todo)
 # remove node_modules also ? (todo)
 
@@ -83,196 +122,69 @@ re: down build-no-cache up ## Restart all services
 .PHONY: clean fclean ffclean re
 
 # ==============================
-##@ ** WIP **
-# ==============================
-
-# ==============================
 ##@ Backend Section
 # ==============================
 
-backend:  ## Run backend locally
-	cd $(BACKEND_DIR) && npm run dev
+back-install:  ## Install backend dependencies
+	@cd $(BACKEND_DIR) && npm install
 
-backend-install:  ## Install backend dependencies
-	cd $(BACKEND_DIR) && npm install
+# back-build:
+# back-start:
 
-backend-test:  ## Run backend tests
-	cd $(BACKEND_DIR) && npm test
+back-dev:  ## Run backend locally
+	@cd $(BACKEND_DIR) && npm run dev
 
-backend-lint:  ## Lint backend code
-	cd $(BACKEND_DIR) && npm run lint
+# back-test:
 
-backend-open:  ## Open backend in browser
-	$(OPEN) $(LOCALHOST):$(BACKEND_PORT)
+back-curl: ## Check backend using `curl`
+	curl -i $(BACKEND_URL)/health -k || echo "❌ Backend is NOT running!"
 
-backend-curl: ## Check backend using `curl`
-	curl -i $(LOCALHOST):$(BACKEND_PORT) || echo "❌ Backend is NOT running!"
-
-backend-check-port: ## Check if backend port is available
+back-check-port: ## Check if backend port is available
 	@$(call CHECK_PORT,$(BACKEND_PORT),print)
 
-backend-clean-port: ## Kill any process using the backend port
+back-clean-port: ## Kill any process using the backend port
 	@$(call KILL_PROCESS_ON_PORT,$(BACKEND_PORT))
 
-.PHONY: backend backend-install backend-test backend-lint \
-		backend-open backend-curl backend-check-port backend-clean-port
+.PHONY: back-install back-dev back-curl \
+back-check-port back-clean-port
 
 # ==============================
 ##@ Frontend Section
 # ==============================
 
-frontend:  ## Run frontend locally
-	cd $(FRONTEND_DIR) && npm run dev
+front-install:  ## Install frontend dependencies
+	@cd $(FRONTEND_DIR) && npm install
 
-frontend-install:  ## Install frontend dependencies
-	cd $(FRONTEND_DIR) && npm install
+front-build:  ## Build frontend for production
+	@cd $(FRONTEND_DIR) && npm run build
 
-frontend-build:  ## Build frontend for production
-	cd $(FRONTEND_DIR) && npm run build
+front-dev:  ## Run frontend locally
+	@cd $(FRONTEND_DIR) && npm run dev
 
-frontend-test:  ## Run frontend tests
-	cd $(FRONTEND_DIR) && npm test
+# front-preview:
 
-frontend-lint:  ## Lint frontend code
-	cd $(FRONTEND_DIR) && npm run lint
-
-frontend-open:  ## Open frontend in browser
-	$(OPEN) $(LOCALHOST):$(FRONTEND_PORT)
-
-frontend-curl: ## Check frontend using `curl`
-	curl -i $(LOCALHOST):$(FRONTEND_PORT) || echo "❌ Frontend is NOT running!"
-
-frontend-check-port: ## Check if frontend port is available
+front-check-port: ## Check if frontend port is available
 	@$(call CHECK_PORT,$(FRONTEND_PORT),print)
 
-frontend-clean-port: ## Kill any process using the frontend port
+front-clean-port: ## Kill any process using the frontend port
 	@$(call KILL_PROCESS_ON_PORT,$(BACKEND_PORT))
 
-.PHONY: frontend frontend-install frontend-build frontend-test frontend-lint \
-		frontend-open frontend-curl frontend-check-port frontend-clean-port
+.PHONY: front-install front-build front-dev \
+front-check-port front-clean-port
 
 # ==============================
 ##@ Pong Game Section (Babylon.js)
 # ==============================
 
-game:  ## Run Pong game
-	cd $(GAME_DIR) && npm run dev
-
 game-install:  ## Install game dependencies
 	cd $(GAME_DIR) && npm install
+
+game-dev:  ## Run Pong game using vite
+	cd $(GAME_DIR) && npm run dev
 
 game-build:  ## Build Pong game
 	cd $(GAME_DIR) && npm run build
 
-# ==============================
-##@ Database Section
-# ==============================
+# game-preview:
 
-# Regenerate Prisma Client to apply changes:
-# npx prisma generate --schema=backend/src/prisma/schema.prisma
-
-# Run the Prisma migration command again to confirm it's using the correct folder
-# npx prisma migrate dev --name init --schema=backend/src/prisma/schema.prisma
-
-
-
-db-migrate:  ## Run Prisma migrations
-	cd $(BACKEND_DIR) && npx prisma migrate dev --name init
-
-db-seed:  ## Seed the database with test data
-	cd $(BACKEND_DIR) && npx prisma db seed
-
-db-reset:  ## Reset the database
-	cd $(BACKEND_DIR) && npx prisma migrate reset --force
-
-# ==============================
-##@ Production Deployment
-# ==============================
-
-prod-build:  ## Build containers for production
-	$(DOCKER_COMPOSE_PROD) build
-
-prod-up:  ## Start production containers
-	$(DOCKER_COMPOSE_PROD) up -d
-
-prod-down:  ## Stop production containers
-	$(DOCKER_COMPOSE_PROD) down
-
-prod-logs:  ## Show logs for production
-	$(DOCKER_COMPOSE_PROD) logs -f
-
-
-# ==============================
-# ** TOCHECK **
-# ==============================
-
-# # Frontend Section ** 
-
-# FRONTEND_DIR	:= frontend
-# SRC_DIR			:= $(FRONTEND_DIR)/src
-# DIST_DIR		:= $(FRONTEND_DIR)/dist
-# TS_FILES		:= $(wildcard $(SRC_DIR)/*ts)
-# JS_FILES		:= $(TS_FILES:$(SRC_DIR)/%.ts=$(DIST_DIR)/%.js)
-
-# tsc: ## Compile TypeScript files
-# 	tsc
-
-# build: tsc ## Compile everything and update files (default command)
-
-# clean: ## Remove compiled files
-# 	rm -rf $(DIST_DIR)/*.js
-
-# start: build ## Launch project after compilation
-# # (add command to lauch project here, e.g.: a local server)
-
-# test: ## Test (if necessary)
-
-# .PHONY: tsc build clean start test
-
-# frontend dependencies ? **tocheck
-# nodejs
-# npm
-# typescript
-# babylonjs (3D)
-
-# npm install --save-dev vite
-# npm run dev
-
-# # 2d vs 3d
-# # inside 'index.html' L.70 :
-# <script type="module" src="./src/main.ts"></script> # 2D
-# <script type="module" src="./src/main3D.ts"></script> # 3D
-
-# ==============================
-# ==============================
-
-# cd $(BACKEND_DIR)
-# npm init -y
-# npm install fastify
-
-
-# npm install @prisma/client
-# npm install --save-dev prisma
-# npx prisma init --datasource-provider sqlite
-# # (in database/.env)
-# DATABASE_URL="file:./database.sqlite"
-# npx prisma migrate dev --name init
-
-# # adding a user:
-# curl -X POST http://localhost:3000/users -H "Content-Type: application/json" -d '{"name": "Alice", "email": "alice@example.com"}'
-
-# curl -X POST http://localhost:3000/register \
-#      -H "Content-Type: application/json" \
-#      -d '{"name": "Alice", "email": "alice@example.com", "password": "securepass"}'
-
-# Test Login
-# curl -X POST http://localhost:3000/login \
-#      -H "Content-Type: application/json" \
-#      -d '{"email": "alice@example.com", "password": "securepass"}'
-
-
-# # checking users:
-# curl http://localhost:3000/users
-
-# ==============================
-# ==============================
+.PHONY: game-install game-dev game-build

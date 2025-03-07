@@ -1,22 +1,24 @@
 
 # ======================
-# Node.js & Fastify
-# ======================
-
-# Dependencies installed via npm or yarn
-node_modules/
-# Compiled and minified files
-dist/
-# Build artifacts generated for deployment
-build/
-
-# ======================
 # Environment Variables
 # ======================
 
 # Environment variables file (contains secrets and API keys)
 .env
 certs/
+
+# ======================
+# Node.js & Fastify
+# ======================
+
+# Dependencies installed via npm or yarn
+node_modules/
+
+# Compiled and minified files
+dist/
+
+# Build artifacts generated for deployment
+build/
 
 # ======================
 # IDE and Editor Configs
@@ -35,10 +37,10 @@ certs/
 
 # Logs folder for application logs
 logs/
+*.log
+
 # Log file generated when npm encounters an issue
 npm-debug.log
-# Log file generated when yarn encounters an issue
-yarn-error.log
 
 # ======================
 # SQLite Database
@@ -49,40 +51,19 @@ database/
 data/
 # SQLite database files
 *.sqlite
-# SQLite v3 database files
-*.sqlite3
-# Generic database files
-*.db
-# Generic database journal
-*.db-journal
-# Write-ahead log for SQLite databases
-*.db-wal
-# Shared memory files for SQLite
-*.db-shm
 
 # ======================
 # Docker
 # ======================
 
-# Docker ignore file (similar to .gitignore but for Docker)
+# Docker ignore file
 .dockerignore
+
 # Local override for docker-compose setup
 docker-compose.override.yml
+
 # Init scripts for database setup in Docker
 **/docker-entrypoint-initdb.d/
-
-# ======================
-# Tailwind CSS & Frontend Build
-# ======================
-
-# Next.js build directory
-.next/
-# Static export directory for Next.js
-out/
-# Caches generated for faster builds
-*.cache/
-# Lock files for package managers (yarn.lock, package-lock.json)
-*.lock
 
 # ======================
 # Babylon.js / WebGL Artifacts
@@ -96,16 +77,6 @@ out/
 *.bin
 # Babylon.js-specific 3D model format
 *.babylon
-
-# ======================
-# Prisma & Database ORM
-# ======================
-
-# Prisma-generated database client files
-prisma/db.sqlite
-prisma/db.sqlite-journal
-prisma/migrations/
-prisma/generated/
 
 # ======================
 # Temporary & Local Files

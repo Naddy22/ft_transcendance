@@ -2,9 +2,18 @@
 // Handles authentication endpoints like login and registration.
 
 import { FastifyInstance } from 'fastify';
-import { User, PublicUser, RegisterRequest, LoginRequest, LogoutRequest } from "../schemas/userSchema.js";
-import bcrypt from 'bcrypt';
+import dotenv from "dotenv";
 import sanitizeHtml from 'sanitize-html';
+import bcrypt from 'bcrypt';
+import {
+  PublicUser, RegisterRequest, LoginRequest, LogoutRequest
+} from "../schemas/userSchema.js";
+
+dotenv.config();
+
+// console.log("BCRYPT_SALT_ROUNDS:", process.env.BCRYPT_SALT_ROUNDS); // debug
+const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12", 10);
+// console.log("SALT_ROUNDS:", SALT_ROUNDS); // debug
 
 export async function authRoutes(fastify: FastifyInstance) {
 
@@ -15,17 +24,31 @@ export async function authRoutes(fastify: FastifyInstance) {
       const { username, email, password } = req.body;
 
       // Validate required fields
-      if (!username || !email || !password ) {
+      if (!username || !email || !password) {
         return reply.status(400).send({ error: "Username, email and password are required" });
       }
 
-      // 🔍 Check if username or email already exists
-      const stmtCheck = await fastify.db.prepare("SELECT id, username, email FROM users WHERE email = ? OR username = ?");
-      const existingUser = await stmtCheck.all(email, username); // `all()` returns an array
+      // 🛡 Sanitize user input to prevent XSS
+      const sanitizedUsername = sanitizeHtml(username, { allowedTags: [], allowedAttributes: {} });
+      const sanitizedEmail = sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} });
+
+      // 🛡 Check email format
+      if (!sanitizedEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        return reply.status(400).send({ error: "Invalid email format" });
+      }
+
+      // 🛡 Ensure sanitized username is still valid
+      if (!sanitizedUsername.match(/^[a-zA-Z0-9_-]{3,30}$/)) {
+        return reply.status(400).send({ error: "Invalid username format (3-30 alphanumeric characters, _ or - allowed)." });
+      }
+
+      // 🔍 Check if username or email already exists (case-insensitive for email)
+      const stmtCheck = await fastify.db.prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?) OR username = ?");
+      const existingUser = await stmtCheck.all(sanitizedEmail, sanitizedUsername); // `all()` returns an array
 
       if (existingUser.length > 0) {
-        const isEmailTaken = existingUser.some(user => user.email === email);
-        const isUsernameTaken = existingUser.some(user => user.username === username);
+        const isEmailTaken = existingUser.some(user => user.email === sanitizedEmail);
+        const isUsernameTaken = existingUser.some(user => user.username === sanitizedUsername);
 
         if (isEmailTaken) {
           return reply.status(400).send({ error: "Email is already registered." });
@@ -35,12 +58,8 @@ export async function authRoutes(fastify: FastifyInstance) {
         }
       }
 
-      // 🔒 Sanitize user input to prevent XSS
-      const sanitizedUsername = sanitizeHtml(username);
-      const sanitizedEmail = sanitizeHtml(email);
-
       // 🔐 Hash the password before storing
-      const hashedPassword = await bcrypt.hash(password, 10); // **use env for salt
+      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
       // 💾 Store user in the database
       const stmt = await fastify.db.prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
@@ -50,11 +69,6 @@ export async function authRoutes(fastify: FastifyInstance) {
       const stmtId = await fastify.db.prepare("SELECT last_insert_rowid() as id");
       const row = await stmtId.get();
       const insertedUserId = row?.id ?? null;
-
-      // // Retrieve the last inserted user ID
-      // const stmtId = await fastify.db.prepare("SELECT last_insert_rowid() as id");
-      // const rows = await stmtId.all();
-      // const insertedUserId = rows.length > 0 ? rows[0].id : null;
 
       // Respond with the user data (excluding password)
       reply.status(201).send({ id: insertedUserId, username: sanitizedUsername, email: sanitizedEmail });
@@ -69,18 +83,18 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: LoginRequest }>("/login", async (req, reply) => {
     try {
 
-      const { email, password } = req.body;
+      const { identifier, password } = req.body;
 
       // Validate required fields
-      if (!email || !password) {
-        return reply.status(400).send({ error: "Email and password are required" });
+      if (!identifier || !password) {
+        return reply.status(400).send({ error: "Username/Email and password are required" });
       }
 
-      // 🔍 Check if user exists
-      const stmt = await fastify.db.prepare("SELECT * FROM users WHERE email = ?");
-      const user = await stmt.get(email);
+      // 🔍 Search for user by either email or username
+      const stmt = await fastify.db.prepare("SELECT * FROM users WHERE email = ? OR username = ?");
+      const user = await stmt.get(identifier, identifier);
 
-      if (!user) return reply.status(401).send({ error: "Invalid email" });
+      if (!user) return reply.status(401).send({ error: "Invalid username or email" });
 
       // 🔒 Verify password
       const passwordMatch = await bcrypt.compare(password, user.password);
@@ -90,9 +104,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       const updateStmt = await fastify.db.prepare("UPDATE users SET status = ? WHERE id = ?");
       await updateStmt.run("online", user.id);
 
-      // Use `publicUser` to exclude the password field
-      // const { password: _, ...safeUser }: PublicUser = user;
-      // const { password: _, ...safeUser }: PublicUser = { ...user, status: "online" };
+      // Exclude password field from response
       const { password: _, ...safeUser } = user as PublicUser;
 
       reply.send({ message: "✅ Login successful", user: safeUser });
