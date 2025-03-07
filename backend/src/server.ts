@@ -113,7 +113,8 @@ await fastify.register(fastifyWebsocket);
 
 // Serve static frontend files
 await fastify.register(fastifyStatic, {
-  root: path.join(__dirname, '../../frontend/dist'),
+  // root: path.join(__dirname, '../../frontend/dist'),
+  root: path.join(__dirname, '../../PongGame/dist'),
   prefix: '/',
   index: ['index.html'],
 });

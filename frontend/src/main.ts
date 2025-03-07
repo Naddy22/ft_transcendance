@@ -1,8 +1,10 @@
 
-import { API } from "./api"
+import { API } from "./api";
+
+const api = new API("https://localhost:3000"); // adjust to your backend URL
 
 document.addEventListener("DOMContentLoaded", () => {
-
+  // Grab UI elements
   const toggleRegister = document.getElementById("toggleRegister") as HTMLButtonElement;
   const toggleLogin = document.getElementById("toggleLogin") as HTMLButtonElement;
   const toggleAllUsers = document.getElementById("toggleAllUsers") as HTMLButtonElement;
@@ -43,242 +45,209 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateStatusBtn = document.getElementById("updateStatusBtn") as HTMLButtonElement;
   const updateResponse = document.getElementById("updateResponse") as HTMLParagraphElement;
 
-  let loggedInUserId: number | null = null; // Store logged-in user ID
+  let loggedInUserId: number | null = null;
   let loggedInUserStatus: string | null = null;
 
-  // Ensure forms are hidden at the start
+  // Initially hide forms and user info
   registerForm.style.display = "none";
   loginForm.style.display = "none";
   logoutBtn.style.display = "none";
   deleteAccountBtn.style.display = "none";
   userInfo.style.display = "none";
+  allUsersResponse.style.display = "none";
 
-  // ────────────────────────────────────────────────────────────────────────────────
-  // DARK MODE HANDLING
+  // Dark Mode Handling
   function setDarkMode(enabled: boolean) {
     document.body.classList.toggle("dark-mode", enabled);
     localStorage.setItem("darkMode", enabled ? "enabled" : "disabled");
     darkModeBtn.textContent = enabled ? "☀️ Light Mode" : "🌙 Dark Mode";
   }
-
-  // Load dark mode preference
   setDarkMode(localStorage.getItem("darkMode") === "enabled");
 
-  // Event listener for toggling dark mode
   darkModeBtn.addEventListener("click", () => {
     setDarkMode(!document.body.classList.contains("dark-mode"));
   });
 
-  // ────────────────────────────────────────────────────────────────────────────────
-  // Fetch & Display User Info
-  async function fetchUserInfo(userId: number | null) {
-    if (!userId)
-      return; // Exit if no user is logged in
-
-    const userData = await API.fetchUserInfo(userId);
-    if (userData) {
+  // Fetch & display user info
+  async function fetchUserInfo(userId: number) {
+    try {
+      const userData = await api.getUser(userId);
       userIdElem.textContent = userData.id.toString();
       userNameElem.textContent = userData.username;
       userEmailElem.textContent = userData.email;
       userStatusElem.textContent = userData.status;
+    } catch (error: any) {
+      console.error("Error fetching user info:", error.message);
     }
   }
 
-  // Fetch & Display All Users
+  // Fetch & display all users
   async function fetchUsers() {
-    const data = await API.fetchUsers();
-    allUsersResponse.textContent = data ? JSON.stringify(data, null, 2) : "❌ Error fetching users.";
+    try {
+      const users = await api.getUsers();
+      allUsersResponse.textContent = JSON.stringify(users, null, 2);
+    } catch (error: any) {
+      allUsersResponse.textContent = `❌ Error: ${error.message}`;
+    }
   }
 
   // Auto-fetch users on page load
   fetchUsers();
 
-  // ────────────────────────────────────────────────────────────────────────────────
-  // Event Listeners
-
-  // Toggle All Users: Show data if hidden, hide if visible
+  // Toggle display of all users
   toggleAllUsers.addEventListener("click", async () => {
-    const isHidden = allUsersResponse.style.display === "none";
-    if (isHidden) {
+    if (allUsersResponse.style.display === "none") {
       toggleAllUsers.textContent = "Loading...";
       await fetchUsers();
-      allUsersResponse.style.display = "block"; // show users
-      toggleAllUsers.textContent = "Show All Users"; // Reset button on failure
+      allUsersResponse.style.display = "block";
+      toggleAllUsers.textContent = "Hide All Users";
     } else {
       allUsersResponse.style.display = "none";
+      toggleAllUsers.textContent = "Show All Users";
     }
   });
 
-  // Toggle Register: Show form if hidden, hide if visible
-  // toggleRegister.addEventListener("click", () => {
-  //   const isHidden = registerForm.style.display === "none";
-  //   registerForm.style.display = isHidden ? "block" : "none";
-  //   loginForm.style.display = "none";
-  //   toggleRegister.textContent = isHidden ? "Hide Register" : "Show Register";
-  //   toggleLogin.textContent = "Show Login";
-  // });
+  // Toggle Register Form
   toggleRegister.addEventListener("click", () => {
     registerForm.style.display = registerForm.style.display === "none" ? "block" : "none";
     loginForm.style.display = "none";
   });
 
-  // Toggle Login: Show form if hidden, hide if visible
-  // toggleLogin.addEventListener("click", () => {
-  //   const isHidden = loginForm.style.display === "none";
-  //   loginForm.style.display = isHidden ? "block" : "none";
-  //   registerForm.style.display = "none";
-  //   toggleLogin.textContent = isHidden ? "Hide Login" : "Show Login";
-  //   toggleRegister.textContent = "Show Register";
-  // });
+  // Toggle Login Form
   toggleLogin.addEventListener("click", () => {
     loginForm.style.display = loginForm.style.display === "none" ? "block" : "none";
     registerForm.style.display = "none";
   });
 
-  // ────────────────────────────────────────────────────────────────────────────────
-
+  // Registration
   registerBtn.addEventListener("click", async () => {
     const username = regUsername.value;
     const email = regEmail.value;
     const password = regPassword.value;
-
     if (!username || !email || !password) {
       registerResponse.textContent = "❌ Please fill all fields.";
       return;
     }
-
-    const response = await API.registerUser(username, email, password);
-    registerResponse.textContent = response ? `✅ Success: ${response.message}` : "❌ Error registering.";
-
-    // Refresh users list if registration was successful
-    if (response) fetchUsers();
+    try {
+      const user = await api.registerUser({ username, email, password });
+      registerResponse.textContent = `✅ Registration successful. User ID: ${user.id}`;
+      fetchUsers();
+    } catch (error: any) {
+      registerResponse.textContent = `❌ Registration failed: ${error.message}`;
+    }
   });
 
+  // Login
   loginBtn.addEventListener("click", async () => {
     const identifier = loginIdentifier.value;
     const password = loginPassword.value;
-
     if (!identifier || !password) {
       loginResponse.textContent = "❌ Please enter username/email and password.";
       return;
     }
-
-    // Check if already logged in
     if (loggedInUserStatus === "online") {
       loginResponse.textContent = "✅ Already logged in.";
       return;
     }
-
-    const response = await API.loginUser(identifier, password)
-    if (response) {
-      loggedInUserId = response.user.id; // Store user ID for logout
-      loggedInUserStatus = response.user.status; // Store user status
-
-      loginResponse.textContent = `✅ Success: ${response.message}`;
-      logoutBtn.style.display = "block"; // Show Logout button
+    try {
+      const response = await api.loginUser({ identifier, password });
+      loggedInUserId = response.user.id;
+      loggedInUserStatus = response.user.status;
+      loginResponse.textContent = `✅ Login successful: ${response.message}`;
+      logoutBtn.style.display = "block";
       deleteAccountBtn.style.display = "block";
       userInfo.style.display = "block";
       fetchUserInfo(loggedInUserId);
       fetchUsers();
-    } else {
-      loginResponse.textContent = "❌ Login failed.";
+    } catch (error: any) {
+      loginResponse.textContent = `❌ Login failed: ${error.message}`;
     }
   });
 
+  // Logout
   logoutBtn.addEventListener("click", async () => {
     if (!loggedInUserId) {
       logoutResponse.textContent = "❌ No user is logged in.";
       return;
     }
-
-    const response = await API.logoutUser(loggedInUserId);
-    if (response) {
-      logoutResponse.textContent = "✅ Successfully logged out.";
-    } else {
-      logoutResponse.textContent = "❌ Logout failed.";
+    try {
+      const response = await api.logoutUser({ id: loggedInUserId });
+      logoutResponse.textContent = `✅ Logged out: ${response.message}`;
+    } catch (error: any) {
+      logoutResponse.textContent = `❌ Logout failed: ${error.message}`;
     }
-
-    // Ensure UI resets regardless of API response
     loggedInUserId = null;
     loggedInUserStatus = null;
-
     logoutBtn.style.display = "none";
     deleteAccountBtn.style.display = "none";
     userInfo.style.display = "none";
-
     loginIdentifier.value = "";
     loginPassword.value = "";
-
     loginResponse.textContent = "🔓 Logged out. You can log in again.";
-
-    fetchUsers(); // Refresh users list
+    fetchUsers();
   });
 
-  // Delete Account API Call
+  // Delete Account
   deleteAccountBtn.addEventListener("click", async () => {
-    if (!loggedInUserId || !confirm("⚠️ Are you sure you want to delete your account?")) return;
-
-    const response = await API.deleteAccount(loggedInUserId);
-    if (response) {
+    if (!loggedInUserId || !confirm("⚠️ Delete your account?")) return;
+    try {
+      const response = await api.deleteUser(loggedInUserId);
+      deleteResponse.textContent = `✅ Account deleted: ${response.message}`;
       loggedInUserId = null;
       loggedInUserStatus = null;
-      deleteResponse.textContent = "✅ Account deleted successfully.";
       logoutBtn.style.display = "none";
       deleteAccountBtn.style.display = "none";
       userInfo.style.display = "none";
-
-      // Clear login fields
       loginIdentifier.value = "";
       loginPassword.value = "";
-
       loginResponse.textContent = "🔓 Account deleted. You can register again.";
-
       fetchUsers();
+    } catch (error: any) {
+      deleteResponse.textContent = `❌ Deletion failed: ${error.message}`;
     }
   });
 
   // Update Username
   updateUsernameBtn.addEventListener("click", async () => {
-    if (!loggedInUserId)
-      return;
-
+    if (!loggedInUserId) return;
     if (!newUsername.value.trim()) {
       updateResponse.textContent = "❌ Please enter a new username.";
       return;
     }
-
-    const response = await API.updateUser(loggedInUserId, { username: newUsername.value });
-    updateResponse.textContent = response ? "✅ Username updated." : "❌ Update failed.";
-    if (response)
+    try {
+      await api.updateUser(loggedInUserId, { username: newUsername.value });
+      updateResponse.textContent = "✅ Username updated.";
       fetchUserInfo(loggedInUserId);
+    } catch (error: any) {
+      updateResponse.textContent = `❌ Update failed: ${error.message}`;
+    }
   });
 
   // Update Email
   updateEmailBtn.addEventListener("click", async () => {
-    if (!loggedInUserId)
-      return;
-
+    if (!loggedInUserId) return;
     if (!newEmail.value.trim()) {
       updateResponse.textContent = "❌ Please enter a new email.";
       return;
     }
-
-    const response = await API.updateUser(loggedInUserId, { email: newEmail.value });
-    updateResponse.textContent = response ? "✅ Email updated." : "❌ Update failed.";
-    if (response) {
-      updateResponse.textContent = "✅ Email updated successfully.";
+    try {
+      await api.updateUser(loggedInUserId, { email: newEmail.value });
+      updateResponse.textContent = "✅ Email updated.";
       fetchUserInfo(loggedInUserId);
+    } catch (error: any) {
+      updateResponse.textContent = `❌ Update failed: ${error.message}`;
     }
   });
 
   // Update Status
   updateStatusBtn.addEventListener("click", async () => {
-    if (!loggedInUserId)
-      return;
-
-    const response = await API.updateUser(loggedInUserId, { status: newStatus.value });
-    updateResponse.textContent = response ? "✅ Status updated." : "❌ Update failed.";
-    if (response) fetchUserInfo(loggedInUserId);
+    if (!loggedInUserId) return;
+    try {
+      await api.updateUser(loggedInUserId, { status: newStatus.value });
+      updateResponse.textContent = "✅ Status updated.";
+      fetchUserInfo(loggedInUserId);
+    } catch (error: any) {
+      updateResponse.textContent = `❌ Update failed: ${error.message}`;
+    }
   });
-
 });
