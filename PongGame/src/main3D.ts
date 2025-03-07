@@ -3,11 +3,15 @@ import { stopPongGame3D as stopPongGame } from './game3D.js';
 import { Tournament } from './tournament3D.js';
 
 // Gestion de l'affichage entre le menu et le jeu
-const startButton = document.getElementById('startButton') as HTMLButtonElement;
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
 const menu = document.getElementById('menu') as HTMLElement;
 const menuButton = document.getElementById("menuButton") as HTMLButtonElement;
 const menuDropdown = document.getElementById("menuDropdown") as HTMLElement;
+
+const howToPlayModal = document.getElementById("howToPlayModal");
+const closeButton = document.querySelector(".close");
+
+const startButton = document.getElementById('startButton') as HTMLButtonElement;
 const game = document.getElementById('game') as HTMLElement;
 const endScreen = document.getElementById('endScreen') as HTMLElement;
 
@@ -16,19 +20,6 @@ const tournamentButton = document.getElementById('tournament') as HTMLElement;
 const tournamentOptions = document.getElementById("tournamentOptions") as HTMLElement;
 const tournament4 = document.getElementById("tournament4") as HTMLButtonElement;
 const tournament8 = document.getElementById("tournament8") as HTMLButtonElement;
-
-// // Création de l’écran de fin dynamiquement
-// const endScreen = document.createElement('div');
-// endScreen.id = 'endScreen';
-// endScreen.innerHTML = `
-// 	<h1 id="winnerMessage"></h1>
-// 	<p id="currentMatchInfo"></p>
-// 	<p id="nextMatchInfo"></p>
-// 	<button id="replayButton">Rejouer</button>
-// 	<button id="returnMenu">Retour au menu</button>
-// 	<button id="nextMatchButton" style="display: none;">Match suivant</button>
-// `;
-// document.body.appendChild(endScreen);
 
 const winnerMessage = document.getElementById('winnerMessage') as HTMLElement;
 const currentMatchInfo = document.getElementById('currentMatchInfo') as HTMLElement;
@@ -42,10 +33,9 @@ const inputsContainer = document.getElementById("inputsContainer") as HTMLElemen
 const playersForm = document.getElementById("playersForm") as HTMLFormElement;
 
 let playerNames: string[] = [];
-// const playerNames = ["Joueur 1", "Joueur 2", "Joueur 3"]; // Liste dynamique plus tard
-// const playerNames = ["Joueur 1", "Joueur 2"]; // Liste dynamique plus tard
 let lastPlayers: string[] = [];
 let isTournamentMode: boolean = false;
+let isVsAIMode: boolean = false; // Par défaut, pas en mode IA
 let currentTournament: Tournament | null = null;
 let playerNumber: number = 0;
 
@@ -84,15 +74,6 @@ function showGame(): void {
 	game.style.display = 'block';
 	endScreen.style.display = 'none';
 }
-
-// function showEndScreen(winner: string, isTournament: boolean = false, isFinal: boolean = false): void {
-// 	winnerMessage.textContent = isFinal ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match!`;
-// 	menu.style.display = 'none';
-// 	game.style.display = 'block';
-// 	endScreen.style.display = 'block';
-// 	replayButton.style.display = isTournament ? 'none' : 'block'; // Cache "Rejouer" en tournoi
-// 	nextMatchButton.style.display = isTournament && !isFinal ? 'block' : 'none';
-// }
 
 function showEndScreen(winner: string, isTournament: boolean = false, isFinal: boolean = false): void {
 	winnerMessage.textContent = isFinal ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match !`;
@@ -150,6 +131,15 @@ function showTournamentOption(): void {
 // 	});
 // });
 
+window.addEventListener("click", function(event) {
+	if (howToPlayModal && event.target === howToPlayModal) {
+		howToPlayModal.style.display = "none";
+	}
+	if (!menuDropdown.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
+		menuDropdown.classList.remove("active");
+	}
+});
+
 homeButton.addEventListener("click", () => {
 	console.log("Retour au menu via bouton Maison");
 
@@ -164,6 +154,25 @@ menuButton.addEventListener("click", () => {
 	menuDropdown.classList.toggle("active"); // Affiche/Cache le menu
 });
 
+if (menuDropdown) {
+	menuDropdown.addEventListener("click", function(event) {
+		const target = event.target as HTMLElement;
+		if (target.dataset.action === "howToPlay" && howToPlayModal) {
+			event.preventDefault();
+			menuDropdown.classList.remove("active");
+			howToPlayModal.style.display = "flex";
+		}
+	});
+}
+
+if (closeButton) {
+	closeButton.addEventListener("click", function() {
+		if (howToPlayModal) {
+			howToPlayModal.style.display = "none";
+		}
+	});
+}
+
 // Vérification que l'élément startButton existe avant d'ajouter l'écouteur
 if (startButton) {
 	startButton.addEventListener('click', function() {
@@ -172,7 +181,7 @@ if (startButton) {
 		showGame();
 
 		// Manipulation de l'historique (ajouter un état pour le jeu)
-		history.pushState({ page: 'game' }, 'Jeu', '#game');
+		history.pushState({ page: 'game', isVsAI: false, isTournament: false, playerNames: [...playerNames] }, 'Jeu', '#game');
 
 		// if (playerNames.length === 4 || playerNames.length === 8) {
 		// 	console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
@@ -192,6 +201,7 @@ if (startButton) {
 		if (playerNames.length === 2) {
 			console.log("Match simple entre", playerNames[0], "et", playerNames[1]);
 			isTournamentMode = false;
+			isVsAIMode = false;
 			startPongGame(playerNames[0], playerNames[1], false, (winner) => {
 				console.log("Match terminé, gagnant :", winner);
 				showEndScreen(winner);
@@ -207,12 +217,14 @@ if (startButton) {
 
 playVsAIButton.addEventListener("click", () => {
 	console.log("Démarrage du jeu contre l'IA");
+	isTournamentMode = false;
+	isVsAIMode = true;
 
 	playerNames = ["Joueur 1", "IA"];
 	lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
 
 	showGame();
-	history.pushState({ page: 'game' }, 'Jeu', '#game');
+	history.pushState({ page: 'game', isVsAI: true, isTournament: false, playerNames: [...playerNames]}, 'Jeu', '#game');
 
 	startPongGame(playerNames[0], playerNames[1], true, (winner) => {
 		console.log("Match terminé, gagnant :", winner);
@@ -256,11 +268,12 @@ playersForm.addEventListener("submit", (event) => {
 	showGame();
 
 	// Manipulation de l'historique (ajouter un état pour le jeu)
-	history.pushState({ page: 'game' }, 'Jeu', '#game');
+	history.pushState({ page: 'game', isVsAI: false, isTournament: true, playerNames: [...playerNames]}, 'Jeu', '#game');
 
 	if (playerNames.length === 4 || playerNames.length === 8) {
 		console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
 		isTournamentMode = true;
+		isVsAIMode = false;
 		currentTournament = new Tournament(playerNames);
 		currentTournament.start((winner) => {
 			console.log("Match terminé, gagnant :", winner);
@@ -303,8 +316,8 @@ playersForm.addEventListener("submit", (event) => {
 replayButton.addEventListener('click', () => {
 	stopPongGame();
 	showGame();
-	history.pushState({ page: 'game' }, 'Jeu', '#game');
-	startPongGame(lastPlayers[0], lastPlayers[1], false, (winner) => {
+	history.pushState({ page: 'game', isVsAI: isVsAIMode, isTournament: false, playerNames: [...playerNames]}, 'Jeu', '#game');
+	startPongGame(lastPlayers[0], lastPlayers[1], isVsAIMode, (winner) => {
 		showEndScreen(winner);
 	});
 });
@@ -319,7 +332,7 @@ returnMenuButton.addEventListener('click', () => {
 nextMatchButton.addEventListener('click', () => {
 	if (currentTournament) {
 		showGame();
-		history.pushState({ page: 'game' }, 'Jeu', '#game');
+		history.pushState({ page: 'game', isVsAI: false, isTournament: true, playerNames: [...playerNames]}, 'Jeu', '#game');
 		currentTournament.nextMatch((winner) => {
 			console.log("Match terminé, gagnant :", winner);
 			if (currentTournament && currentTournament.isTournamentOver()) {
@@ -352,16 +365,33 @@ window.addEventListener("popstate", (event) => {
 		return;
 	}
 
+	let lastGameWasVsAI = event.state.isVsAI; 
+	let lastGameWasTournament = event.state.isTournament;
+	let StatePlayerNames = event.state.playerNames || [];
+
 	switch (event.state.page) {
 		case "game":
 			console.log("Reprise du jeu via popstate");
 			lastPlayers = playerNames.slice();
 			showGame();
 
-			if (isTournamentMode) {
-				console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
+			if (lastGameWasVsAI) {
+				console.log("Démarrage du jeu via state contre l'IA");
+				isTournamentMode = false;
+				isVsAIMode = true;
+
+				lastPlayers = StatePlayerNames.slice(); // Sauvegarde pour "Rejouer"
+
+				startPongGame(StatePlayerNames[0], StatePlayerNames[1], true, (winner) => {
+					console.log("Match terminé, gagnant :", winner);
+					showEndScreen(winner);
+				});
+			}
+			else if (lastGameWasTournament) {
+				console.log("Lancement d’un tournoi via state avec", playerNames.length, "joueurs");
 				isTournamentMode = true;
-				currentTournament = new Tournament(playerNames);
+				isVsAIMode = false;
+				currentTournament = new Tournament(StatePlayerNames);
 				currentTournament.start((winner) => {
 				console.log("Match terminé, gagnant :", winner);
 				if (currentTournament && currentTournament.isTournamentOver()) {
@@ -372,17 +402,16 @@ window.addEventListener("popstate", (event) => {
 				}
 			});
 			} else {
-				if (playerNames.length === 2) {
-					console.log("Match simple entre", playerNames[0], "et", playerNames[1]);
-					isTournamentMode = false;
-					startPongGame(playerNames[0], playerNames[1], false, (winner) => {
-						console.log("Match terminé, gagnant :", winner);
-						showEndScreen(winner);
-					});
-				} else {
-					alert("Pas assez de joueurs pour jouer !");
-					showMenu();
-				}
+				lastPlayers = StatePlayerNames.slice(); // Sauvegarde pour "Rejouer"
+
+				console.log("Match simple via state entre", StatePlayerNames[0], "et", StatePlayerNames[1]);
+				isTournamentMode = false;
+				isVsAIMode = false;
+
+				startPongGame(StatePlayerNames[0], StatePlayerNames[1], false, (winner) => {
+					console.log("Match terminé, gagnant :", winner);
+					showEndScreen(winner);
+				});
 			}
 			break;
 
@@ -409,48 +438,6 @@ window.addEventListener("popstate", (event) => {
 			showMenu();
 	}
 });
-
-
-// window.addEventListener('popstate', (event) => {
-// 	console.log('popstate event:', event.state);
-	
-// 	// Si l'état correspond au jeu, on affiche le jeu
-// 	if (event.state && event.state.page === 'game') {
-// 		console.log("Relance du jeu via popstate");
-// 		lastPlayers = playerNames.slice();
-// 		// Affiche le jeu et cache le menu
-// 		showGame();
-// 		if (playerNames.length === 4 || playerNames.length === 8) {
-// 			console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
-// 			isTournamentMode = true;
-// 			currentTournament = new Tournament(playerNames); // Toujours recréer pour cohérence
-// 			currentTournament.start((winner) => {
-// 				console.log("Match terminé, gagnant :", winner);
-// 				if (currentTournament && currentTournament.isTournamentOver()) {
-// 					console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
-// 					showEndScreen(winner, true, true);
-// 				} else {
-// 					showEndScreen(winner, true);
-// 				}
-// 			});
-// 		} else if (playerNames.length === 2) {
-// 			console.log("Match simple entre", playerNames[0], "et", playerNames[1]);
-// 			isTournamentMode = false;
-// 			startPongGame(playerNames[0], playerNames[1], (winner) => {
-// 				console.log("Match terminé, gagnant :", winner);
-// 				showEndScreen(winner);
-// 			});
-// 		} else {
-// 			alert("Pas assez de joueurs pour jouer !");
-// 			showMenu();
-// 		}
-// 	} else {
-// 		console.log("Arrêt du jeu via popstate");
-// 		stopPongGame();
-// 		showMenu();
-// 		currentTournament = null;
-// 	}
-// });
 
 // function resizeCanvas() {
 // 	// Obtenir la taille du conteneur en pixels

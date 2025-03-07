@@ -61,7 +61,7 @@ export class Tournament {
 		}
 	
 		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
-		startPongGame3D(currentMatch.player1, currentMatch.player2, (winner) => {
+		startPongGame3D(currentMatch.player1, currentMatch.player2, false, (winner) => {
 			stopPongGame3D();
 			this.setMatchWinner(winner);
 			callback(winner);
@@ -77,7 +77,7 @@ export class Tournament {
 		}
 	
 		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
-		startPongGame3D(currentMatch.player1, currentMatch.player2, (winner) => {
+		startPongGame3D(currentMatch.player1, currentMatch.player2, false, (winner) => {
 			stopPongGame3D();
 			this.setMatchWinner(winner);
 			callback(winner);
