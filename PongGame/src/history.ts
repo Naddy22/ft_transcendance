@@ -28,30 +28,3 @@ export function updateHistoryUI(): void {
 	});
 	console.log("Historique mis à jour :", gameHistory); // Vérifie que les données sont bien là
 }
-
-// // 🎯 Écouteurs d'événements spécifiques à l'historique
-// export function setupHistoryListeners() {
-// 	const historyButton = document.getElementById("historyButton") as HTMLElement;
-// 	// const closeHistoryButton = document.getElementById("closeHistoryButton") as HTMLElement;
-// 	const closeHistoryButton = document.querySelector(".close") as HTMLElement;
-// 	const historyModal = document.getElementById("historyModal") as HTMLElement;
-	
-// 	// 📜 Ouvrir l’historique
-// 	historyButton.addEventListener("click", (event) => {
-// 		event.preventDefault();
-// 		updateHistoryUI();
-// 		historyModal.style.display = "flex";
-// 	});
-
-// 	// ❌ Fermer l’historique
-// 	closeHistoryButton.addEventListener("click", () => {
-// 		historyModal.style.display = "none";
-// 	});
-
-// 	// ❌ Fermer si on clique en dehors
-// 	window.addEventListener("click", (event) => {
-// 		if (event.target === historyModal) {
-// 			historyModal.style.display = "none";
-// 		}
-// 	});
-// }

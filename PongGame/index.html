@@ -30,13 +30,17 @@
 		</div>
 	</div>
 	<!-- Fenêtre modale statistiques cachée -->
-	<div id="statisticsModal" class="modal">
-		<div class="modal-content statistics-content">
+	<div id="statsModal" class="modal">
+		<div class="modal-content stats-content">
 			<span class="close">&times;</span>
 			<h2>Statistiques du joueur</h2>
-			<!-- <div class="history-container">
-				<ul id="gameHistoryList"></ul>
-			</div> -->
+			<div class="stats-container">
+				<p id="totalGames">Total de parties : 0</p>
+				<p id="wins">Victoires : 0</p>
+				<p id="losses">Défaites : 0</p>
+				<p id="winRate">Taux de victoire : 0%</p>
+				<canvas id="statsChart"></canvas> <!-- Graphique ici -->
+			</div>
 		</div>
 	</div>
 	<!-- Fenêtre modale Comment jouer? cachée -->
