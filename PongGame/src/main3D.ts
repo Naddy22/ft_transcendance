@@ -2,6 +2,7 @@ import { startPongGame3D as startPongGame } from './game3D.js';
 import { stopPongGame3D as stopPongGame } from './game3D.js';
 import { Tournament } from './tournament3D.js';
 import { addGameToHistory } from "./history.js";
+import { updateHistoryUI } from "./history.js";
 
 // Gestion de l'affichage entre le menu et le jeu
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -9,8 +10,9 @@ const menu = document.getElementById('menu') as HTMLElement;
 const menuButton = document.getElementById("menuButton") as HTMLButtonElement;
 const menuDropdown = document.getElementById("menuDropdown") as HTMLElement;
 
-const howToPlayModal = document.getElementById("howToPlayModal");
-const closeButton = document.querySelector(".close");
+const historyModal = document.getElementById("historyModal") as HTMLElement;
+const howToPlayModal = document.getElementById("howToPlayModal") as HTMLElement;
+const closeButton = document.querySelectorAll(".close");
 
 const startButton = document.getElementById('startButton') as HTMLButtonElement;
 const game = document.getElementById('game') as HTMLElement;
@@ -133,11 +135,14 @@ function showTournamentOption(): void {
 // });
 
 window.addEventListener("click", function(event) {
+	if (!menuDropdown.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
+		menuDropdown.classList.remove("active");
+	}
 	if (howToPlayModal && event.target === howToPlayModal) {
 		howToPlayModal.style.display = "none";
 	}
-	if (!menuDropdown.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
-		menuDropdown.classList.remove("active");
+	if (historyModal && event.target === historyModal) {
+		historyModal.style.display = "none";
 	}
 });
 
@@ -158,19 +163,28 @@ menuButton.addEventListener("click", () => {
 if (menuDropdown) {
 	menuDropdown.addEventListener("click", function(event) {
 		const target = event.target as HTMLElement;
+		if (target.dataset.action === "history" && historyModal) {
+			event.preventDefault();
+			updateHistoryUI(); // Mets à jour l'historique
+			historyModal.style.display = "flex";
+		}
 		if (target.dataset.action === "howToPlay" && howToPlayModal) {
 			event.preventDefault();
-			menuDropdown.classList.remove("active");
 			howToPlayModal.style.display = "flex";
 		}
+		menuDropdown.classList.remove("active");
 	});
 }
 
 if (closeButton) {
-	closeButton.addEventListener("click", function() {
-		if (howToPlayModal) {
-			howToPlayModal.style.display = "none";
-		}
+	closeButton.forEach((button) => {
+		button.addEventListener("click", () => {
+			// Trouver la modale parente de ce bouton
+			const modal = button.closest(".modal") as HTMLElement;
+			if (modal) {
+				modal.style.display = "none";
+			}
+		});
 	});
 }
 
@@ -205,12 +219,11 @@ if (startButton) {
 			isVsAIMode = false;
 			startPongGame(playerNames[0], playerNames[1], false, (winner) => {
 				console.log("Match terminé, gagnant :", winner);
+
 				// Déterminer le résultat
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
-				let gameType = "⚔️ 1vs1"; // Match simple
-		
 				// Ajouter à l’historique
-				addGameToHistory(gameType, result);
+				addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
 
 				showEndScreen(winner);
 			});
@@ -234,12 +247,11 @@ playVsAIButton.addEventListener("click", () => {
 
 	startPongGame(playerNames[0], playerNames[1], true, (winner) => {
 		console.log("Match terminé, gagnant :", winner);
+
 		// Déterminer le résultat
 		let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
-		let gameType = "⚔️ 1vsIA"; // Match simple
-
 		// Ajouter à l’historique
-		addGameToHistory(gameType, result);
+		addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
 
 		showEndScreen(winner);
 	});
@@ -294,10 +306,8 @@ playersForm.addEventListener("submit", (event) => {
 				console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
 				// Déterminer le résultat
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
-				let gameType = "⚔️ tournois"; // Match simple
-		
 				// Ajouter à l’historique
-				addGameToHistory(gameType, result);
+				addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
 
 				showEndScreen(winner, true, true);
 			} else {
@@ -341,14 +351,8 @@ replayButton.addEventListener('click', () => {
 		console.log("Match terminé, gagnant :", winner);
 		// Déterminer le résultat
 		let result = winner === lastPlayers[0] ? "✅ Victoire" : "❌ Défaite";
-		let gameType :string;
-		if (isVsAIMode === false)
-			gameType = "⚔️ 1vs1"; // Match simple
-		else
-			gameType = "⚔️ 1vsIA";
-
 		// Ajouter à l’historique
-		addGameToHistory(gameType, result);
+		addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
 		showEndScreen(winner);
 	});
 });
@@ -370,10 +374,8 @@ nextMatchButton.addEventListener('click', () => {
 				console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
 				// Déterminer le résultat
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
-				let gameType = "⚔️ Tournoi"; // Match simple
-
 				// Ajouter à l’historique
-				addGameToHistory(gameType, result);
+				addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -423,10 +425,8 @@ window.addEventListener("popstate", (event) => {
 					console.log("Match terminé, gagnant :", winner);
 					// Déterminer le résultat
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
-					let gameType = "⚔️ 1vsIA"; // Match simple
-
 					// Ajouter à l’historique
-					addGameToHistory(gameType, result);
+					addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
 					showEndScreen(winner);
 				});
 			}
@@ -441,10 +441,8 @@ window.addEventListener("popstate", (event) => {
 					console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
 					// Déterminer le résultat
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
-					let gameType = "⚔️ Tournoi"; // Match simple
-
 					// Ajouter à l’historique
-					addGameToHistory(gameType, result);
+					addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
 					showEndScreen(winner, true, true);
 				} else {
 					showEndScreen(winner, true);
@@ -461,10 +459,8 @@ window.addEventListener("popstate", (event) => {
 					console.log("Match terminé, gagnant :", winner);
 					// Déterminer le résultat
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
-					let gameType = "⚔️ 1vsIA"; // Match simple
-
 					// Ajouter à l’historique
-					addGameToHistory(gameType, result);
+					addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
 					showEndScreen(winner);
 				});
 			}

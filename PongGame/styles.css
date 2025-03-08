@@ -235,7 +235,8 @@ button:hover {
 	background-color: #e5fbc9;
 	padding: 20px;
 	border-radius: 10px;
-	width: 370px;
+	/* width: 370px; suffisant pour comment jouer */
+	width: 500px; /*minimum pour historique*/
 	text-align: center;
 	box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
 	font-family: 'Mochiy Pop P One', sans-serif;
@@ -281,4 +282,8 @@ button:hover {
 #gameHistoryList li {
 	padding: 8px;
 	border-bottom: 1px solid #eee;
+}
+
+.statistics-content {
+	
 }
