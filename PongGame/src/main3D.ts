@@ -1,6 +1,7 @@
 import { startPongGame3D as startPongGame } from './game3D.js';
 import { stopPongGame3D as stopPongGame } from './game3D.js';
 import { Tournament } from './tournament3D.js';
+import { addGameToHistory } from "./history.js";
 
 // Gestion de l'affichage entre le menu et le jeu
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -204,9 +205,14 @@ if (startButton) {
 			isVsAIMode = false;
 			startPongGame(playerNames[0], playerNames[1], false, (winner) => {
 				console.log("Match terminé, gagnant :", winner);
+				// Déterminer le résultat
+				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
+				let gameType = "⚔️ 1vs1"; // Match simple
+		
+				// Ajouter à l’historique
+				addGameToHistory(gameType, result);
+
 				showEndScreen(winner);
-			// }, () => {
-			// 	startButton.disabled = false; // Active une fois chargé
 			});
 		} else {
 			alert("Pas assez de joueurs pour jouer !");
@@ -228,6 +234,13 @@ playVsAIButton.addEventListener("click", () => {
 
 	startPongGame(playerNames[0], playerNames[1], true, (winner) => {
 		console.log("Match terminé, gagnant :", winner);
+		// Déterminer le résultat
+		let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
+		let gameType = "⚔️ 1vsIA"; // Match simple
+
+		// Ajouter à l’historique
+		addGameToHistory(gameType, result);
+
 		showEndScreen(winner);
 	});
 });
@@ -279,6 +292,13 @@ playersForm.addEventListener("submit", (event) => {
 			console.log("Match terminé, gagnant :", winner);
 			if (currentTournament && currentTournament.isTournamentOver()) {
 				console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
+				// Déterminer le résultat
+				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
+				let gameType = "⚔️ tournois"; // Match simple
+		
+				// Ajouter à l’historique
+				addGameToHistory(gameType, result);
+
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -318,6 +338,17 @@ replayButton.addEventListener('click', () => {
 	showGame();
 	history.pushState({ page: 'game', isVsAI: isVsAIMode, isTournament: false, playerNames: [...playerNames]}, 'Jeu', '#game');
 	startPongGame(lastPlayers[0], lastPlayers[1], isVsAIMode, (winner) => {
+		console.log("Match terminé, gagnant :", winner);
+		// Déterminer le résultat
+		let result = winner === lastPlayers[0] ? "✅ Victoire" : "❌ Défaite";
+		let gameType :string;
+		if (isVsAIMode === false)
+			gameType = "⚔️ 1vs1"; // Match simple
+		else
+			gameType = "⚔️ 1vsIA";
+
+		// Ajouter à l’historique
+		addGameToHistory(gameType, result);
 		showEndScreen(winner);
 	});
 });
@@ -337,6 +368,12 @@ nextMatchButton.addEventListener('click', () => {
 			console.log("Match terminé, gagnant :", winner);
 			if (currentTournament && currentTournament.isTournamentOver()) {
 				console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
+				// Déterminer le résultat
+				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
+				let gameType = "⚔️ Tournoi"; // Match simple
+
+				// Ajouter à l’historique
+				addGameToHistory(gameType, result);
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -384,6 +421,12 @@ window.addEventListener("popstate", (event) => {
 
 				startPongGame(StatePlayerNames[0], StatePlayerNames[1], true, (winner) => {
 					console.log("Match terminé, gagnant :", winner);
+					// Déterminer le résultat
+					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
+					let gameType = "⚔️ 1vsIA"; // Match simple
+
+					// Ajouter à l’historique
+					addGameToHistory(gameType, result);
 					showEndScreen(winner);
 				});
 			}
@@ -396,6 +439,12 @@ window.addEventListener("popstate", (event) => {
 				console.log("Match terminé, gagnant :", winner);
 				if (currentTournament && currentTournament.isTournamentOver()) {
 					console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
+					// Déterminer le résultat
+					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
+					let gameType = "⚔️ Tournoi"; // Match simple
+
+					// Ajouter à l’historique
+					addGameToHistory(gameType, result);
 					showEndScreen(winner, true, true);
 				} else {
 					showEndScreen(winner, true);
@@ -410,6 +459,12 @@ window.addEventListener("popstate", (event) => {
 
 				startPongGame(StatePlayerNames[0], StatePlayerNames[1], false, (winner) => {
 					console.log("Match terminé, gagnant :", winner);
+					// Déterminer le résultat
+					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
+					let gameType = "⚔️ 1vsIA"; // Match simple
+
+					// Ajouter à l’historique
+					addGameToHistory(gameType, result);
 					showEndScreen(winner);
 				});
 			}
