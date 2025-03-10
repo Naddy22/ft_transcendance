@@ -28,6 +28,27 @@ export async function setupDatabase(fastify: FastifyInstance) {
 	);
   `);
 
+  // await db.exec(`
+  //   CREATE TABLE IF NOT EXISTS friends (
+  //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+  //     userId INTEGER NOT NULL,
+  //     friendId INTEGER NOT NULL,
+  //     FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+  //     FOREIGN KEY (friendId) REFERENCES users(id) ON DELETE CASCADE,
+  //     UNIQUE(userId, friendId) -- Prevent duplicate friendships
+  //   );
+  // `);
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS friends (
+      userId INTEGER NOT NULL,
+      friendId INTEGER NOT NULL,
+      PRIMARY KEY (userId, friendId),
+      FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (friendId) REFERENCES users(id) ON DELETE CASCADE
+    );
+  `);
+
   await db.exec(`
 	CREATE TABLE IF NOT EXISTS matches (
 	  matchId INTEGER PRIMARY KEY AUTOINCREMENT,

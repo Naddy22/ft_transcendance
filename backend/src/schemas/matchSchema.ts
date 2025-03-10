@@ -29,10 +29,17 @@ export const matchSchema = {
     "score": {
       "type": "object",
       "properties": {
-        "player1": { "type": "integer", "minimum": 0 },
-        "player2": { "type": "integer", "minimum": 0 }
+        "player1": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "player2": {
+          "type": "integer",
+          "minimum": 0
+        }
       },
-      "description": "Match scores"
+      "description": "Match scores",
+      "additionalProperties": false
     },
     "startTime": {
       "type": "string",
@@ -49,7 +56,13 @@ export const matchSchema = {
       "description": "If part of a tournament, reference the tournament ID"
     }
   },
-  "required": ["matchId", "player1", "player2", "score", "startTime"]
+  "required": ["matchId", "player1", "player2", "score", "startTime"],
+  "additionalProperties": false
 } as const;
 
 export type Match = FromSchema<typeof matchSchema>;
+export type MatchResultUpdate = Pick<Match, "winner" | "score">;
+export type NewMatchRequest = Omit<Match, "matchId" | "winner" | "endTime">;
+export type MatchUpdateRequest = Partial<Pick<Match, "winner" | "score" | "endTime">>;
+export type MatchResultRequest = Pick<Match, "matchId" | "winner" | "score">;
+

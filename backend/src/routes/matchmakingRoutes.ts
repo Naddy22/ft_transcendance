@@ -3,6 +3,7 @@
 
 import { FastifyInstance } from "fastify";
 import { MatchmakingRequest, MatchmakingResponse } from "../schemas/matchmakingSchema.js";
+import { sendError } from "../utils/error.js";
 
 type Player = { id: number; username: string; socket?: any };
 let waitingPlayer: Player | null = null;
@@ -10,7 +11,11 @@ let waitingPlayer: Player | null = null;
 export async function matchmakingRoutes(fastify: FastifyInstance) {
 
   fastify.post<{ Body: MatchmakingRequest, Reply: MatchmakingResponse }>("/join", async (req, reply) => {
+    try {
       const { userId, username } = req.body;
+      // if (!userId || !username) {
+      //   return reply.status(400).send({ error: "User ID and username are required" });
+      // }
 
       // If no one is waiting, store player and respond with "waiting"
       if (!waitingPlayer) {
@@ -19,7 +24,8 @@ export async function matchmakingRoutes(fastify: FastifyInstance) {
           matchId: 0,
           player1: waitingPlayer,
           player2: { id: 0, username: "" },
-          status: "waiting" });
+          status: "waiting"
+        });
       }
 
       // Match found, create match entry
@@ -36,14 +42,15 @@ export async function matchmakingRoutes(fastify: FastifyInstance) {
         status: "started",
       };
 
-      // Notify both players
+      // If the waiting player has an associated socket, notify them
       if (waitingPlayer.socket) {
         waitingPlayer.socket.send(JSON.stringify({ event: "match_found", data: matchData }));
       }
 
       reply.send(matchData);
       waitingPlayer = null;
+    } catch (error) {
+      return sendError(reply, 500, "Internal Server Error during matchmaking", error);
     }
-  );
-
+  });
 }

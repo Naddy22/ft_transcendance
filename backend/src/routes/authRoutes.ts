@@ -5,28 +5,35 @@ import { FastifyInstance } from 'fastify';
 import dotenv from "dotenv";
 import sanitizeHtml from 'sanitize-html';
 import bcrypt from 'bcrypt';
-import {
-  PublicUser, RegisterRequest, LoginRequest, LogoutRequest
-} from "../schemas/userSchema.js";
+import { RegisterRequest, LoginRequest, LogoutRequest } from '../schemas/authSchema.js';
+import { User } from "../schemas/userSchema.js";
+// import { sendError } from "../utils/error.js";
 
 dotenv.config();
 
-// console.log("BCRYPT_SALT_ROUNDS:", process.env.BCRYPT_SALT_ROUNDS); // debug
 const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12", 10);
-// console.log("SALT_ROUNDS:", SALT_ROUNDS); // debug
 
 export async function authRoutes(fastify: FastifyInstance) {
+
+  // // Helper function to send errors (optionally, only detailed in development)
+  // function sendError(reply: any, statusCode: number, errorMsg: string, error?: any) {
+  //   fastify.log.error(error || errorMsg);
+  //   // Optionally, expose more info in development:
+  //   const response = process.env.NODE_ENV === 'development'
+  //     ? { error: errorMsg, details: error?.message }
+  //     : { error: errorMsg };
+  //   return reply.status(statusCode).send(response);
+  // }
 
   // User registration route
   fastify.post<{ Body: RegisterRequest }>("/register", async (req, reply) => {
     try {
-      // Extract user input
       const { username, email, password } = req.body;
 
-      // Validate required fields
-      if (!username || !email || !password) {
-        return reply.status(400).send({ error: "Username, email and password are required" });
-      }
+      // Validate required fields with specific messages
+      if (!username) return reply.status(400).send({ error: "Username is required" });
+      if (!email) return reply.status(400).send({ error: "Email is required" });
+      if (!password) return reply.status(400).send({ error: "Password is required" });
 
       // 🛡 Sanitize user input to prevent XSS
       const sanitizedUsername = sanitizeHtml(username, { allowedTags: [], allowedAttributes: {} });
@@ -47,6 +54,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       const existingUser = await stmtCheck.all(sanitizedEmail, sanitizedUsername); // `all()` returns an array
 
       if (existingUser.length > 0) {
+        // Check separately for email and username
         const isEmailTaken = existingUser.some(user => user.email === sanitizedEmail);
         const isUsernameTaken = existingUser.some(user => user.username === sanitizedUsername);
 
@@ -76,23 +84,22 @@ export async function authRoutes(fastify: FastifyInstance) {
     } catch (error) {
       console.error("❌ Error during registration:", error);
       reply.status(500).send({ error: "Internal Server Error" });
+      // return sendError(reply, 500, "Internal Server Error during registration", error);
     }
   });
 
   // User login route
   fastify.post<{ Body: LoginRequest }>("/login", async (req, reply) => {
     try {
-
       const { identifier, password } = req.body;
 
       // Validate required fields
-      if (!identifier || !password) {
-        return reply.status(400).send({ error: "Username/Email and password are required" });
-      }
+      if (!identifier) return reply.status(400).send({ error: "Username or email is required" });
+      if (!password) return reply.status(400).send({ error: "Password is required" });
 
-      // 🔍 Search for user by either email or username
-      const stmt = await fastify.db.prepare("SELECT * FROM users WHERE email = ? OR username = ?");
-      const user = await stmt.get(identifier, identifier);
+      // 🔍 Search for user by either username or email
+      const stmt = await fastify.db.prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+      const user = await stmt.get(identifier, identifier) as User | undefined;
 
       if (!user) return reply.status(401).send({ error: "Invalid username or email" });
 
@@ -105,9 +112,10 @@ export async function authRoutes(fastify: FastifyInstance) {
       await updateStmt.run("online", user.id);
 
       // Exclude password field from response
-      const { password: _, ...safeUser } = user as PublicUser;
+      const { password: _, ...safeUser } = user;
 
       reply.send({ message: "✅ Login successful", user: safeUser });
+
     } catch (error) {
       console.error("❌ Error during login:", error);
       reply.status(500).send({ error: "Internal Server Error" });
@@ -129,6 +137,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     } catch (error) {
       console.error("❌ Error during logout:", error);
       reply.status(500).send({ error: "Internal Server Error" });
+      // return sendError(reply, 500, "Internal Server Error during logout", error);
     }
   });
 

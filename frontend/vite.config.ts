@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  root: "./", // Ensures paths are relative to the project root
+  // root: "./", // Ensures paths are relative to the project root
   build: { 
     outDir: "dist", // The directory where built files go
     rollupOptions: {

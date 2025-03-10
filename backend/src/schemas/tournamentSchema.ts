@@ -26,7 +26,7 @@ export const tournamentSchema = {
     },
     "matches": {
       "type": "array",
-      "items": { "$ref": "https://example.com/match.schema.json" },
+      "items": { "type" : "integer" },
       "description": "List of matches in the tournament"
     },
     "winner": {
@@ -39,7 +39,11 @@ export const tournamentSchema = {
       "description": "Current tournament status"
     }
   },
-  "required": ["tournamentId", "name", "players", "matches", "status"]
+  "required": ["tournamentId", "name", "players", "matches", "status"],
+  "additionalProperties": false
 } as const;
 
 export type Tournament = FromSchema<typeof tournamentSchema>;
+export type PublicTournament = Omit<Tournament, "matches">;
+export type NewTournamentRequest = Pick<Tournament, "name" | "players">;
+export type TournamentUpdateRequest = Partial<Pick<Tournament, "status" | "winner">>;

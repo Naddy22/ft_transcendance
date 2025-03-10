@@ -1,5 +1,6 @@
 
 import { API } from "./api";
+import { UserStatus } from "./api"; //tmp
 
 const api = new API("https://localhost:3000"); // adjust to your backend URL
 
@@ -92,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Auto-fetch users on page load
-  fetchUsers();
+  // fetchUsers();
 
   // Toggle display of all users
   toggleAllUsers.addEventListener("click", async () => {
@@ -240,10 +241,25 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Update Status
+  // Function to assert a value as UserStatus
+  const toUserStatus = (value: string): UserStatus => {
+    switch (value) {
+      case "online":
+      case "offline":
+      case "in-game":
+        return value;
+      default:
+        throw new Error(`Invalid status value: ${value}`);
+    }
+  };
+
   updateStatusBtn.addEventListener("click", async () => {
     if (!loggedInUserId) return;
+
     try {
-      await api.updateUser(loggedInUserId, { status: newStatus.value });
+      const statusValue = toUserStatus(newStatus.value);
+      await api.updateUser(loggedInUserId, { status: statusValue });
+      // await api.updateUser(loggedInUserId, { status: newStatus.value });
       updateResponse.textContent = "✅ Status updated.";
       fetchUserInfo(loggedInUserId);
     } catch (error: any) {

@@ -137,7 +137,7 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		ground.rotation.x = 0; // Oriente le plan horizontalement
 		ground.position.z = 0.8; // Légèrement derrière les objets pour éviter le z-fighting
 		const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
-		groundMaterial.diffuseTexture = new BABYLON.Texture("/textures/grass-draw.jpg", scene);
+		groundMaterial.diffuseTexture = new BABYLON.Texture("textures/grass-draw.jpg", scene);
 		groundMaterial.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15); // Supprime la réflexion spéculaire
 		// groundMaterial.roughness = 1.0; // Rend le matériau mat (moins de brillance)
 		ground.material = groundMaterial;

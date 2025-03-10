@@ -1,7 +1,5 @@
 // File: backend/src/schemas/userSchema.ts
-// User Schema (Registration, Authentication, Profile)
-// Covers user authentication, friends list, status updates, and match history.
- 
+
 import { FromSchema } from 'json-schema-to-ts';
 
 export const userSchema = {
@@ -46,47 +44,26 @@ export const userSchema = {
       "enum": ["online", "offline", "in-game"],
       "description": "User's online status"
     },
-	"wins": {
-		"type": "integer",
-		"minimum": 0,
-		"description": "Total matches won"
-	},
-	"losses": {
-		"type": "integer",
-		"minimum": 0,
-		"description": "Total matches lost"
-	},
-	"matchesPlayed": {
-		"type": "integer",
-		"minimum": 0,
-		"description": "Total matches played"
-	}
+    "wins": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total matches won"
+    },
+    "losses": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total matches lost"
+    },
+    "matchesPlayed": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total matches played"
+    }
   },
-  "required": ["username", "email", "password"]
+  "required": ["username", "email", "password"],
+  "additionalProperties": false
 } as const;
 
 export type User = FromSchema<typeof userSchema>;
 export type PublicUser = Omit<User, "password">;
-export type RegisterRequest = Pick<User, "username" | "email" | "password">;
 export type UpdateUserRequest = Partial<Pick<User, "username" | "email" | "avatar" | "status">>;
-export type LogoutRequest = Pick<User, "id">;
-
-// Login Schema
-export const loginSchema = {
-	"$id": "loginSchema",
-	"title": "User Login",
-	"description": "Schema for user login",
-	"type": "object",
-	"properties": {
-		"email": {
-			"type": "string"
-		},
-		"password": {
-			"type": "string",
-			"minLength": 8
-		}
-	},
-	"required": ["identifier", "password"]
-} as const;
-
-export type LoginRequest = FromSchema<typeof loginSchema>;

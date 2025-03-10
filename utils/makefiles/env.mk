@@ -24,6 +24,10 @@ PORT=3000
 # USE_HTTPS=false
 USE_HTTPS=true
 
+# Node environment
+NODE_ENV=development
+# NODE_ENV=production
+
 # CORS Configuration
 # CORS_ORIGIN="http://localhost:5173"
 # (Frontend URL during development)

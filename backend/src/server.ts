@@ -2,6 +2,7 @@
 // Main Fastify server setup, including routes, database, and shutdown handling.
 
 import Fastify from 'fastify';
+import pino from 'pino';
 import fastifyGracefulExit from "@mgcrea/fastify-graceful-exit";
 import fastifyStatic from '@fastify/static';
 import fastifyWebsocket from '@fastify/websocket';
@@ -21,7 +22,6 @@ import { setupDatabase } from './database.js';
 import { userSchema } from './schemas/userSchema.js';
 import { matchSchema } from './schemas/matchSchema.js';
 import { tournamentSchema } from './schemas/tournamentSchema.js';
-import { wsSchema } from './schemas/wsSchema.js';
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Load environment variables
@@ -71,8 +71,23 @@ if (!fs.existsSync(dbPath)) {
 // Initialize Fastify Server (allowing http for developpement)
 const isHttps = process.env.USE_HTTPS === "true";
 
+// // Example: set up a transport for "pretty" logs only in dev mode
+// const loggerOptions = process.env.NODE_ENV !== 'production'
+//   ? {
+//       transport: {
+//         target: 'pino-pretty',
+//         options: {
+//           colorize: true,         // Adds ANSI color codes to the output
+//           translateTime: 'SYS:standard',
+//           ignore: 'pid,hostname'  // Hide some fields if you want
+//         }
+//       }
+//     }
+//   : true;  // In production, default pino logs or you can supply an object
+
 const fastify = Fastify({
   logger: true,
+  // logger: loggerOptions,
   ignoreTrailingSlash: true,  // Ignore trailing slashes for route consistency
   ...(isHttps && {
     https: {
@@ -82,20 +97,27 @@ const fastify = Fastify({
   })
 });
 
-// // Initialize Fastify Server
-// const fastify = Fastify({
-//   logger: true,
-//   ignoreTrailingSlash: true,  // Ignore trailing slashes for route consistency
-//   https: {
-//     key: fs.readFileSync(keyPath),
-//     cert: fs.readFileSync(certPath),
-//   }
-// });
-
 // ────────────────────────────────────────────────────────────────────────────────
 // Register plugins
 
-await fastify.register(helmet);
+await fastify.register(helmet, {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      // Optionally, we can set styleSrcElem explicitly as well:
+      // styleSrcElem: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "data:", "blob:"], // allow blob: URLs for images
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+});
+
+
 // await fastify.register(fastifyRateLimit, {
 //   max: 5, // Allow only 5 login attempts per minute per IP
 //   timeWindow: "1 minute",
@@ -113,8 +135,8 @@ await fastify.register(fastifyWebsocket);
 
 // Serve static frontend files
 await fastify.register(fastifyStatic, {
-  // root: path.join(__dirname, '../../frontend/dist'),
-  root: path.join(__dirname, '../../PongGame/dist'),
+  root: path.join(__dirname, '../../frontend/dist'),
+  // root: path.join(__dirname, '../../PongGame/dist'),
   prefix: '/',
   index: ['index.html'],
 });
@@ -123,7 +145,7 @@ await fastify.register(fastifyRoutes);
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register JSON Schemas
-const schemas = [userSchema, matchSchema, tournamentSchema, wsSchema];
+const schemas = [userSchema, matchSchema, tournamentSchema];
 schemas.forEach(schema => fastify.addSchema(schema));
 
 // ────────────────────────────────────────────────────────────────────────────────

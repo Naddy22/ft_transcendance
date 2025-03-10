@@ -48,7 +48,7 @@ export class Paddle3D {
 		// Charger le modèle 3D pour la raquette
 		BABYLON.SceneLoader.ImportMesh(
 			"",
-			"/models/paw/",
+			"models/paw/",
 			"scene.gltf",
 			scene,
 			(meshes) => {

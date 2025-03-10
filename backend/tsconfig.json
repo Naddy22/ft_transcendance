@@ -18,7 +18,8 @@
 	], // Only compile `src/` folder
 	"exclude": [
 		"node_modules",
-		"dist"
+		"dist",
+		"../_local"
 	] // Ignore `node_modules` and `dist/`
 }
 

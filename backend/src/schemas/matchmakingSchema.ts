@@ -17,7 +17,8 @@ export const matchmakingRequestSchema = {
 		"description": "Username of the player"
 	}
   },
-  "required": ["userId", "username"]
+  "required": ["userId", "username"],
+  "additionalProperties": false
 } as const;
 
 export type MatchmakingRequest = FromSchema<typeof matchmakingRequestSchema>;
@@ -41,7 +42,8 @@ export const matchmakingResponseSchema = {
 			"type": "string"
 		}
       },
-      "required": ["id", "username"]
+      "required": ["id", "username"],
+      "additionalProperties": false
     },
     "player2": {
       "type": "object",
@@ -53,7 +55,8 @@ export const matchmakingResponseSchema = {
 			"type": "string"
 		}
       },
-      "required": ["id", "username"]
+      "required": ["id", "username"],
+      "additionalProperties": false
     },
     "status": {
 		"type": "string",
@@ -61,7 +64,8 @@ export const matchmakingResponseSchema = {
 		"description": "Current match status"
 	}
   },
-  "required": ["matchId", "player1", "player2", "status"]
+  "required": ["matchId", "player1", "player2", "status"],
+  "additionalProperties": false
 } as const;
 
 export type MatchmakingResponse = FromSchema<typeof matchmakingResponseSchema>;

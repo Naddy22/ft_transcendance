@@ -33,7 +33,7 @@ export class Ball3D {
 		this.dy = 0;
 	
 		// Charger le modèle 3D et l'utiliser comme mesh de la balle
-		BABYLON.SceneLoader.ImportMesh("", "/models/wool/", "scene.gltf", scene, (meshes) => {
+		BABYLON.SceneLoader.ImportMesh("", "models/wool/", "scene.gltf", scene, (meshes) => {
 			console.log("Modèle chargé avec succès", meshes);
 			// On suppose que le premier mesh importé est celui de la balle
 			this.mesh = meshes[0] as BABYLON.Mesh;
