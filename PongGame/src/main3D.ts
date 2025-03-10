@@ -1,8 +1,8 @@
 import { startPongGame3D as startPongGame } from './game3D.js';
 import { stopPongGame3D as stopPongGame } from './game3D.js';
 import { Tournament } from './tournament3D.js';
-import { addGameToHistory } from "./history.js";
-import { updateHistoryUI } from "./history.js";
+import { addGameToHistory, updateHistoryUI } from "./history.js";
+import { addGameToStats, updateStatsUI } from "./stats.js";
 
 // Gestion de l'affichage entre le menu et le jeu
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -11,6 +11,7 @@ const menuButton = document.getElementById("menuButton") as HTMLButtonElement;
 const menuDropdown = document.getElementById("menuDropdown") as HTMLElement;
 
 const historyModal = document.getElementById("historyModal") as HTMLElement;
+const statsModal = document.getElementById("statsModal") as HTMLElement;
 const howToPlayModal = document.getElementById("howToPlayModal") as HTMLElement;
 const closeButton = document.querySelectorAll(".close");
 
@@ -138,11 +139,14 @@ window.addEventListener("click", function(event) {
 	if (!menuDropdown.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
 		menuDropdown.classList.remove("active");
 	}
-	if (howToPlayModal && event.target === howToPlayModal) {
-		howToPlayModal.style.display = "none";
-	}
 	if (historyModal && event.target === historyModal) {
 		historyModal.style.display = "none";
+	}
+	if (statsModal && event.target === statsModal) {
+		statsModal.style.display = "none";
+	}
+	if (howToPlayModal && event.target === howToPlayModal) {
+		howToPlayModal.style.display = "none";
 	}
 });
 
@@ -171,6 +175,13 @@ if (menuDropdown) {
 		if (target.dataset.action === "howToPlay" && howToPlayModal) {
 			event.preventDefault();
 			howToPlayModal.style.display = "flex";
+		}
+		if (target.dataset.action === "statistics" && statsModal) {
+			console.log("Ajout de l'écouteur pour le bouton Statistiques");
+			event.preventDefault();
+			updateStatsUI(); // Met à jour les nombres
+			// renderStatsChart(); // Génère le graphique
+			statsModal.style.display = "flex";
 		}
 		menuDropdown.classList.remove("active");
 	});
@@ -224,7 +235,7 @@ if (startButton) {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
-
+				addGameToStats(winner === playerNames[0] ? "Victoire" : "Défaite");
 				showEndScreen(winner);
 			});
 		} else {
@@ -252,7 +263,7 @@ playVsAIButton.addEventListener("click", () => {
 		let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 		// Ajouter à l’historique
 		addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
-
+		addGameToStats(winner === playerNames[0] ? "Victoire" : "Défaite");
 		showEndScreen(winner);
 	});
 });
@@ -308,7 +319,7 @@ playersForm.addEventListener("submit", (event) => {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
-
+				addGameToStats(winner === playerNames[0] ? "Victoire" : "Défaite");
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -353,6 +364,7 @@ replayButton.addEventListener('click', () => {
 		let result = winner === lastPlayers[0] ? "✅ Victoire" : "❌ Défaite";
 		// Ajouter à l’historique
 		addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
+		addGameToStats(winner === lastPlayers[0] ? "Victoire" : "Défaite");
 		showEndScreen(winner);
 	});
 });
@@ -376,6 +388,7 @@ nextMatchButton.addEventListener('click', () => {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
+				addGameToStats(winner === playerNames[0] ? "Victoire" : "Défaite");
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -427,6 +440,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
+					addGameToStats(winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
 					showEndScreen(winner);
 				});
 			}
@@ -443,6 +457,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
+					addGameToStats(winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
 					showEndScreen(winner, true, true);
 				} else {
 					showEndScreen(winner, true);
@@ -461,6 +476,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(isTournamentMode ? "⚔️ Tournoi" : isVsAIMode ? "⚔️ vs IA" : "⚔️ 1vs1", result);
+					addGameToStats(winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
 					showEndScreen(winner);
 				});
 			}

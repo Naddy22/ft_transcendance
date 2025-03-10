@@ -234,7 +234,6 @@ button:hover {
 .modal-content {
 	background-color: #e5fbc9;
 	padding: 20px;
-	border-radius: 10px;
 	/* width: 370px; suffisant pour comment jouer */
 	width: 500px; /*minimum pour historique*/
 	text-align: center;
@@ -285,5 +284,57 @@ button:hover {
 }
 
 .stats-content {
-	
+	display: flex; /* Flex horizontal pour texte et graphique */
+	justify-content: space-between; /* Espacement entre les deux */
+	align-items: flex-start; /* Alignement en haut */
+}
+
+/* Conteneur principal texte + graphique */
+.stats-container {
+	display: flex; /* Flex horizontal */
+	justify-content: space-between; /* Texte à gauche, graphique à droite */
+	align-items: flex-start; /* Alignement en haut */
+	width: 100%;
+	padding: 0; /* Pas de padding supplémentaire ici */
+}
+
+/* Zone texte à gauche */
+.stats-text {
+	display: flex;
+	flex-direction: column;
+	gap: 10px; /* Espacement entre les lignes de texte */
+	font-size: 18px;
+	width: 50%; /* ✅ Réserve une partie pour le texte */
+	font-size: 18px;
+	margin-top: 20px; /* Ajoute une marge en haut pour descendre le texte */
+}
+
+.stats-text span {
+	font-weight: bold;
+	font-size: 20px;
+	color: #ff4b4b; /* Rouge pastel */
+}
+
+/* S’assurer que les <p> restent des blocs */
+.stats-text p {
+	margin: 0; /* Supprime marges par défaut */
+	padding: 0; /* Pas de padding inutile */
+	display: block; /* Force le comportement bloc */
+	white-space: nowrap; /* Empêche le texte de se couper sur plusieurs lignes */
+}
+
+/* Zone graphique à droite */
+.stats-chart-container {
+	width: 45%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	max-width: 150px; /* Limite la taille du graphique */
+	margin-top: 20px; /* Ajoute une marge en haut pour descendre le texte */
+}
+
+/* Ajuste la taille du canvas */
+#statsChart {
+	width: 100% !important;
+	height: auto !important;
 }

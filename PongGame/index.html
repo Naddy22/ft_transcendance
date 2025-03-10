@@ -23,7 +23,7 @@
 	<div id="historyModal" class="modal">
 		<div class="modal-content">
 			<span class="close">&times;</span>
-			<h2>📜 Historique des parties</h2>
+			<h1 class="text-outline">📜 Historique des parties</h1>
 			<div class="history-container">
 				<ul id="gameHistoryList"></ul>
 			</div>
@@ -31,15 +31,19 @@
 	</div>
 	<!-- Fenêtre modale statistiques cachée -->
 	<div id="statsModal" class="modal">
-		<div class="modal-content stats-content">
+		<div class="modal-content">
 			<span class="close">&times;</span>
-			<h2>Statistiques du joueur</h2>
+			<h1 class="text-outline">📊 Statistiques du joueur</h1>
 			<div class="stats-container">
-				<p id="totalGames">Total de parties : 0</p>
-				<p id="wins">Victoires : 0</p>
-				<p id="losses">Défaites : 0</p>
-				<p id="winRate">Taux de victoire : 0%</p>
-				<canvas id="statsChart"></canvas> <!-- Graphique ici -->
+				<div class="stats-text">
+					<p>🕹️ Total de parties : <span id="totalGames">0</span></p>
+					<p>🏆 Victoires : <span id="wins">0</span></p>
+					<p>❌ Défaites : <span id="losses">0</span></p>
+					<p>🔥 Taux de victoire : <span id="winRate">0.00</span></p>
+				</div>
+				<div class="stats-chart-container">
+					<canvas id="statsChart"></canvas> <!-- Graphique avec chart.js -->
+				</div>
 			</div>
 		</div>
 	</div>
@@ -47,7 +51,7 @@
 	<div id="howToPlayModal" class="modal">
 		<div class="modal-content">
 			<span class="close">&times;</span>
-			<h1 class="text-outline">Comment jouer ?</h1>
+			<h1 class="text-outline">🎮 Comment jouer ?</h1>
 			<p>Joueur de gauche :    W (haut) / S (bas)</p>
 			<p>Joueur de droite :    ↑ (haut) / ↓ (bas)</p>
 			<p>Mode IA :  L'ordinateur joue automatiquement le joueur de droite</p>
