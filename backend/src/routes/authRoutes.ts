@@ -7,7 +7,7 @@ import sanitizeHtml from 'sanitize-html';
 import bcrypt from 'bcrypt';
 import { RegisterRequest, LoginRequest, LogoutRequest } from '../schemas/authSchema.js';
 import { User } from "../schemas/userSchema.js";
-// import { sendError } from "../utils/error.js";
+import { sendError } from "../utils/error.js";
 
 dotenv.config();
 
@@ -39,30 +39,30 @@ export async function authRoutes(fastify: FastifyInstance) {
       const sanitizedUsername = sanitizeHtml(username, { allowedTags: [], allowedAttributes: {} });
       const sanitizedEmail = sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} });
 
-      // 🛡 Check email format
-      if (!sanitizedEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
-        return reply.status(400).send({ error: "Invalid email format" });
-      }
-
       // 🛡 Ensure sanitized username is still valid
       if (!sanitizedUsername.match(/^[a-zA-Z0-9_-]{3,30}$/)) {
         return reply.status(400).send({ error: "Invalid username format (3-30 alphanumeric characters, _ or - allowed)." });
       }
 
+      // 🛡 Check email format
+      if (!sanitizedEmail.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        return reply.status(400).send({ error: "Invalid email format" });
+      }
+
       // 🔍 Check if username or email already exists (case-insensitive for email)
-      const stmtCheck = await fastify.db.prepare("SELECT id FROM users WHERE LOWER(email) = LOWER(?) OR username = ?");
-      const existingUser = await stmtCheck.all(sanitizedEmail, sanitizedUsername); // `all()` returns an array
+      const stmtCheck = await fastify.db.prepare("SELECT id, username, email FROM users WHERE username = ? OR LOWER(email) = LOWER(?)");
+      const existingUser = await stmtCheck.all(sanitizedUsername, sanitizedEmail); // `all()` returns an array
 
       if (existingUser.length > 0) {
         // Check separately for email and username
-        const isEmailTaken = existingUser.some(user => user.email === sanitizedEmail);
         const isUsernameTaken = existingUser.some(user => user.username === sanitizedUsername);
+        const isEmailTaken = existingUser.some(user => user.email === sanitizedEmail);
 
-        if (isEmailTaken) {
-          return reply.status(400).send({ error: "Email is already registered." });
-        }
         if (isUsernameTaken) {
           return reply.status(400).send({ error: "Username is already taken." });
+        }
+        if (isEmailTaken) {
+          return reply.status(400).send({ error: "Email is already registered." });
         }
       }
 
@@ -82,9 +82,9 @@ export async function authRoutes(fastify: FastifyInstance) {
       reply.status(201).send({ id: insertedUserId, username: sanitizedUsername, email: sanitizedEmail });
 
     } catch (error) {
-      console.error("❌ Error during registration:", error);
-      reply.status(500).send({ error: "Internal Server Error" });
-      // return sendError(reply, 500, "Internal Server Error during registration", error);
+      // console.error("❌ Error during registration:", error);
+      // reply.status(500).send({ error: "Internal Server Error" });
+      return sendError(reply, 500, "Internal Server Error during registration", error);
     }
   });
 

@@ -28,6 +28,10 @@ USE_HTTPS=true
 NODE_ENV=development
 # NODE_ENV=production
 
+# Frontend built directory for serving static files
+FRONTEND_DIST="../../frontend/dist";
+# FRONTEND_DIST="../../PongGame/dist";
+
 # CORS Configuration
 # CORS_ORIGIN="http://localhost:5173"
 # (Frontend URL during development)

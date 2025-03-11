@@ -16,12 +16,11 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { fpSqlitePlugin } from 'fastify-sqlite-typed';
 
+// import fastifyRequestLogger from "@mgcrea/fastify-request-logger";
+// import prettifier from "@mgcrea/pino-pretty-compact";
+
 import { setupRoutes } from './routes/setupRoutes.js';
 import { setupDatabase } from './database.js';
-
-import { userSchema } from './schemas/userSchema.js';
-import { matchSchema } from './schemas/matchSchema.js';
-import { tournamentSchema } from './schemas/tournamentSchema.js';
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Load environment variables
@@ -30,6 +29,8 @@ dotenv.config();
 // Resolve __dirname and paths correctly in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+//  **! maybe make this a decoration on instance ?
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Ensure cert directory exists before initializing the certificates
@@ -85,10 +86,25 @@ const isHttps = process.env.USE_HTTPS === "true";
 //     }
 //   : true;  // In production, default pino logs or you can supply an object
 
+const loggerOptions = {
+  level: 'info',
+  file: './server.log',
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      colorize: true,
+      translateTime: 'SYS:standard',
+      ignore: 'pid,hostname'
+    }
+  }
+};
+
 const fastify = Fastify({
-  logger: true,
-  // logger: loggerOptions,
-  ignoreTrailingSlash: true,  // Ignore trailing slashes for route consistency
+  logger: loggerOptions,
+  // logger: true,
+  // disableRequestLogging: true, // to replace with custom or better one eventually...
+  ignoreTrailingSlash: true,
+  // trustProxy: true, // uncomment when/if we setup nginx
   ...(isHttps && {
     https: {
       key: fs.readFileSync(keyPath),
@@ -96,6 +112,16 @@ const fastify = Fastify({
     }
   })
 });
+
+// ────────────────────────────────────────────────────────────────────────────────
+// Custom request/response logging
+const now = () => Date.now();
+
+// fastify.addHook("onRequest", (req, reply, done) => {
+//   reply.startTime = now();
+//   req.log.info({ url: req.raw.url, id: req.id }, "recieved request");
+//   done();
+// })
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register plugins
@@ -130,13 +156,23 @@ await fastify.register(fpSqlitePlugin, {
   dbFilename: dbPath
 });
 
+
 await fastify.register(fastifyMultipart);
 await fastify.register(fastifyWebsocket);
 
+const FRONTEND_DIST = process.env.FRONTEND_DIST || "../../frontend/dist";
+// const frontendPath = path.resolve(__dirname, FRONTEND_DIST);
+// console.log("Serving frontend from:", frontendPath); // Debugging output
+
+// if (!fs.existsSync(frontendPath)) {
+//   console.error("⚠️ Frontend dist folder does not exist:", frontendPath);
+//   process.exit(1);
+// }
+
 // Serve static frontend files
 await fastify.register(fastifyStatic, {
-  root: path.join(__dirname, '../../frontend/dist'),
-  // root: path.join(__dirname, '../../PongGame/dist'),
+  // root: frontendPath,
+  root: path.resolve(__dirname, FRONTEND_DIST),
   prefix: '/',
   index: ['index.html'],
 });
@@ -145,8 +181,8 @@ await fastify.register(fastifyRoutes);
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register JSON Schemas
-const schemas = [userSchema, matchSchema, tournamentSchema];
-schemas.forEach(schema => fastify.addSchema(schema));
+// const schemas = [userSchema, matchSchema, tournamentSchema];
+// schemas.forEach(schema => fastify.addSchema(schema));
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register routes
