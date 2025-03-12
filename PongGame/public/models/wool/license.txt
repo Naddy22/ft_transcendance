@@ -1,0 +1,11 @@
+Model Information:
+* title:	Wool
+* source:	https://sketchfab.com/3d-models/wool-b323726bded0459e856acae86fa0e45c
+* author:	andreamaggiolo (https://sketchfab.com/andreamaggiolo)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Wool" (https://sketchfab.com/3d-models/wool-b323726bded0459e856acae86fa0e45c) by andreamaggiolo (https://sketchfab.com/andreamaggiolo) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
