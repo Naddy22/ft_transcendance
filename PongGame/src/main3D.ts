@@ -3,12 +3,21 @@ import { stopPongGame3D as stopPongGame } from './game3D.js';
 import { Tournament } from './tournament3D.js';
 import { addGameToHistory, updateHistoryUI } from "./history.js";
 import { addGameToStats, updateStatsUI } from "./stats.js";
+import { registerUser, loginUser, logoutUser } from "./auth";
 
-// Gestion de l'affichage entre le menu et le jeu
+
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
 const menu = document.getElementById('menu') as HTMLElement;
 const menuButton = document.getElementById("menuButton") as HTMLButtonElement;
 const menuDropdown = document.getElementById("menuDropdown") as HTMLElement;
+
+// Gestion et affichage du bouton auth
+const authButton = document.getElementById("authButton") as HTMLElement;
+const authPage = document.getElementById("authPage") as HTMLElement;
+const loginForm = document.getElementById("loginForm") as HTMLFormElement;
+const registerForm = document.getElementById("registerForm") as HTMLFormElement;
+const loginMessage = document.getElementById("loginMessage") as HTMLParagraphElement;
+const registerMessage = document.getElementById("registerMessage") as HTMLParagraphElement;
 
 const historyModal = document.getElementById("historyModal") as HTMLElement;
 const statsModal = document.getElementById("statsModal") as HTMLElement;
@@ -46,9 +55,66 @@ let playerNumber: number = 0;
 // Définir l'état initial pour le menu
 history.replaceState({ page: 'menu' }, 'Menu', '#menu');
 
+// 🔹 Vérifie si l'utilisateur est connecté au chargement de la page
+function updateAuthButton() {
+	const userData = localStorage.getItem("loggedInUser");
+	const logoutButton = document.getElementById("logoutButton") as HTMLElement;
+
+	if (userData) {
+		logoutButton.style.display = "block"; // Affiche le bouton Déconnexion dans le menu
+		authButton.style.display = "none"; // Cache le bouton Connexion / Inscription
+	} else {
+		logoutButton.style.display = "none"; // Cache la déconnexion
+		authButton.style.display = "block"; // Affiche Connexion / Inscription
+	}
+}
+
+// Afficher la page d'authentification
+authButton.addEventListener("click", () => {
+	showAuthPage();
+});
+
+
+// Inscription
+registerForm.addEventListener("submit", async (event) => {
+	event.preventDefault();
+
+	const username = (document.getElementById("regUsername") as HTMLInputElement).value;
+	const email = (document.getElementById("regEmail") as HTMLInputElement).value;
+	const password = (document.getElementById("regPassword") as HTMLInputElement).value;
+
+	try {
+		await registerUser(username, email, password);
+		alert("Inscription réussie ! Connectez-vous.");
+	} catch (error: any) {
+		registerMessage.textContent = error.message; // Affiche l'erreur sous le formulaire
+	}
+});
+
+loginForm.addEventListener("submit", async (event) => {
+	event.preventDefault();
+
+	const identifier = (document.getElementById("loginIdentifier") as HTMLInputElement).value;
+	const password = (document.getElementById("loginPassword") as HTMLInputElement).value;
+
+	try {
+		await loginUser(identifier, password);
+		authPage.style.display = "none";
+		showMenu();
+		updateAuthButton();
+		history.pushState({ page: "menu" }, "Menu", "#menu");
+	} catch (error: any) {
+		loginMessage.textContent = error.message; // Affiche l'erreur sous le formulaire
+	}
+});
+
+// 🌟 Met à jour le bouton d'auth au chargement
+document.addEventListener("DOMContentLoaded", updateAuthButton);
+
 // Fonction pour afficher les champs de pseudos
 function showPlayerInputs(players: number) {
 	menu.style.display = 'none';
+	authPage.style.display = "none";
 	tournamentOptions.style.display = "none";
 	game.style.display = 'none';
 	endScreen.style.display = 'none';
@@ -58,21 +124,32 @@ function showPlayerInputs(players: number) {
 		inputsContainer.innerHTML += `<input type="text" placeholder="Joueur ${i}" id="player${i}" required><br>`;
 	}
 	playerInputs.style.display = 'block'; // Afficher les inputs
-	// // Ajoute l'état dans l'historique pour "Précédent"
-	// history.replaceState({ page: "tournamentForm" }, "Saisie des joueurs", "#tournamentForm");
 }
 
 // Fonctions d’affichage
 function showMenu(): void {
 	menu.style.display = 'block';
+	authPage.style.display = "none";
 	tournamentOptions.style.display = 'none';
 	playerInputs.style.display = 'none';
 	game.style.display = 'none';
 	endScreen.style.display = 'none';
 }
 
+function showAuthPage(): void {
+	menu.style.display = 'none';
+	tournamentOptions.style.display = "none";
+	game.style.display = 'none';
+	endScreen.style.display = 'none';
+	playerInputs.style.display = 'none';
+	authPage.style.display = "block";
+	loginMessage.textContent = "";  // Réinitialise le message d'erreur du login
+	registerMessage.textContent = "";  // Réinitialise le message d'erreur de l'inscription
+}
+
 function showGame(): void {
 	menu.style.display = 'none';
+	authPage.style.display = "none";
 	tournamentOptions.style.display = 'none';
 	playerInputs.style.display = 'none';
 	game.style.display = 'block';
@@ -82,6 +159,7 @@ function showGame(): void {
 function showEndScreen(winner: string, isTournament: boolean = false, isFinal: boolean = false): void {
 	winnerMessage.textContent = isFinal ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match !`;
 	menu.style.display = 'none';
+	authPage.style.display = "none";
 	tournamentOptions.style.display = 'none';
 	playerInputs.style.display = 'none';
 	game.style.display = 'block';
@@ -107,35 +185,14 @@ function showEndScreen(winner: string, isTournament: boolean = false, isFinal: b
 function showTournamentOption(): void {
 	playerInputs.style.display = 'none';
 	menu.style.display = 'none';
+	authPage.style.display = "none";
 	game.style.display = 'none';
 	endScreen.style.display = 'none';
 	tournamentOptions.style.display = 'block'; // Afficher les choix 4 ou 8
 }
 
-// // a ajouté apres quand on fera menu deroulant
-// document.querySelectorAll(".menu-dropdown a").forEach(link => {
-// 	link.addEventListener("click", (event) => {
-// 		event.preventDefault(); // Empêche le comportement par défaut des liens
-
-// 		const action = (event.target as HTMLElement).getAttribute("data-action");
-
-// 		if (action === "profile") {
-// 			console.log("Ouvrir le profil");
-// 			// Ajouter ici plus tard la logique pour ouvrir le profil
-// 		} else if (action === "history") {
-// 			console.log("Ouvrir l'historique");
-// 			// Ajouter ici plus tard la logique pour les paramètres
-// 		} else if (action === "statistics") {
-// 			console.log("Ouvrir les statistiques");
-// 			// Ajouter ici plus tard la logique pour déconnecter l'utilisateur
-// 		}
-
-// 		// Ferme le menu après un clic sur un bouton
-// 		menuDropdown.classList.remove("active");
-// 	});
-// });
-
 window.addEventListener("click", function(event) {
+	console.log("🌍 Clic global détecté, target :", event.target);
 	if (!menuDropdown.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
 		menuDropdown.classList.remove("active");
 	}
@@ -183,7 +240,21 @@ if (menuDropdown) {
 			// renderStatsChart(); // Génère le graphique
 			statsModal.style.display = "flex";
 		}
+		if (target.id === "logoutButton") {
+			event.preventDefault();
+			logoutUser(); // Supprime la session
+			updateAuthButton(); // Met à jour l'affichage des boutons
+
+			// 🔄 Ajoute un nouvel état propre après la déconnexion
+			history.pushState({ page: "menu" }, "Menu", "#menu");
+
+			console.log("🔄 Historique mis à jour : ", history.state, "URL actuelle : ", window.location.hash);
+
+			showMenu(); // Affiche le menu
+			console.log("📺 Après showMenu");
+		}
 		menuDropdown.classList.remove("active");
+		console.log("🔽 Menu déroulant fermé");
 	});
 }
 
@@ -414,6 +485,7 @@ window.addEventListener("popstate", (event) => {
 	if (!event.state || !event.state.page) {
 		console.log("Aucun état trouvé, retour au menu par défaut.");
 		showMenu();
+		history.replaceState({ page: "menu" }, "Menu", "#menu");
 		return;
 	}
 

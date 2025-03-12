@@ -9,15 +9,34 @@
 	<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Klee+One&display=swap" rel="stylesheet">
 </head>
 <body>
-	<!-- Menu Button-->
-	<button id="menuButton" class="menu-button">
-		☰
-	</button>
+	<div class="top-buttons">
+		<button id="authButton" class="auth-button">Connexion / Inscription</button>
+		<button id="menuButton" class="menu-button">☰</button>
+	</div>
+	<div id="authPage" style="display: none; text-align: center; margin-top: 15px;">
+		<div class="auth-content">
+			<h1>Connexion / Inscription</h1>
+			<form id="loginForm">
+				<input type="text" id="loginIdentifier" placeholder="Email ou Nom d'utilisateur" required>
+				<input type="password" id="loginPassword" placeholder="Mot de passe" required>
+				<p id="loginMessage" class="auth-message"></p>
+				<button type="submit">Se connecter</button>
+			</form>
+			<form id="registerForm">
+				<input type="text" id="regUsername" placeholder="Nom d'utilisateur" required>
+				<input type="email" id="regEmail" placeholder="Email" required>
+				<input type="password" id="regPassword" placeholder="Mot de passe" required>
+				<p id="registerMessage" class="auth-message"></p>
+				<button type="submit">S'inscrire</button>
+			</form>
+		</div>
+	</div>
 	<div id="menuDropdown" class="menu-dropdown">
 		<a href="#" data-action="profile">Profil</a>
 		<a href="#" data-action="history">Historiques</a>
 		<a href="#" data-action="statistics">Statistiques</a>
 		<a href="#" data-action="howToPlay">Comment jouer ?</a>
+		<a href="#" id="logoutButton" style="display: none;">Déconnexion</a>
 	</div>	
 	<!-- Fenêtre modale historique cachée -->
 	<div id="historyModal" class="modal">

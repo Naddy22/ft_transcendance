@@ -15,8 +15,8 @@ FRONTEND_URL	:= http://localhost:$(FRONTEND_PORT)
 
 # Directories
 BACKEND_DIR		:= backend
-FRONTEND_DIR	:= frontend
-# FRONTEND_DIR	:= PongGame
+# FRONTEND_DIR	:= frontend
+FRONTEND_DIR	:= PongGame
 
 # Log files
 LOG_DIRS			:= $(BACKEND_DIR)/logs $(FRONTEND_DIR)/logs
