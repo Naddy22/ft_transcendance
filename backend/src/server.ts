@@ -2,10 +2,9 @@
 // Main Fastify server setup, including routes, database, and shutdown handling.
 
 import Fastify from 'fastify';
-import pino from 'pino';
 import fastifyGracefulExit from "@mgcrea/fastify-graceful-exit";
-import fastifyStatic from '@fastify/static';
-import fastifyWebsocket from '@fastify/websocket';
+import fastifyStatic from '@fastify/static'; // https://github.com/fastify/fastify-static
+// import fastifyWebsocket from '@fastify/websocket';
 import fastifyMultipart from "@fastify/multipart";
 import fastifyRoutes from '@fastify/routes';
 // import fastifyRateLimit from "@fastify/rate-limit";
@@ -16,8 +15,8 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { fpSqlitePlugin } from 'fastify-sqlite-typed';
 
-// import fastifyRequestLogger from "@mgcrea/fastify-request-logger";
-// import prettifier from "@mgcrea/pino-pretty-compact";
+import fastifyRequestLogger from "@mgcrea/fastify-request-logger";
+import prettifier from "@mgcrea/pino-pretty-compact";
 
 import { setupRoutes } from './routes/setupRoutes.js';
 import { setupDatabase } from './database.js';
@@ -69,40 +68,31 @@ if (!fs.existsSync(dbPath)) {
 // console.log(`🗄️ Using SQLite database at: ${dbPath}`); // debug
 
 // ────────────────────────────────────────────────────────────────────────────────
+// Transport setup for "pretty" logs only in dev mode
+const loggerOptions = process.env.NODE_ENV !== 'production'
+  ? {
+    // level: 'info',
+    // file: './server.log',
+    transport: {
+      target: 'pino-pretty',
+      // target: "@mgcrea/pino-pretty-compact",
+      options: {
+        colorize: true,
+        translateTime: "SYS:H:MM:ss",
+        // translateTime: "SYS:yyyy-mm-dd HH:MM:ss",
+        ignore: 'pid,hostname',
+      }
+    }
+  }
+  : true;  // Raw JSON logs in production for better machine parsing and performance.
+
+// ────────────────────────────────────────────────────────────────────────────────
 // Initialize Fastify Server (allowing http for developpement)
 const isHttps = process.env.USE_HTTPS === "true";
 
-// // Example: set up a transport for "pretty" logs only in dev mode
-// const loggerOptions = process.env.NODE_ENV !== 'production'
-//   ? {
-//       transport: {
-//         target: 'pino-pretty',
-//         options: {
-//           colorize: true,         // Adds ANSI color codes to the output
-//           translateTime: 'SYS:standard',
-//           ignore: 'pid,hostname'  // Hide some fields if you want
-//         }
-//       }
-//     }
-//   : true;  // In production, default pino logs or you can supply an object
-
-const loggerOptions = {
-  level: 'info',
-  file: './server.log',
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      translateTime: 'SYS:standard',
-      ignore: 'pid,hostname'
-    }
-  }
-};
-
 const fastify = Fastify({
   logger: loggerOptions,
-  // logger: true,
-  // disableRequestLogging: true, // to replace with custom or better one eventually...
+  disableRequestLogging: true,
   ignoreTrailingSlash: true,
   // trustProxy: true, // uncomment when/if we setup nginx
   ...(isHttps && {
@@ -114,26 +104,24 @@ const fastify = Fastify({
 });
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Custom request/response logging
-const now = () => Date.now();
-
-// fastify.addHook("onRequest", (req, reply, done) => {
-//   reply.startTime = now();
-//   req.log.info({ url: req.raw.url, id: req.id }, "recieved request");
-//   done();
-// })
-
-// ────────────────────────────────────────────────────────────────────────────────
 // Register plugins
 
+await fastify.register(fastifyRequestLogger, {
+  // logBody: false,
+  logResponseTime: false,
+  logBindings: {},
+});
+
+// ────────────────────────────────────────────────────────────────────────────────
+// 
 await fastify.register(helmet, {
+  // noSniff: true,
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      // Optionally, we can set styleSrcElem explicitly as well:
-      // styleSrcElem: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      // styleSrcElem: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Optionally, we can set styleSrcElem explicitly as well
       imgSrc: ["'self'", "data:", "blob:"], // allow blob: URLs for images
       connectSrc: ["'self'"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
@@ -143,7 +131,8 @@ await fastify.register(helmet, {
   },
 });
 
-
+// ────────────────────────────────────────────────────────────────────────────────
+// 
 // await fastify.register(fastifyRateLimit, {
 //   max: 5, // Allow only 5 login attempts per minute per IP
 //   timeWindow: "1 minute",
@@ -152,14 +141,18 @@ await fastify.register(helmet, {
 //   }
 // });
 
+// ────────────────────────────────────────────────────────────────────────────────
+// 
 await fastify.register(fpSqlitePlugin, {
   dbFilename: dbPath
 });
 
-
+// ────────────────────────────────────────────────────────────────────────────────
+// Register file upload plugin
 await fastify.register(fastifyMultipart);
-await fastify.register(fastifyWebsocket);
 
+// ────────────────────────────────────────────────────────────────────────────────
+// 
 const FRONTEND_DIST = process.env.FRONTEND_DIST || "../../frontend/dist";
 // const frontendPath = path.resolve(__dirname, FRONTEND_DIST);
 // console.log("Serving frontend from:", frontendPath); // Debugging output
@@ -177,6 +170,8 @@ await fastify.register(fastifyStatic, {
   index: ['index.html'],
 });
 
+// ────────────────────────────────────────────────────────────────────────────────
+// 
 await fastify.register(fastifyRoutes);
 
 // ────────────────────────────────────────────────────────────────────────────────

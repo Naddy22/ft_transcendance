@@ -42,6 +42,9 @@ export interface MatchScore {
   player2: number;
 }
 
+/*
+score?: 
+*/
 export interface Match {
   matchId: number;
   player1: number;
@@ -186,6 +189,8 @@ export class API {
   async deleteUser(id: number): Promise<{ message: string }> {
     return this.request<{ message: string }>(`/users/${id}`, {
       method: "DELETE",
+      // Ensuring no empty body is sent
+      headers: {}, // Removing `Content-Type`
     });
   }
 

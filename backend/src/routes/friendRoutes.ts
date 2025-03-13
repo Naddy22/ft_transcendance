@@ -14,10 +14,12 @@ import { sendError } from "../utils/error.js";
  *  - DELETE /users/:id/friends/:friendId  → Remove friend
  */
 export async function friendRoutes(fastify: FastifyInstance) {
+
   // GET /users/:id/friends: get friend list for a user
   fastify.get<{ Params: { id: string } }>("/:id/friends", async (req, reply) => {
     try {
       const { id } = req.params;
+      
       // Query friends table for friend IDs
       const stmt = await fastify.db.prepare("SELECT friendId FROM friends WHERE userId = ?");
       const rows = await stmt.all(id);

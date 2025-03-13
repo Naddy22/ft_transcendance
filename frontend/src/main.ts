@@ -38,6 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const userEmailElem = document.getElementById("userEmail") as HTMLSpanElement;
   const userStatusElem = document.getElementById("userStatus") as HTMLSpanElement;
 
+  // Grab the avatar UI elements
+  const avatarImg = document.getElementById("userAvatar") as HTMLImageElement;
+  const avatarInput = document.getElementById("avatarInput") as HTMLInputElement;
+  const uploadAvatarBtn = document.getElementById("uploadAvatarBtn") as HTMLButtonElement;
+  const removeAvatarBtn = document.getElementById("removeAvatarBtn") as HTMLButtonElement;
+
   const newUsername = document.getElementById("newUsername") as HTMLInputElement;
   const updateUsernameBtn = document.getElementById("updateUsernameBtn") as HTMLButtonElement;
   const newEmail = document.getElementById("newEmail") as HTMLInputElement;
@@ -69,6 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setDarkMode(!document.body.classList.contains("dark-mode"));
   });
 
+  // Helper function to update the displayed avatar
+  function updateAvatarDisplay(avatarUrl: string | null | undefined) {
+    // If the avatarUrl is null or empty, revert to default
+    avatarImg.src = avatarUrl ? avatarUrl : "/avatars/default.png";
+  }
+
+
   // Fetch & display user info
   async function fetchUserInfo(userId: number) {
     try {
@@ -77,6 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
       userNameElem.textContent = userData.username;
       userEmailElem.textContent = userData.email;
       userStatusElem.textContent = userData.status;
+
+      updateAvatarDisplay(userData.avatar);
+
     } catch (error: any) {
       console.error("Error fetching user info:", error.message);
     }
@@ -266,4 +282,44 @@ document.addEventListener("DOMContentLoaded", () => {
       updateResponse.textContent = `❌ Update failed: ${error.message}`;
     }
   });
+
+
+  // 
+
+  // Upload Avatar
+  uploadAvatarBtn.addEventListener("click", async () => {
+    if (!avatarInput.files || avatarInput.files.length === 0) {
+      console.error("No file selected for upload.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", avatarInput.files[0]);
+    try {
+      // First, upload the file
+      const uploadResponse = await api.uploadAvatar(formData);
+      console.log("Avatar uploaded:", uploadResponse.avatarUrl);
+      // Then, update the avatar reference in the database (if required)
+      if (loggedInUserId) {
+        const updateResponse = await api.updateAvatar(loggedInUserId, uploadResponse.avatarUrl);
+        console.log("Avatar updated:", updateResponse.avatarUrl);
+        updateAvatarDisplay(updateResponse.avatarUrl);
+      }
+    } catch (error: any) {
+      console.error("Avatar upload failed:", error.message);
+    }
+  });
+
+  // Remove Avatar (revert to default)
+  removeAvatarBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) return;
+    try {
+      const response = await api.removeAvatar(loggedInUserId);
+      console.log("Avatar removed:", response.avatarUrl);
+      updateAvatarDisplay(response.avatarUrl);
+    } catch (error: any) {
+      console.error("Avatar removal failed:", error.message);
+    }
+  });
+
 });
+

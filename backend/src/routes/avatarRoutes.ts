@@ -1,11 +1,17 @@
 // File: backend/src/routes/avatarRoutes.ts
 
+/* TOCHECK:
+- image deletion ?
+- path for default, what happens if not found
+*/
+
 import { FastifyInstance } from "fastify";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import sharp from "sharp";
 import fastifyStatic from '@fastify/static';
+
 import { sendError } from "../utils/error.js";
 
 // Resolve __dirname and paths correctly in ES Modules
@@ -13,6 +19,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function avatarRoutes(fastify: FastifyInstance) {
+
   // Define where to store avatars
   const AVATAR_DIR = path.join(__dirname, "../../uploads/avatars");
   if (!fs.existsSync(AVATAR_DIR)) {
@@ -54,6 +61,7 @@ export async function avatarRoutes(fastify: FastifyInstance) {
         .resize({ width: 256, height: 256, fit: "inside" })
         .toBuffer();
 
+      // Save the file
       await fs.promises.writeFile(filePath, resizedBuffer);
 
       // Return the public URL for the uploaded avatar
@@ -106,4 +114,5 @@ export async function avatarRoutes(fastify: FastifyInstance) {
       return sendError(reply, 500, "Internal Server Error during avatar removal", error);
     }
   });
+
 }
