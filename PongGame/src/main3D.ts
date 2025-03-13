@@ -3,7 +3,7 @@ import { stopPongGame3D as stopPongGame } from './game3D.js';
 import { Tournament } from './tournament3D.js';
 import { addGameToHistory, updateHistoryUI } from "./history.js";
 import { addGameToStats, updateStatsUI } from "./stats.js";
-import { registerUser, loginUser, logoutUser } from "./auth";
+import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
 
 
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -29,7 +29,7 @@ const game = document.getElementById('game') as HTMLElement;
 const endScreen = document.getElementById('endScreen') as HTMLElement;
 
 const playVsAIButton = document.getElementById("playVsAI") as HTMLButtonElement;
-const tournamentButton = document.getElementById('tournament') as HTMLElement;
+const tournamentButton = document.getElementById('tournament') as HTMLButtonElement;
 const tournamentOptions = document.getElementById("tournamentOptions") as HTMLElement;
 const tournament4 = document.getElementById("tournament4") as HTMLButtonElement;
 const tournament8 = document.getElementById("tournament8") as HTMLButtonElement;
@@ -45,6 +45,7 @@ const playerInputs = document.getElementById("playerInputs") as HTMLElement;
 const inputsContainer = document.getElementById("inputsContainer") as HTMLElement;
 const playersForm = document.getElementById("playersForm") as HTMLFormElement;
 
+let currentUser: { id: number; username: string; email: string } | null = null;
 let playerNames: string[] = [];
 let lastPlayers: string[] = [];
 let isTournamentMode: boolean = false;
@@ -57,16 +58,34 @@ history.replaceState({ page: 'menu' }, 'Menu', '#menu');
 
 // 🔹 Vérifie si l'utilisateur est connecté au chargement de la page
 function updateAuthButton() {
-	const userData = localStorage.getItem("loggedInUser");
+	console.log("update auth");
 	const logoutButton = document.getElementById("logoutButton") as HTMLElement;
 
-	if (userData) {
-		logoutButton.style.display = "block"; // Affiche le bouton Déconnexion dans le menu
-		authButton.style.display = "none"; // Cache le bouton Connexion / Inscription
-	} else {
-		logoutButton.style.display = "none"; // Cache la déconnexion
-		authButton.style.display = "block"; // Affiche Connexion / Inscription
-	}
+	checkSession().then((user) => {
+		currentUser = user;
+		if (currentUser) {
+			console.log("✅ Session active :", currentUser.username);
+			logoutButton.style.display = "block"; // Affiche le bouton Déconnexion dans le menu
+			authButton.style.display = "none"; // Cache le bouton Connexion / Inscription
+		
+			menuButton.style.display = "block";
+			menuButton.style.paddingTop = "10px"; // Ajuste si le texte est trop bas
+			homeButton.style.visibility = "visible";
+			startButton.style.display = "block";
+			playVsAIButton.style.display = "block";
+			tournamentButton.style.display = "block";
+		} else {
+			console.log("❌ Aucun utilisateur connecté.");
+			logoutButton.style.display = "none";
+			authButton.style.display = "block";
+
+			menuButton.style.display = "none";
+			homeButton.style.visibility = "hidden";
+			startButton.style.display = "none";
+			playVsAIButton.style.display = "none";
+			tournamentButton.style.display = "none";
+		}
+	});
 }
 
 // Afficher la page d'authentification
@@ -109,7 +128,9 @@ loginForm.addEventListener("submit", async (event) => {
 });
 
 // 🌟 Met à jour le bouton d'auth au chargement
-document.addEventListener("DOMContentLoaded", updateAuthButton);
+document.addEventListener("DOMContentLoaded", () => {
+	updateAuthButton();
+});
 
 // Fonction pour afficher les champs de pseudos
 function showPlayerInputs(players: number) {
@@ -120,7 +141,10 @@ function showPlayerInputs(players: number) {
 	endScreen.style.display = 'none';
 	inputsContainer.innerHTML = ""; // Réinitialiser
 
-	for (let i = 1; i <= players; i++) {
+	// Premier champ avec le pseudo de l'utilisateur connecté
+	inputsContainer.innerHTML += `<input type="text" value="${currentUser?.username}" id="player1" disabled><br>`;
+
+	for (let i = 2; i <= players; i++) {
 		inputsContainer.innerHTML += `<input type="text" placeholder="Joueur ${i}" id="player${i}" required><br>`;
 	}
 	playerInputs.style.display = 'block'; // Afficher les inputs
@@ -137,6 +161,8 @@ function showMenu(): void {
 }
 
 function showAuthPage(): void {
+	(document.getElementById("loginForm") as HTMLFormElement).reset();
+	(document.getElementById("registerForm") as HTMLFormElement).reset();
 	menu.style.display = 'none';
 	tournamentOptions.style.display = "none";
 	game.style.display = 'none';
@@ -242,16 +268,17 @@ if (menuDropdown) {
 		}
 		if (target.id === "logoutButton") {
 			event.preventDefault();
-			logoutUser(); // Supprime la session
-			updateAuthButton(); // Met à jour l'affichage des boutons
-
-			// 🔄 Ajoute un nouvel état propre après la déconnexion
-			history.pushState({ page: "menu" }, "Menu", "#menu");
-
-			console.log("🔄 Historique mis à jour : ", history.state, "URL actuelle : ", window.location.hash);
-
-			showMenu(); // Affiche le menu
-			console.log("📺 Après showMenu");
+			logoutUser().then(() => {
+				updateAuthButton(); // Met à jour l'affichage des boutons
+		
+				// 🔄 Ajoute un nouvel état propre après la déconnexion
+				history.pushState({ page: "menu" }, "Menu", "#menu");
+		
+				console.log("🔄 Historique mis à jour : ", history.state, "URL actuelle : ", window.location.hash);
+		
+				showMenu(); // Affiche le menu
+				console.log("📺 Après showMenu");
+			});
 		}
 		menuDropdown.classList.remove("active");
 		console.log("🔽 Menu déroulant fermé");
@@ -273,7 +300,11 @@ if (closeButton) {
 // Vérification que l'élément startButton existe avant d'ajouter l'écouteur
 if (startButton) {
 	startButton.addEventListener('click', function() {
-		playerNames = ["Joueur 1", "Joueur 2"];
+		if (!currentUser) {
+			alert("Vous devez vous connecter");
+			return ;
+		}
+		playerNames = [currentUser.username, "Joueur 2"];
 		lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
 		showGame();
 
@@ -317,11 +348,15 @@ if (startButton) {
 }
 
 playVsAIButton.addEventListener("click", () => {
+	if (!currentUser) {
+		alert("Vous devez vous connecter");
+		return ;
+	}
 	console.log("Démarrage du jeu contre l'IA");
 	isTournamentMode = false;
 	isVsAIMode = true;
 
-	playerNames = ["Joueur 1", "IA"];
+	playerNames = [currentUser.username, "IA"];
 	lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
 
 	showGame();
@@ -341,6 +376,10 @@ playVsAIButton.addEventListener("click", () => {
 
 // Quand on clique sur "Tournoi", afficher les options
 tournamentButton.addEventListener("click", () => {
+	if (!currentUser) {
+		alert("Vous devez vous connecter");
+		return ;
+	}
 	showTournamentOption();
 	history.pushState({ page: 'tournamentOption' }, 'Tournament', '#tournamentOption');
 });

@@ -11,7 +11,7 @@
 <body>
 	<div class="top-buttons">
 		<button id="authButton" class="auth-button">Connexion / Inscription</button>
-		<button id="menuButton" class="menu-button">☰</button>
+		<button id="menuButton" class="menu-button" style="display: none;">☰</button>
 	</div>
 	<div id="authPage" style="display: none; text-align: center; margin-top: 15px;">
 		<div class="auth-content">
@@ -77,7 +77,7 @@
 		</div>
 	</div>
 	<!-- Home button -->
-	<button id="homeButton" class="home-button">
+	<button id="homeButton" class="home-button" style="visibility: hidden;">
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#333" width="32px" height="32px">
 			<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
 		</svg>
@@ -86,9 +86,9 @@
 	<div id="menu">
 		<h1>Cat Pong Game</h1>
 		<!-- <button id="startButton">Démarrer le jeu</button> -->
-		<button id="startButton">1 vs 1</button>
-		<button id="playVsAI">1 vs IA</button>
-		<button id="tournament">Tournoi</button>
+		<button id="startButton" style="display: none;">1 vs 1</button>
+		<button id="playVsAI" style="display: none;">1 vs IA</button>
+		<button id="tournament" style="display: none;">Tournoi</button>
 	</div>
 	<!--tournament Options -->
 	<div id="tournamentOptions" style="display: none; text-align: center; margin-top: 15px;">
