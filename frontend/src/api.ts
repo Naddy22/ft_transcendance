@@ -395,6 +395,25 @@ export class API {
     });
   }
 
+  // ── Anonymisation ─────────────────────────────────────────────────────
+
+  // Anonymize user data
+  async anonymizeUser(userId: number): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/users/${userId}/anonymize`, {
+      method: "PUT",
+      // Override headers so that Content-Type isn't sent
+      headers: {}
+    });
+  }
+
+  // Export user data 
+  async exportUserData(userId: number): Promise<any> {
+    return this.request<any>(`/users/${userId}/export`, {
+      method: "GET",
+    });
+  }
+
+
 }
 
 /*

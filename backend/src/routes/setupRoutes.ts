@@ -12,6 +12,8 @@ import { matchHistoryRoutes } from './matchHistoryRoutes.js';
 import { tournamentRoutes } from './tournamentRoutes.js';
 import { matchmakingRoutes } from './matchmakingRoutes.js';
 import { avatarRoutes } from './avatarRoutes.js';
+import { anonymizationRoutes } from './anonymizationRoutes.js';
+import { exportRoutes } from './exportRoutes.js';
 
 export function setupRoutes(fastify: FastifyInstance) {
   fastify.register(authRoutes, { prefix: '/auth' });
@@ -24,4 +26,6 @@ export function setupRoutes(fastify: FastifyInstance) {
   fastify.register(tournamentRoutes, { prefix: '/tournaments' });
   fastify.register(matchmakingRoutes, { prefix: '/matchmaking' });
   fastify.register(avatarRoutes, { prefix: '/' }); // Endpoints will be at /avatar, /avatar (PUT), /avatar (DELETE)
+  fastify.register(anonymizationRoutes, { prefix: '/users' });
+  fastify.register(exportRoutes, { prefix: '/users' });
 }

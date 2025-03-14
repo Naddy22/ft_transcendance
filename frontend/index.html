@@ -52,6 +52,21 @@
       Status: <span id="userStatus"></span>
     </p>
 
+    <!-- Privacy Settings Section -->
+    <div id="privacySettings" class="container">
+      <h3>Privacy Settings</h3>
+      <p>
+        In accordance with GDPR, you have the right to manage your personal data.
+        You can export your data, or if you choose, permanently anonymize your account.
+        <strong>Note:</strong> Once anonymized, your original credentials will be lost and you will no longer be able to log in.
+      </p>
+      <div class="form-group">
+        <button id="exportDataBtn">Export My Data</button>
+        <button id="anonymizeBtn" class="danger-btn">Anonymize My Data Permanently</button>
+      </div>
+      <p id="privacyResponse"></p>
+    </div>
+
     <!-- Avatar Section -->
     <div id="avatarSection" class="form-group">
       <h3>Avatar</h3>
@@ -117,14 +132,14 @@
     </div>
 
     <!-- Update Section -->
-     <h3>Update</h3>
+    <h3>Update</h3>
 
     <!-- Update Username -->
     <div class="form-group">
       <input type="text" id="newUsername" placeholder="New Username" />
       <button id="updateUsernameBtn">Update Username</button>
     </div>
-    
+
     <!-- Update Email -->
     <div class="form-group">
       <input type="email" id="newEmail" placeholder="New Email" />

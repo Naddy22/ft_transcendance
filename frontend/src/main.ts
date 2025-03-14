@@ -560,4 +560,61 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  // 
+  // 
+  // Create references for the Privacy Settings elements
+  const exportDataBtn = document.getElementById("exportDataBtn") as HTMLButtonElement;
+  const anonymizeBtn = document.getElementById("anonymizeBtn") as HTMLButtonElement;
+  const privacyResponse = document.getElementById("privacyResponse") as HTMLParagraphElement;
+
+  // Event listener for data export (stub example)
+  exportDataBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) {
+      privacyResponse.textContent = "❌ You must be logged in to export your data.";
+      return;
+    }
+    try {
+      // If you implement an export endpoint, call it here.
+      const data = await api.exportUserData(loggedInUserId);
+      // For example, convert data to JSON and trigger a download.
+      const dataStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "my_data_export.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      privacyResponse.textContent = "✅ Data export initiated.";
+    } catch (error: any) {
+      privacyResponse.textContent = `❌ Data export failed: ${error.message}`;
+    }
+  });
+
+  // Event listener for permanent anonymization
+  anonymizeBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) {
+      privacyResponse.textContent = "❌ You must be logged in to anonymize your data.";
+      return;
+    }
+    // Confirm with the user before proceeding
+    if (!confirm("WARNING: This action will permanently anonymize your account. You will lose your original login credentials. Proceed?")) {
+      return;
+    }
+    try {
+      const response = await api.anonymizeUser(loggedInUserId);
+      privacyResponse.textContent = `✅ ${response.message}`;
+      // Optionally force a logout and update UI since the account is now anonymized.
+      loggedInUserId = null;
+      loggedInUserStatus = null;
+      logoutBtn.style.display = "none";
+      deleteAccountBtn.style.display = "none";
+      userInfo.style.display = "none";
+      loginResponse.textContent = "Your account has been anonymized. Please register a new account if you wish to continue using the service.";
+    } catch (error: any) {
+      privacyResponse.textContent = `❌ Anonymization failed: ${error.message}`;
+    }
+  });
+
 });
