@@ -29,7 +29,7 @@ export function updateHistoryUI(userId: number): void {
 		historyList.innerHTML = "";
 		historyEntries.forEach(({ date, type, result }) => {
 		const listItem = document.createElement("li");
-		listItem.textContent = `${new Date(date).toLocaleString()} - ${type} : ${result}`;
+		listItem.textContent = `${new Date(date).toLocaleString()} - ⚔️ ${type} : ${result}`;
 		historyList.appendChild(listItem);
 		});
 	})
