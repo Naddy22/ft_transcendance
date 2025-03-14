@@ -165,6 +165,8 @@ export async function userRoutes(fastify: FastifyInstance) {
     }
   });
 
+}
+
   // /**
   //  * Get a specific user's match stats
   //  */
@@ -184,4 +186,4 @@ export async function userRoutes(fastify: FastifyInstance) {
   //   }
   // });
 
-}
+// }

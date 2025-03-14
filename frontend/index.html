@@ -21,7 +21,7 @@
   </div>
 
   <!-- Registration Form -->
-  <div id="registerForm" class="container">
+  <div id="registerForm" class="container hidden">
     <h2>Register</h2>
     <input type="text" id="regUsername" placeholder="Username" />
     <input type="email" id="regEmail" placeholder="Email" />
@@ -31,7 +31,7 @@
   </div>
 
   <!-- Login Form -->
-  <div id="loginForm" class="container">
+  <div id="loginForm" class="container hidden">
     <h2>Login</h2>
     <input type="text" id="loginIdentifier" placeholder="Username or Email" />
     <input type="password" id="loginPassword" placeholder="Password" />
@@ -39,8 +39,11 @@
     <p id="loginResponse"></p>
   </div>
 
+  <!-- All Users List -->
+  <pre id="allUsersResponse" class="container hidden"></pre>
+
   <!-- User Info & Actions -->
-  <div id="userInfo" class="container">
+  <div id="userInfo" class="container" style="display: none;">
     <h2>User Info</h2>
     <p>
       ID: <span id="userId"></span><br />
@@ -48,6 +51,7 @@
       Email: <span id="userEmail"></span><br />
       Status: <span id="userStatus"></span>
     </p>
+
     <div id="avatarSection" class="form-group">
       <h3>Avatar</h3>
       <!-- Display current avatar -->
@@ -58,6 +62,49 @@
       <!-- Button to remove avatar and revert to default -->
       <button id="removeAvatarBtn" class="danger-btn">Remove Avatar</button>
     </div>
+
+    <!-- Friend Section -->
+    <div id="friendSection" class="container">
+      <h3>Friends</h3>
+      <!-- Search for a friend by username or email -->
+      <div id="friendSearch">
+        <input type="text" id="friendSearchInput" placeholder="Search by username or email" />
+        <button id="friendSearchBtn">Search</button>
+      </div>
+      <!-- Display search results with an "Add Friend" button -->
+      <ul id="friendSearchResults"></ul>
+      <h4>Your Friends</h4>
+      <!-- List to display current friends with remove options -->
+      <ul id="friendList"></ul>
+      <hr>
+    </div>
+
+    <!-- Manual Match -->
+    <div id="manualMatchSection" class="container">
+      <h3>Manually Add a Match (Test)</h3>
+      <select id="matchType">
+        <option value="1vs1">1vs1</option>
+        <option value="vs AI">vs AI</option>
+        <option value="Tournament">Tournament</option>
+      </select>
+      <select id="matchResult">
+        <option value="✅ Victoire">✅ Victoire</option>
+        <option value="❌ Défaite">❌ Défaite</option>
+        <!-- <option value="✅ Victory">✅ Victory</option>
+        <option value="❌ Defeat">❌ Defeat</option> -->
+      </select>
+      <button id="addMatchBtn">Add Match</button>
+      <p id="matchResponse"></p>
+    </div>
+
+    <!-- Game History Section -->
+    <div id="gameHistorySection" class="container">
+      <h3>Game History</h3>
+      <ul id="gameHistoryList" style="display: none;"></ul>
+      <button id="loadGameHistoryBtn">Load Game History</button>
+    </div>
+
+    <!-- Update Section -->
     <div class="form-group">
       <input type="text" id="newUsername" placeholder="New Username" />
       <button id="updateUsernameBtn">Update Username</button>
@@ -75,17 +122,12 @@
       <button id="updateStatusBtn">Update Status</button>
     </div>
     <p id="updateResponse"></p>
-    <button id="logoutBtn">Logout</button>
-    <button id="deleteAccountBtn" class="danger-btn">Delete Account</button>
+
+    <button id="logoutBtn" style="display: none;">Logout</button>
+    <button id="deleteAccountBtn" class="danger-btn" style="display: none;">Delete Account</button>
     <p id="logoutResponse"></p>
     <p id="deleteResponse"></p>
   </div>
-
-  <!-- All Users List -->
-  <pre id="allUsersResponse" class="container"></pre>
-
-  <!-- Include your game UI below as needed -->
-  <!-- ... existing game elements ... -->
 
   <!-- Main script (make sure this file imports the API client and sets up events) -->
   <script type="module" src="./src/main.ts"></script>

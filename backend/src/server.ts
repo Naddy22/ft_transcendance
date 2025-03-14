@@ -74,8 +74,8 @@ const loggerOptions = process.env.NODE_ENV !== 'production'
     // level: 'info',
     // file: './server.log',
     transport: {
-      target: 'pino-pretty',
-      // target: "@mgcrea/pino-pretty-compact",
+      // target: 'pino-pretty',
+      target: "@mgcrea/pino-pretty-compact",
       options: {
         colorize: true,
         translateTime: "SYS:H:MM:ss",
