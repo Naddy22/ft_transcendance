@@ -47,6 +47,7 @@ export interface UserStats {
   wins: number;
   losses: number;
   matchesPlayed: number;
+  winRatio: number;
 }
 
 export interface MatchScore {

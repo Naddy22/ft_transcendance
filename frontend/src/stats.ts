@@ -16,9 +16,6 @@ let statsChart: Chart | null = null;
 export async function addGameToStats(userId: number, result: "Victoire" | string): Promise<void> {
   // Define the increments. For example, 1 game is played always,
   // and win increments wins by 1 while loss increments losses by 1.
-  // const statsIncrement = result === "Victoire"
-  //   ? { wins: 1, losses: 0, matchesPlayed: 1 }
-  //   : { wins: 0, losses: 1, matchesPlayed: 1 };
   const statsIncrement = result.includes("Victoire")
     ? { wins: 1, losses: 0, matchesPlayed: 1 }
     : { wins: 0, losses: 1, matchesPlayed: 1 };
@@ -38,7 +35,7 @@ export async function updateStatsUI(userId: number): Promise<void> {
   try {
     const stats: UserStats = await api.getUserStats(userId);
     const totalGames = stats.matchesPlayed;
-    const winRate = totalGames > 0 ? (stats.wins / totalGames) * 100 : 0;
+    // const winRate = totalGames > 0 ? (stats.wins / totalGames) * 100 : 0;
 
     const totalGamesEl = document.getElementById("totalGames") as HTMLElement;
     const winsEl = document.getElementById("wins") as HTMLElement;
@@ -48,7 +45,7 @@ export async function updateStatsUI(userId: number): Promise<void> {
     if (totalGamesEl) totalGamesEl.textContent = totalGames.toString();
     if (winsEl) winsEl.textContent = stats.wins.toString();
     if (lossesEl) lossesEl.textContent = stats.losses.toString();
-    if (winRateEl) winRateEl.textContent = winRate.toFixed(2) + "%";
+    if (winRateEl) winRateEl.textContent = stats.winRatio.toFixed(2) + "%";
 
     renderStatsChart(stats);
   } catch (error: any) {

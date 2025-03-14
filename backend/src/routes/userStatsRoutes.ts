@@ -9,7 +9,14 @@ export async function userStatsRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { id: string } }>("/:id/stats", async (req, reply) => {
     try {
       const { id } = req.params;
-      const stmt = await fastify.db.prepare("SELECT wins, losses, matchesPlayed FROM users WHERE id = ?");
+
+      // const stmt = await fastify.db.prepare("SELECT wins, losses, matchesPlayed FROM users WHERE id = ?");
+      const stmt = await fastify.db.prepare(`
+        SELECT wins, losses, matchesPlayed,
+          CASE WHEN matchesPlayed > 0 THEN (wins * 100.0 / matchesPlayed) ELSE 0 END AS winRatio
+        FROM users
+        WHERE id = ?
+      `);
       stmt.bind(id);
       const stats = await stmt.get();
 
