@@ -130,6 +130,10 @@ button:hover {
 	box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
+button.danger {
+	background-color: #FF5252;
+}
+
 /* Style des inputs */
 #playersForm input {
 	width: 50%;
@@ -191,13 +195,13 @@ button:hover {
 
 .auth-message {
 	font-size: 14px;
-	color: red;
 	margin-top: 5px;
 }
 
 /* Styles des inputs (identiques à ceux de #playersForm) */
 #loginForm input,
-#registerForm input {
+#registerForm input,
+#profileForm input {
 	width: 50%;
 	padding: 10px;
 	margin: 10px 0;
@@ -210,7 +214,8 @@ button:hover {
 
 /* Effet au focus */
 #loginForm input:focus,
-#registerForm input:focus {
+#registerForm input:focus,
+#profileForm input:focus {
 	border-color: #f86b9a; /* Bordure plus foncée */
 	background: #f9dbe6; /* Fond légèrement coloré */
 }
@@ -310,6 +315,68 @@ button:hover {
 
 .text-outline {
 	text-shadow: 2px 2px 2px rgb(147, 145, 145);
+}
+
+/* 🔹 Spécifique pour la modale du profil */
+#profileModal .profile-modal {
+	width: 655px;  /* 📏 Change la largeur de la modale du profil */
+	height: auto;   /* Ajuste la hauteur selon le contenu */
+	max-height: 80vh; /* Pour éviter qu'elle soit trop grande */
+	overflow-y: auto;
+	margin: auto; /* Centre la modale */
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%); /* Centre parfaitement */
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* 🔹 Afficher le label et l'input sur une seule ligne */
+#profileModal .profile-modal .form-group {
+	display: flex;
+	align-items: center;
+	gap: 10px; /* Espace entre le label et l'input */
+	margin-bottom: 10px;
+	justify-content: center; /* Centre les champs */
+}
+
+/* 🔹 Ajuster la largeur du label pour que tout soit aligné */
+#profileModal .profile-modal label {
+	width: 200px; /* Ajuste cette valeur si nécessaire */
+	font-weight: bold;
+}
+
+/* 🔹 Permettre aux inputs de prendre toute la place restante */
+#profileModal .profile-modal input {
+	width: 275px; /* 📏 Change la largeur selon tes préférences */
+	/* flex: 1; */
+	padding: 8px;
+}
+
+#profileModal .profile-modal button {
+	width: auto;
+	font-size: 14px; /* 📏 Change la taille du texte */
+}
+
+
+.profile-avatar img {
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	display: block;
+	margin: 0 auto 10px;
+}
+
+/* 🔹 Style du message de confirmation */
+.profile-message {
+	text-align: center;
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 10px;
+	opacity: 0; /* Caché par défaut */
+	transition: opacity 0.5s ease-in-out;
 }
 
 .history-container {

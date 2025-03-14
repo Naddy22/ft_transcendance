@@ -1,9 +1,10 @@
-import { startPongGame3D as startPongGame } from './game3D.js';
-import { stopPongGame3D as stopPongGame } from './game3D.js';
-import { Tournament } from './tournament3D.js';
-import { addGameToHistory, updateHistoryUI } from "./history.js";
-import { addGameToStats, updateStatsUI } from "./stats.js";
+import { startPongGame3D as startPongGame } from './game3D';
+import { stopPongGame3D as stopPongGame } from './game3D';
+import { Tournament } from './tournament3D';
+import { addGameToHistory, updateHistoryUI } from "./history";
+import { addGameToStats, updateStatsUI } from "./stats";
 import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
+import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, removeFriend, deleteUserAccount } from "./profile";
 
 
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -18,6 +19,14 @@ const loginForm = document.getElementById("loginForm") as HTMLFormElement;
 const registerForm = document.getElementById("registerForm") as HTMLFormElement;
 const loginMessage = document.getElementById("loginMessage") as HTMLParagraphElement;
 const registerMessage = document.getElementById("registerMessage") as HTMLParagraphElement;
+
+const profileModal = document.getElementById("profileModal") as HTMLElement;
+const profileForm = document.getElementById("profileForm") as HTMLFormElement;
+const profileMessage = document.getElementById("profileMessage") as HTMLParagraphElement;
+const avatarInput = document.getElementById("avatarInput")! as HTMLInputElement;
+const uploadAvatarBtn = document.getElementById("uploadAvatarBtn") as HTMLButtonElement;
+const deleteAccountBtn = document.getElementById("deleteAccountBtn") as HTMLButtonElement;
+const friendList = document.getElementById("friendList") as HTMLUListElement;
 
 const historyModal = document.getElementById("historyModal") as HTMLElement;
 const statsModal = document.getElementById("statsModal") as HTMLElement;
@@ -104,9 +113,11 @@ registerForm.addEventListener("submit", async (event) => {
 	const password = (document.getElementById("regPassword") as HTMLInputElement).value;
 
 	try {
-		await registerUser(username, email, password);
-		alert("Inscription réussie ! Connectez-vous.");
+		const message = await registerUser(username, email, password);
+		registerMessage.style.color = "green"; // ✅ Change la couleur en vert
+		registerMessage.textContent =  message;
 	} catch (error: any) {
+		registerMessage.style.color = "red"; // ❌ Change la couleur en rouge
 		registerMessage.textContent = error.message; // Affiche l'erreur sous le formulaire
 	}
 });
@@ -124,6 +135,7 @@ loginForm.addEventListener("submit", async (event) => {
 		updateAuthButton();
 		history.pushState({ page: "menu" }, "Menu", "#menu");
 	} catch (error: any) {
+		loginMessage.style.color = "red"; // ❌ Change la couleur en rouge
 		loginMessage.textContent = error.message; // Affiche l'erreur sous le formulaire
 	}
 });
@@ -223,6 +235,9 @@ window.addEventListener("click", function(event) {
 	if (!menuDropdown.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
 		menuDropdown.classList.remove("active");
 	}
+	if (profileModal && event.target === profileModal) {
+		profileModal.style.display = "none";
+	}
 	if (historyModal && event.target === historyModal) {
 		historyModal.style.display = "none";
 	}
@@ -244,6 +259,119 @@ homeButton.addEventListener("click", () => {
 	history.pushState({ page: "menu" }, "Menu", "#menu");
 });
 
+// 📌 Charger le profil utilisateur + amis
+function loadUserProfile() {
+
+	getCompleteProfile(currentUser!.id)
+		.then(({ profile, friends }) => {
+			console.log("✅ Profil chargé :", profile);
+			console.log("✅ Amis chargés :", friends);
+
+			(document.getElementById("newUsername")! as HTMLInputElement).value = profile.username;
+			(document.getElementById("newEmail")! as HTMLInputElement).value = profile.email;
+			(document.getElementById("userAvatar")! as HTMLImageElement).src = profile.avatar;
+			updateFriendsUI(friends);
+		})
+		.catch(error => {
+			console.error("❌ Erreur chargement profil :", error.message);
+			alert("Erreur lors du chargement du profil.");
+		});
+}
+
+// 📌 Mettre à jour le profil
+profileForm.addEventListener("submit", (event) => {
+	event.preventDefault();
+
+	const updatedData = {
+		username: (document.getElementById("newUsername")! as HTMLInputElement).value.trim(),
+		email: (document.getElementById("newEmail")! as HTMLInputElement).value.trim(),
+	};
+
+	const oldPassword = (document.getElementById("oldPassword")! as HTMLInputElement).value.trim();
+	const newPassword = (document.getElementById("newPassword")! as HTMLInputElement).value.trim();
+
+	Promise.all([
+		updateUserProfile(currentUser!.id, updatedData),
+		newPassword ? updatePassword(currentUser!.id, oldPassword, newPassword) : Promise.resolve()
+	])
+	.then(messages => {
+		profileMessage.style.color = "green";
+		profileMessage.textContent = messages.join("\n");
+		loadUserProfile(); // Recharge après modification
+
+		setTimeout(() => {
+			profileMessage.style.opacity = "0";
+		}, 10000);
+	})
+	.catch(error => {
+		profileMessage.style.color = "red";
+		profileMessage.textContent = `❌ Erreur : ${error.message}`;
+
+		// 🔹 Supprime le message après 5 secondes
+		setTimeout(() => {
+			profileMessage.style.opacity = "0";
+		}, 10000);
+	});
+	// 🔹 Montre le message immédiatement
+	profileMessage.style.opacity = "1";
+});
+
+// 📌 Changer l'avatar
+uploadAvatarBtn.addEventListener("click", () => {
+	if (!currentUser!.id || !avatarInput.files || avatarInput.files.length === 0) return;
+
+	uploadAvatar(currentUser!.id, avatarInput.files[0])
+		.then(newAvatarUrl => {
+			(document.getElementById("userAvatar")! as HTMLImageElement).src = newAvatarUrl;
+			alert("✅ Avatar mis à jour !");
+		})
+		.catch(error => alert(`❌ Erreur : ${error.message}`));
+});
+
+// 📌 Mettre à jour l'affichage des amis
+function updateFriendsUI(friends: { id: number; username: string }[]) {
+	friendList.innerHTML = "";
+	if (friends.length === 0) {
+		friendList.innerHTML = "<li>Aucun ami pour le moment.</li>";
+		return;
+	}
+
+	friends.forEach(friend => {
+		const li = document.createElement("li");
+		li.textContent = friend.username;
+		li.id = `friend-${friend.id}`;
+
+		const removeBtn = document.createElement("button");
+		removeBtn.textContent = "❌";
+		removeBtn.addEventListener("click", () => removeFriendUI(friend.id));
+
+		li.appendChild(removeBtn);
+		friendList.appendChild(li);
+	});
+}
+
+// 📌 Supprimer un ami
+function removeFriendUI(friendId: number) {
+	removeFriend(currentUser!.id, friendId)
+		.then(message => {
+			alert(message);
+			document.getElementById(`friend-${friendId}`)?.remove();
+		})
+		.catch(error => alert(`❌ Erreur : ${error.message}`));
+}
+
+// 📌 Supprimer son compte
+deleteAccountBtn.addEventListener("click", () => {
+	if (!currentUser!.id || !confirm("⚠️ Es-tu sûr de vouloir supprimer ton compte ?")) return;
+
+	deleteUserAccount(currentUser!.id)
+		.then(message => {
+			alert(message);
+			window.location.reload();
+		})
+		.catch(error => alert(`❌ Erreur : ${error.message}`));
+});
+
 menuButton.addEventListener("click", () => {
 	menuDropdown.classList.toggle("active"); // Affiche/Cache le menu
 });
@@ -251,6 +379,11 @@ menuButton.addEventListener("click", () => {
 if (menuDropdown) {
 	menuDropdown.addEventListener("click", function(event) {
 		const target = event.target as HTMLElement;
+		if (target.dataset.action === "profile" && profileModal) {
+			event.preventDefault();
+			loadUserProfile();
+			profileModal.style.display = "block";
+		}
 		if (target.dataset.action === "history" && historyModal) {
 			event.preventDefault();
 			updateHistoryUI(currentUser!.id); // Mets à jour l'historique
@@ -263,7 +396,7 @@ if (menuDropdown) {
 		if (target.dataset.action === "statistics" && statsModal) {
 			console.log("Ajout de l'écouteur pour le bouton Statistiques");
 			event.preventDefault();
-			updateStatsUI(); // Met à jour les nombres
+			updateStatsUI(currentUser!.id); // Met à jour les nombres
 			// renderStatsChart(); // Génère le graphique
 			statsModal.style.display = "flex";
 		}
@@ -334,7 +467,7 @@ if (startButton) {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-				addGameToStats(winner === playerNames[0] ? "Victoire" : "Défaite");
+				addGameToStats(currentUser!.id, winner === playerNames[0] ? "Victoire" : "Défaite");
 				showEndScreen(winner);
 			});
 		} else {
@@ -362,7 +495,7 @@ playVsAIButton.addEventListener("click", () => {
 		let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 		// Ajouter à l’historique
 		addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-		addGameToStats(winner === playerNames[0] ? "Victoire" : "Défaite");
+		addGameToStats(currentUser!.id, winner === playerNames[0] ? "Victoire" : "Défaite");
 		showEndScreen(winner);
 	});
 });
@@ -422,7 +555,7 @@ playersForm.addEventListener("submit", (event) => {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-				addGameToStats(winner === playerNames[0] ? "Victoire" : "Défaite");
+				addGameToStats(currentUser!.id, winner === playerNames[0] ? "Victoire" : "Défaite");
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -467,7 +600,7 @@ replayButton.addEventListener('click', () => {
 		let result = winner === lastPlayers[0] ? "✅ Victoire" : "❌ Défaite";
 		// Ajouter à l’historique
 		addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-		addGameToStats(winner === lastPlayers[0] ? "Victoire" : "Défaite");
+		addGameToStats(currentUser!.id, winner === lastPlayers[0] ? "Victoire" : "Défaite");
 		showEndScreen(winner);
 	});
 });
@@ -491,7 +624,7 @@ nextMatchButton.addEventListener('click', () => {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-				addGameToStats(winner === playerNames[0] ? "Victoire" : "Défaite");
+				addGameToStats(currentUser!.id, winner === playerNames[0] ? "Victoire" : "Défaite");
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -556,7 +689,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-					addGameToStats(winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
+					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
 					showEndScreen(winner);
 				});
 			}
@@ -573,7 +706,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-					addGameToStats(winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
+					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
 					showEndScreen(winner, true, true);
 				} else {
 					showEndScreen(winner, true);
@@ -592,7 +725,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-					addGameToStats(winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
+					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
 					showEndScreen(winner);
 				});
 			}

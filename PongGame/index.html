@@ -37,7 +37,43 @@
 		<a href="#" data-action="statistics">Statistiques</a>
 		<a href="#" data-action="howToPlay">Comment jouer ?</a>
 		<a href="#" id="logoutButton" style="display: none;">Déconnexion</a>
-	</div>	
+	</div>
+	<!-- 📌 fenetre modale du Profil caché-->
+	<div id="profileModal" class="modal">
+		<div class="modal-content profile-modal">
+			<span class="close">&times;</span>
+			<h1 class="text-outline">👤 Mon Profil</h1>
+			<div class="profile-avatar">
+				<img id="userAvatar" src="/avatars/default.png" alt="Avatar">
+				<input type="file" id="avatarInput">
+				<button id="uploadAvatarBtn">📤 Changer l'avatar</button>
+			</div>
+			<form id="profileForm">
+				<div class="form-group">
+					<label for="newUsername">✏️ Pseudo :</label>
+					<input type="text" id="newUsername">
+				</div>
+				<div class="form-group">
+					<label for="newEmail">📧 Email :</label>
+					<input type="email" id="newEmail">
+				</div>
+				<div class="form-group">
+					<label for="newPassword">🔒 Nouveau mot de passe :</label>
+					<input type="password" id="oldPassword" placeholder="Ancien mot de passe">
+					<input type="password" id="newPassword" placeholder="Nouveau mot de passe">
+				</div>
+				<h3>👥 Amis :</h3>
+				<ul id="friendList"></ul>
+				<h3>Ajouter un ami :</h3>
+				<input type="text" id="friendSearchInput" placeholder="Pseudo ou email">
+				<button id="friendSearchBtn">🔍 Rechercher</button>
+				<ul id="friendSearchResults"></ul>
+				<button type="submit" id="saveChangesBtn">✅ Sauvegarder les changements</button>
+				<p id="profileMessage" class="profile-message"></p>
+			</form>
+			<button id="deleteAccountBtn" class="danger">⚠️ Supprimer mon compte</button>
+		</div>
+	</div>
 	<!-- Fenêtre modale historique cachée -->
 	<div id="historyModal" class="modal">
 		<div class="modal-content">
