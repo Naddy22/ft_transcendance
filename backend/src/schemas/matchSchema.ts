@@ -51,16 +51,21 @@ export const matchSchema = {
       "format": "date-time",
       "description": "Match end timestamp"
     },
+    "matchType": {
+      "type": "string", "enum": ["1vs1", "vs AI", "Tournament"],
+      "description": "Type of match"
+    },
     "tournamentId": {
       "type": ["integer", "null"],
       "description": "If part of a tournament, reference the tournament ID"
     }
   },
-  "required": ["matchId", "player1", "player2", "score", "startTime"],
+  "required": ["matchId", "player1", "player2", "score", "startTime", "matchType"],
   "additionalProperties": false
 } as const;
 
 export type Match = FromSchema<typeof matchSchema>;
+export type MatchHistoryEntry = Pick<Match, "startTime" | "matchType" | "winner">;
 export type MatchResultUpdate = Pick<Match, "winner" | "score">;
 export type NewMatchRequest = Omit<Match, "matchId" | "winner" | "endTime">;
 export type MatchUpdateRequest = Partial<Pick<Match, "winner" | "score" | "endTime">>;

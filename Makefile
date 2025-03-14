@@ -99,6 +99,7 @@ $(LOG_DIRS):
 
 stop: ## Kill all backend running BACKEND_PORT
 	@$(call KILL_PROCESS_ON_PORT,$(BACKEND_PORT),print)
+	@echo ""
 
 .PHONY: all test stop
 

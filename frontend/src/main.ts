@@ -1,18 +1,28 @@
+// File: frontend/src/main.ts
 
 import { API } from "./api";
-import { UserStatus } from "./api"; //tmp
+import { UserStatus, PublicUser } from "./api";
+import { setupToggleLoginRegister } from "./toggle";
+import { setupDarkMode } from "./darkMode";
+import { addGameToHistory, updateHistoryUI } from "./history";
+// import { updateUserStatsAfterMatch } from "./stats";
+import { addGameToStats, updateStatsUI } from "./stats";
 
-const api = new API("https://localhost:3000"); // adjust to your backend URL
+const api = new API("https://localhost:3000");
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Grab UI elements
-  const toggleRegister = document.getElementById("toggleRegister") as HTMLButtonElement;
-  const toggleLogin = document.getElementById("toggleLogin") as HTMLButtonElement;
-  const toggleAllUsers = document.getElementById("toggleAllUsers") as HTMLButtonElement;
-  const darkModeBtn = document.getElementById("toggleDarkMode") as HTMLButtonElement;
 
-  const registerForm = document.getElementById("registerForm") as HTMLDivElement;
-  const loginForm = document.getElementById("loginForm") as HTMLDivElement;
+  // =================================================
+  // Global Variables & Element References
+  // =================================================
+  let loggedInUserId: number | null = null;
+  let loggedInUserStatus: string | null = null;
+
+  setupDarkMode();
+  setupToggleLoginRegister();
+
+  // Authentication & User Info
+  const toggleAllUsers = document.getElementById("toggleAllUsers") as HTMLButtonElement;
 
   const registerBtn = document.getElementById("registerBtn") as HTMLButtonElement;
   const loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
@@ -38,6 +48,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const userEmailElem = document.getElementById("userEmail") as HTMLSpanElement;
   const userStatusElem = document.getElementById("userStatus") as HTMLSpanElement;
 
+  // Avatar
+  const avatarImg = document.getElementById("userAvatar") as HTMLImageElement;
+  const avatarInput = document.getElementById("avatarInput") as HTMLInputElement;
+  const uploadAvatarBtn = document.getElementById("uploadAvatarBtn") as HTMLButtonElement;
+  const removeAvatarBtn = document.getElementById("removeAvatarBtn") as HTMLButtonElement;
+
+  // Manual Match
+  const matchTypeInput = document.getElementById("matchType") as HTMLSelectElement;
+  const matchResultInput = document.getElementById("matchResult") as HTMLSelectElement;
+  const addMatchBtn = document.getElementById("addMatchBtn") as HTMLButtonElement;
+  const matchResponse = document.getElementById("matchResponse") as HTMLParagraphElement;
+
+  // Match History
+  const gameHistoryList = document.getElementById("gameHistoryList") as HTMLUListElement;
+  const loadGameHistoryBtn = document.getElementById("loadGameHistoryBtn") as HTMLButtonElement;
+
+  // Friends & Friend Search
+  const friendSearchInput = document.getElementById("friendSearchInput") as HTMLInputElement;
+  const friendSearchBtn = document.getElementById("friendSearchBtn") as HTMLButtonElement;
+  const friendSearchResults = document.getElementById("friendSearchResults") as HTMLUListElement;
+  const friendList = document.getElementById("friendList") as HTMLUListElement;
+
+  // User Updates
   const newUsername = document.getElementById("newUsername") as HTMLInputElement;
   const updateUsernameBtn = document.getElementById("updateUsernameBtn") as HTMLButtonElement;
   const newEmail = document.getElementById("newEmail") as HTMLInputElement;
@@ -46,28 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateStatusBtn = document.getElementById("updateStatusBtn") as HTMLButtonElement;
   const updateResponse = document.getElementById("updateResponse") as HTMLParagraphElement;
 
-  let loggedInUserId: number | null = null;
-  let loggedInUserStatus: string | null = null;
-
-  // Initially hide forms and user info
-  registerForm.style.display = "none";
-  loginForm.style.display = "none";
-  logoutBtn.style.display = "none";
-  deleteAccountBtn.style.display = "none";
-  userInfo.style.display = "none";
-  allUsersResponse.style.display = "none";
-
-  // Dark Mode Handling
-  function setDarkMode(enabled: boolean) {
-    document.body.classList.toggle("dark-mode", enabled);
-    localStorage.setItem("darkMode", enabled ? "enabled" : "disabled");
-    darkModeBtn.textContent = enabled ? "☀️ Light Mode" : "🌙 Dark Mode";
-  }
-  setDarkMode(localStorage.getItem("darkMode") === "enabled");
-
-  darkModeBtn.addEventListener("click", () => {
-    setDarkMode(!document.body.classList.contains("dark-mode"));
-  });
+  // =================================================
+  // Authentication & User Info Functions
+  // =================================================
 
   // Fetch & display user info
   async function fetchUserInfo(userId: number) {
@@ -77,6 +91,10 @@ document.addEventListener("DOMContentLoaded", () => {
       userNameElem.textContent = userData.username;
       userEmailElem.textContent = userData.email;
       userStatusElem.textContent = userData.status;
+
+      await updateAvatarDisplay(userData.avatar);
+      await updateStatsUI(userId);
+
     } catch (error: any) {
       console.error("Error fetching user info:", error.message);
     }
@@ -92,33 +110,165 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Auto-fetch users on page load
-  // fetchUsers();
-
   // Toggle display of all users
   toggleAllUsers.addEventListener("click", async () => {
-    if (allUsersResponse.style.display === "none") {
+    if (allUsersResponse.classList.contains("hidden")) {
       toggleAllUsers.textContent = "Loading...";
       await fetchUsers();
-      allUsersResponse.style.display = "block";
+      allUsersResponse.classList.remove("hidden");
       toggleAllUsers.textContent = "Hide All Users";
     } else {
-      allUsersResponse.style.display = "none";
+      allUsersResponse.classList.add("hidden");
       toggleAllUsers.textContent = "Show All Users";
     }
   });
 
-  // Toggle Register Form
-  toggleRegister.addEventListener("click", () => {
-    registerForm.style.display = registerForm.style.display === "none" ? "block" : "none";
-    loginForm.style.display = "none";
+  // =================================================
+  // Avatar Functions
+  // =================================================
+
+  // Helper function to update the displayed avatar
+  async function updateAvatarDisplay(avatarUrl: string | null | undefined) {
+
+    // If the avatarUrl is null or empty, revert to default
+    avatarImg.src = avatarUrl ? avatarUrl : "/avatars/default.png";
+  }
+
+  // Upload Avatar
+  uploadAvatarBtn.addEventListener("click", async () => {
+    if (!avatarInput.files || avatarInput.files.length === 0) {
+      console.error("No file selected for upload.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", avatarInput.files[0]);
+    try {
+
+      // First, upload the file
+      const uploadResponse = await api.uploadAvatar(formData);
+      console.log("Avatar uploaded:", uploadResponse.avatarUrl);
+
+      // Then, update the avatar reference in the database (if required)
+      if (loggedInUserId) {
+        const updateResponse = await api.updateAvatar(loggedInUserId, uploadResponse.avatarUrl);
+        console.log("Avatar updated:", updateResponse.avatarUrl);
+        await updateAvatarDisplay(updateResponse.avatarUrl);
+      }
+    } catch (error: any) {
+      console.error("Avatar upload failed:", error.message);
+    }
   });
 
-  // Toggle Login Form
-  toggleLogin.addEventListener("click", () => {
-    loginForm.style.display = loginForm.style.display === "none" ? "block" : "none";
-    registerForm.style.display = "none";
+  // Remove Avatar (revert to default)
+  removeAvatarBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) return;
+    try {
+      const response = await api.removeAvatar(loggedInUserId);
+      console.log("Avatar removed:", response.avatarUrl);
+      await updateAvatarDisplay(response.avatarUrl);
+    } catch (error: any) {
+      console.error("Avatar removal failed:", error.message);
+    }
   });
+
+  // =================================================
+  // Friend List & Search Functions
+  // =================================================
+
+  // Function to fetch and display the current friend list
+  async function fetchFriendList(userId: number) {
+    try {
+      const friends = await api.getFriends(userId);
+      friendList.innerHTML = "";
+      if (friends.length === 0) {
+        friendList.innerHTML = "<li>You have no friends yet.</li>";
+      } else {
+        friends.forEach(friend => {
+          const li = document.createElement("li");
+          li.textContent = `ID: ${friend.id} - ${friend.username} (${friend.status})`;
+
+          // Create a button to remove friend
+          const removeBtn = document.createElement("button");
+          removeBtn.textContent = "Remove";
+          removeBtn.classList.add("danger-btn");
+          removeBtn.addEventListener("click", async () => {
+            try {
+              const res = await api.removeFriend(userId, friend.id);
+              alert(res.message);
+              // Refresh friend list (and optionally search results)
+              await fetchFriendList(userId);
+            } catch (error: any) {
+              alert(`Error removing friend: ${error.message}`);
+            }
+          });
+          li.appendChild(removeBtn);
+          friendList.appendChild(li);
+        });
+      }
+    } catch (error: any) {
+      friendList.innerHTML = `<li>Error fetching friends: ${error.message}</li>`;
+    }
+  }
+
+  // Function to search users by username or email using the getUsers() endpoint
+  async function searchUsers(query: string): Promise<PublicUser[]> {
+    try {
+
+      // Get all users
+      const users = await api.getUsers();
+
+      // Filter out the logged-in user and any whose username or email doesn't include the query (case insensitive)
+      return users.filter(user => {
+        if (loggedInUserId && user.id === loggedInUserId) return false;
+        return (
+          user.username.toLowerCase().includes(query.toLowerCase()) ||
+          user.email.toLowerCase().includes(query.toLowerCase())
+        );
+      });
+    } catch (error: any) {
+      alert(`Error searching users: ${error.message}`);
+      return [];
+    }
+  }
+
+  // Event listener for the friend search button
+  friendSearchBtn.addEventListener("click", async () => {
+    const query = friendSearchInput.value.trim();
+    if (!query) {
+      alert("Please enter a search term.");
+      return;
+    }
+    const results = await searchUsers(query);
+    friendSearchResults.innerHTML = "";
+    if (results.length === 0) {
+      friendSearchResults.innerHTML = "<li>No matching users found.</li>";
+    } else {
+      results.forEach(user => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `ID: ${user.id} - ${user.username} (${user.email})`;
+        // Button to add friend
+        const addBtn = document.createElement("button");
+        addBtn.textContent = "Add Friend";
+        addBtn.addEventListener("click", async () => {
+          if (!loggedInUserId) return;
+          try {
+            const res = await api.addFriend(loggedInUserId, user.id);
+            alert(res.message);
+            // Refresh the friend list after adding
+            await fetchFriendList(loggedInUserId);
+          } catch (error: any) {
+            alert(`Error adding friend: ${error.message}`);
+          }
+        });
+        listItem.appendChild(addBtn);
+        friendSearchResults.appendChild(listItem);
+      });
+    }
+  });
+
+  // =================================================
+  // Authentication Event Listeners
+  // =================================================
 
   // Registration
   registerBtn.addEventListener("click", async () => {
@@ -132,7 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const user = await api.registerUser({ username, email, password });
       registerResponse.textContent = `✅ Registration successful. User ID: ${user.id}`;
-      fetchUsers();
+      await fetchUsers();
     } catch (error: any) {
       registerResponse.textContent = `❌ Registration failed: ${error.message}`;
     }
@@ -158,8 +308,9 @@ document.addEventListener("DOMContentLoaded", () => {
       logoutBtn.style.display = "block";
       deleteAccountBtn.style.display = "block";
       userInfo.style.display = "block";
-      fetchUserInfo(loggedInUserId);
-      fetchUsers();
+      await fetchUserInfo(loggedInUserId);
+      await fetchUsers();
+      await fetchFriendList(loggedInUserId);
     } catch (error: any) {
       loginResponse.textContent = `❌ Login failed: ${error.message}`;
     }
@@ -185,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
     loginIdentifier.value = "";
     loginPassword.value = "";
     loginResponse.textContent = "🔓 Logged out. You can log in again.";
-    fetchUsers();
+    await fetchUsers();
   });
 
   // Delete Account
@@ -202,11 +353,15 @@ document.addEventListener("DOMContentLoaded", () => {
       loginIdentifier.value = "";
       loginPassword.value = "";
       loginResponse.textContent = "🔓 Account deleted. You can register again.";
-      fetchUsers();
+      await fetchUsers();
     } catch (error: any) {
       deleteResponse.textContent = `❌ Deletion failed: ${error.message}`;
     }
   });
+
+  // =================================================
+  // User Update Functions
+  // =================================================
 
   // Update Username
   updateUsernameBtn.addEventListener("click", async () => {
@@ -218,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await api.updateUser(loggedInUserId, { username: newUsername.value });
       updateResponse.textContent = "✅ Username updated.";
-      fetchUserInfo(loggedInUserId);
+      await fetchUserInfo(loggedInUserId);
     } catch (error: any) {
       updateResponse.textContent = `❌ Update failed: ${error.message}`;
     }
@@ -234,13 +389,15 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await api.updateUser(loggedInUserId, { email: newEmail.value });
       updateResponse.textContent = "✅ Email updated.";
-      fetchUserInfo(loggedInUserId);
+      await fetchUserInfo(loggedInUserId);
     } catch (error: any) {
       updateResponse.textContent = `❌ Update failed: ${error.message}`;
     }
   });
 
-  // Update Status
+  // Update Password
+  // TODO
+
   // Function to assert a value as UserStatus
   const toUserStatus = (value: string): UserStatus => {
     switch (value) {
@@ -253,6 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
+  // Update Status
   updateStatusBtn.addEventListener("click", async () => {
     if (!loggedInUserId) return;
 
@@ -261,9 +419,119 @@ document.addEventListener("DOMContentLoaded", () => {
       await api.updateUser(loggedInUserId, { status: statusValue });
       // await api.updateUser(loggedInUserId, { status: newStatus.value });
       updateResponse.textContent = "✅ Status updated.";
-      fetchUserInfo(loggedInUserId);
+      await fetchUserInfo(loggedInUserId);
     } catch (error: any) {
       updateResponse.textContent = `❌ Update failed: ${error.message}`;
     }
   });
+
+  // =================================================
+  // Matches – Manual Match Functionality
+  // =================================================
+
+  // Function to manually add a match
+  async function addManualMatch() {
+    if (!loggedInUserId) return;
+
+    // Get match type and result from the dropdowns
+    const matchType = matchTypeInput.value as "1vs1" | "vs AI" | "Tournament";
+    const matchResultStr = matchResultInput.value; // e.g., ("✅ Victory" or "❌ Defeat") or ("✅ Victoire" or "❌ Défaite")
+    const player1 = loggedInUserId;
+    const player2 = 9999; // Dummy opponent
+    const score = { player1: 0, player2: 0 };
+    const startTime = new Date().toISOString();
+
+    try {
+      // Call the API to create a new match
+      const createRes = await api.createMatch({
+        player1,
+        player2,
+        score,
+        startTime,
+        tournamentId: null,
+        matchType,
+      });
+
+      // Determine winner based on the selected result
+      // const winner = matchResultStr.includes("Victory") ? player1 : player2;
+      // const winner = matchResultStr.includes("Victoire") ? player1 : player2;
+      const didWin = matchResultStr.includes("Victoire");
+      const winner = didWin ? player1 : player2;
+
+      // Update the match with the result
+      await api.submitMatchResult({
+        matchId: createRes.matchId,
+        winner,
+        score, // Optionally, update scores if needed
+      });
+
+      // Provide feedback to the user
+      matchResponse.textContent = `✅ Test match added: ${matchType} - ${matchResultStr}`;
+
+      // Refresh match history after adding a match
+      // await loadUserHistory(loggedInUserId!);
+
+      // Update match history (already calls updateHistoryUI)
+      await addGameToHistory(loggedInUserId, matchType, matchResultStr);
+
+      // Update the user stats on the backend and then update the UI
+      await addGameToStats(loggedInUserId, matchResultStr);
+      await updateStatsUI(loggedInUserId);
+
+    } catch (error: any) {
+      matchResponse.textContent = `❌ Error adding test match: ${error.message}`;
+    }
+  }
+
+  // Event listener for adding a match
+  addMatchBtn.addEventListener("click", addManualMatch);
+
+  // =================================================
+  // Match History – Toggle Display
+  // =================================================
+
+  // Function to load the match history for a given user ID
+  async function loadUserHistory(userId: number) {
+    try {
+      const history = await api.getUserMatchHistory(userId);
+      gameHistoryList.innerHTML = "";
+
+      if (history.length === 0) {
+        gameHistoryList.innerHTML = "<li>No match history found.</li>";
+        return;
+      }
+
+      history.forEach(({ date, type, result }) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${date} - ${type} : ${result}`;
+        gameHistoryList.appendChild(listItem);
+      });
+    } catch (error: any) {
+      console.error("Error loading history:", error.message);
+      gameHistoryList.innerHTML = `<li>Error loading history: ${error.message}</li>`;
+    }
+  }
+
+  loadGameHistoryBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) {
+      alert("Please log in to view your match history.");
+      return;
+    }
+
+    // Toggle the visibility of the match history section
+    if (gameHistoryList.style.display === "none" || gameHistoryList.style.display === "") {
+
+      // Fetch game history and show the list
+      // await loadUserHistory(loggedInUserId);
+      await updateHistoryUI(loggedInUserId);
+
+      gameHistoryList.style.display = "block";
+      loadGameHistoryBtn.textContent = "Hide Game History";
+    } else {
+      // Hide the game history list
+      gameHistoryList.style.display = "none";
+      loadGameHistoryBtn.textContent = "Load Game History";
+    }
+  });
+
 });
