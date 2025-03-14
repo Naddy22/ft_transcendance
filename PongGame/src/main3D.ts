@@ -142,7 +142,7 @@ function showPlayerInputs(players: number) {
 	inputsContainer.innerHTML = ""; // Réinitialiser
 
 	// Premier champ avec le pseudo de l'utilisateur connecté
-	inputsContainer.innerHTML += `<input type="text" value="${currentUser?.username}" id="player1" disabled><br>`;
+	inputsContainer.innerHTML += `<input type="text" value="${currentUser?.username}" id="player1"><br>`;
 
 	for (let i = 2; i <= players; i++) {
 		inputsContainer.innerHTML += `<input type="text" placeholder="Joueur ${i}" id="player${i}" required><br>`;
