@@ -20,21 +20,22 @@ export function addGameToHistory(
 }
 
 // Update the UI by fetching the match history from the backend:
-export async function updateHistoryUI(userId: number): Promise<void> {
+export function updateHistoryUI(userId: number): void {
 	const historyList = document.getElementById("gameHistoryList") as HTMLUListElement;
 	if (!historyList) return;
 
-	try {
-	const historyEntries: MatchHistory[] = await api.getMatchHistory(userId);
-	historyList.innerHTML = "";
-	historyEntries.forEach(({ date, type, result }) => {
+	api.getMatchHistory(userId)
+	.then((historyEntries: MatchHistory[]) => {
+		historyList.innerHTML = "";
+		historyEntries.forEach(({ date, type, result }) => {
 		const listItem = document.createElement("li");
 		listItem.textContent = `${new Date(date).toLocaleString()} - ${type} : ${result}`;
 		historyList.appendChild(listItem);
+		});
+	})
+	.catch((error) => {
+		console.error("Error updating history UI:", error.message);
 	});
-	} catch (error: any) {
-	console.error("Error updating history UI:", error.message);
-	}
 }
 
 // export let gameHistory: { date: string, type: string, result: string }[] = [];

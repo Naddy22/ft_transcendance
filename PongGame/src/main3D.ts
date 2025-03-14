@@ -252,7 +252,7 @@ if (menuDropdown) {
 		const target = event.target as HTMLElement;
 		if (target.dataset.action === "history" && historyModal) {
 			event.preventDefault();
-			updateHistoryUI(); // Mets à jour l'historique
+			updateHistoryUI(currentUser.id); // Mets à jour l'historique
 			historyModal.style.display = "flex";
 		}
 		if (target.dataset.action === "howToPlay" && howToPlayModal) {
