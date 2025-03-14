@@ -63,15 +63,22 @@ export async function toggleAsyncVisibility(
       button.textContent = "Loading...";
       await asyncAction();
     }
-    // element.classList.remove("hidden");
-    // button.textContent = hideText;
     showElement(element, button, hideText);
   } else {
     hideElement(element, button, showText);
-    // element.classList.add("hidden");
-    // button.textContent = showText;
   }
 }
+/*
+toggleAllUsers.addEventListener("click", async () => {
+    await toggleAsyncVisibility(
+      allUsersResponse,
+      toggleAllUsers,
+      "Show All Users",
+      "Hide All Users",
+      fetchUsers
+    );
+  });
+*/
 
 /**
  * Toggles the target form and hides the alternate form.
@@ -92,30 +99,3 @@ export function toggleForms(
     hideElement(alternateForm, alternateButton, alternateShowText);
   }
 }
-
-/**
- * Setup toggling between login and register forms.
- * When one form is shown, the other is automatically hidden and its button text is reset.
- */
-export function setupToggleLoginRegister() {
-  const toggleLogin = document.getElementById("toggleLogin") as HTMLButtonElement;
-  const toggleRegister = document.getElementById("toggleRegister") as HTMLButtonElement;
-  const loginForm = document.getElementById("loginForm") as HTMLDivElement;
-  const registerForm = document.getElementById("registerForm") as HTMLDivElement;
-
-  toggleLogin.addEventListener("click", () => {
-    toggleForms(
-      loginForm, toggleLogin, "Show Login", "Hide Login",
-      registerForm, toggleRegister, "Show Register"
-    );
-  });
-
-  toggleRegister.addEventListener("click", () => {
-    toggleForms(
-      registerForm, toggleRegister, "Show Register", "Hide Register",
-      loginForm, toggleLogin, "Show Login"
-    );
-  });
-}
-
-

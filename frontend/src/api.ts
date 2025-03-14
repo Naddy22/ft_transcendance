@@ -37,14 +37,23 @@ export interface UpdateUserRequest {
   status?: UserStatus;
 }
 
+export interface UserStatsUpdate {
+  wins?: number;
+  losses?: number;
+  matchesPlayed?: number;
+}
+
+export interface UserStats {
+  wins: number;
+  losses: number;
+  matchesPlayed: number;
+}
+
 export interface MatchScore {
   player1: number;
   player2: number;
 }
 
-/*
-score?: 
-*/
 export interface Match {
   matchId: number;
   player1: number;
@@ -59,7 +68,13 @@ export interface Match {
 
 export interface MatchHistory {
   date: string;
-  type: string;
+  type: "1vs1" | "vs AI" | "Tournament";
+  result: string;
+}
+
+export interface NewMatchHistoryEntry {
+  userId: number;
+  type: "1vs1" | "vs AI" | "Tournament";
   result: string;
 }
 
@@ -205,6 +220,29 @@ export class API {
     });
   }
 
+  // ── User Stats Endpoints ──────────────────────────────────────────
+
+  // async updateUserStats(userId: number, stats: UserStatsUpdate): Promise<{ message: string }> {
+  //   return this.request<{ message: string }>(`/users/${userId}/stats`, {
+  //     method: "PUT",
+  //     body: JSON.stringify(stats),
+  //   });
+  // }
+
+  // Update user stats by incrementing values
+  async updateUserStats(userId: number, stats: Partial<UserStats>): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/users/${userId}/stats`, {
+      method: "PUT",
+      body: JSON.stringify(stats),
+    });
+  }
+
+  // Retrieve user stats from the backend
+  async getUserStats(userId: number): Promise<UserStats> {
+    return this.request<UserStats>(`/users/${userId}/stats`);
+  }
+
+
   // ── Friend Endpoints ──────────────────────────────────────────────
 
   // Get friend list for a user
@@ -270,6 +308,21 @@ export class API {
   //     body: JSON.stringify(data),
   //   });
   // }
+
+  // ── Match History Endpoint ────────────────────────────────────────────
+
+  // Create a new match history entry
+  async createMatchHistoryEntry(data: NewMatchHistoryEntry): Promise<{ message: string; id: number }> {
+    return this.request<{ message: string; id: number }>("/matchHistory", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  // Get match history for a user
+  async getMatchHistory(userId: number): Promise<MatchHistory[]> {
+    return this.request<MatchHistory[]>(`/matchHistory/${userId}`);
+  }
 
   // ── Matchmaking Endpoint ──────────────────────────────────────────────
 

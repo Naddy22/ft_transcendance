@@ -2,8 +2,11 @@
 
 import { API } from "./api";
 import { UserStatus, PublicUser } from "./api";
-import { setupToggleLoginRegister, toggleElement, toggleAsyncVisibility } from "./utils";
+import { setupToggleLoginRegister } from "./toggle";
 import { setupDarkMode } from "./darkMode";
+import { addGameToHistory, updateHistoryUI } from "./history";
+// import { updateUserStatsAfterMatch } from "./stats";
+import { addGameToStats, updateStatsUI } from "./stats";
 
 const api = new API("https://localhost:3000");
 
@@ -16,16 +19,10 @@ document.addEventListener("DOMContentLoaded", () => {
   let loggedInUserStatus: string | null = null;
 
   setupDarkMode();
-
+  setupToggleLoginRegister();
 
   // Authentication & User Info
-  // const toggleRegister = document.getElementById("toggleRegister") as HTMLButtonElement;
-  // const toggleLogin = document.getElementById("toggleLogin") as HTMLButtonElement;
   const toggleAllUsers = document.getElementById("toggleAllUsers") as HTMLButtonElement;
-  // const darkModeBtn = document.getElementById("toggleDarkMode") as HTMLButtonElement;
-
-  // const registerForm = document.getElementById("registerForm") as HTMLDivElement;
-  // const loginForm = document.getElementById("loginForm") as HTMLDivElement;
 
   const registerBtn = document.getElementById("registerBtn") as HTMLButtonElement;
   const loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
@@ -41,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginPassword = document.getElementById("loginPassword") as HTMLInputElement;
   const loginResponse = document.getElementById("loginResponse") as HTMLParagraphElement;
 
-  // const allUsersResponse = document.getElementById("allUsersResponse") as HTMLPreElement;
+  const allUsersResponse = document.getElementById("allUsersResponse") as HTMLPreElement;
   const logoutResponse = document.getElementById("logoutResponse") as HTMLParagraphElement;
   const deleteResponse = document.getElementById("deleteResponse") as HTMLParagraphElement;
 
@@ -96,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
       userStatusElem.textContent = userData.status;
 
       await updateAvatarDisplay(userData.avatar);
+      await updateStatsUI(userId);
 
     } catch (error: any) {
       console.error("Error fetching user info:", error.message);
@@ -111,6 +109,19 @@ document.addEventListener("DOMContentLoaded", () => {
       allUsersResponse.textContent = `❌ Error: ${error.message}`;
     }
   }
+
+  // Toggle display of all users
+  toggleAllUsers.addEventListener("click", async () => {
+    if (allUsersResponse.classList.contains("hidden")) {
+      toggleAllUsers.textContent = "Loading...";
+      await fetchUsers();
+      allUsersResponse.classList.remove("hidden");
+      toggleAllUsers.textContent = "Hide All Users";
+    } else {
+      allUsersResponse.classList.add("hidden");
+      toggleAllUsers.textContent = "Show All Users";
+    }
+  });
 
   // =================================================
   // Avatar Functions
@@ -258,33 +269,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // =================================================
   // Authentication Event Listeners
   // =================================================
-
-  // Toggle display of all users
-  // toggleAllUsers.addEventListener("click", async () => {
-  //   if (allUsersResponse.classList.contains("hidden")) {
-  //     toggleAllUsers.textContent = "Loading...";
-  //     await fetchUsers();
-  //     allUsersResponse.classList.remove("hidden");
-  //     toggleAllUsers.textContent = "Hide All Users";
-  //   } else {
-  //     allUsersResponse.classList.add("hidden");
-  //     toggleAllUsers.textContent = "Show All Users";
-  //   }
-  // });
-  toggleAllUsers.addEventListener("click", async () => {
-    const allUsersResponse = document.getElementById("allUsersResponse") as HTMLPreElement;
-
-    await toggleAsyncVisibility(
-      allUsersResponse,
-      toggleAllUsers,
-      "Show All Users",
-      "Hide All Users",
-      fetchUsers // This is your async function that fetches users.
-    );
-  });
-
-  // Initialize the login/register toggle functionality
-  setupToggleLoginRegister();
 
   // Registration
   registerBtn.addEventListener("click", async () => {
@@ -470,7 +454,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Determine winner based on the selected result
       // const winner = matchResultStr.includes("Victory") ? player1 : player2;
-      const winner = matchResultStr.includes("Victoire") ? player1 : player2;
+      // const winner = matchResultStr.includes("Victoire") ? player1 : player2;
+      const didWin = matchResultStr.includes("Victoire");
+      const winner = didWin ? player1 : player2;
 
       // Update the match with the result
       await api.submitMatchResult({
@@ -483,7 +469,14 @@ document.addEventListener("DOMContentLoaded", () => {
       matchResponse.textContent = `✅ Test match added: ${matchType} - ${matchResultStr}`;
 
       // Refresh match history after adding a match
-      await loadUserHistory(loggedInUserId!);
+      // await loadUserHistory(loggedInUserId!);
+
+      // Update match history (already calls updateHistoryUI)
+      await addGameToHistory(loggedInUserId, matchType, matchResultStr);
+
+      // Update the user stats on the backend and then update the UI
+      await addGameToStats(loggedInUserId, matchResultStr);
+      await updateStatsUI(loggedInUserId);
 
     } catch (error: any) {
       matchResponse.textContent = `❌ Error adding test match: ${error.message}`;
@@ -527,8 +520,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Toggle the visibility of the match history section
     if (gameHistoryList.style.display === "none" || gameHistoryList.style.display === "") {
+
       // Fetch game history and show the list
-      await loadUserHistory(loggedInUserId);
+      // await loadUserHistory(loggedInUserId);
+      await updateHistoryUI(loggedInUserId);
+
       gameHistoryList.style.display = "block";
       loadGameHistoryBtn.textContent = "Hide Game History";
     } else {

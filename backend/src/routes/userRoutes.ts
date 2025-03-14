@@ -166,24 +166,3 @@ export async function userRoutes(fastify: FastifyInstance) {
   });
 
 }
-
-  // /**
-  //  * Get a specific user's match stats
-  //  */
-  // fastify.get<{ Params: { id: string } }>("/:id/stats", async (req, reply) => {
-  //   try {
-  //     const { id } = req.params;
-  //     const stmt = await fastify.db.prepare("SELECT wins, losses, matchesPlayed FROM users WHERE id = ?");
-  //     stmt.bind(id);
-  //     const stats = await stmt.get();
-
-  //     if (!stats) return reply.status(404).send({ error: "User not found" });
-
-  //     reply.send(stats);
-  //   } catch (error) {
-  //     console.error("❌ Error fetching user stats:", error);
-  //     reply.status(500).send({ error: "Internal Server Error" });
-  //   }
-  // });
-
-// }
