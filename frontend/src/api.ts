@@ -212,6 +212,17 @@ export class API {
     });
   }
 
+  async updatePassword(
+    userId: number,
+    oldPassword: string,
+    newPassword: string
+  ): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/users/${userId}/password`, {
+      method: "PUT",
+      body: JSON.stringify({ oldPassword, newPassword }),
+    });
+  }
+
   async deleteUser(id: number): Promise<{ message: string }> {
     return this.request<{ message: string }>(`/users/${id}`, {
       method: "DELETE",
@@ -221,13 +232,6 @@ export class API {
   }
 
   // ── User Stats Endpoints ──────────────────────────────────────────
-
-  // async updateUserStats(userId: number, stats: UserStatsUpdate): Promise<{ message: string }> {
-  //   return this.request<{ message: string }>(`/users/${userId}/stats`, {
-  //     method: "PUT",
-  //     body: JSON.stringify(stats),
-  //   });
-  // }
 
   // Update user stats by incrementing values
   async updateUserStats(userId: number, stats: Partial<UserStats>): Promise<{ message: string }> {
@@ -241,7 +245,6 @@ export class API {
   async getUserStats(userId: number): Promise<UserStats> {
     return this.request<UserStats>(`/users/${userId}/stats`);
   }
-
 
   // ── Friend Endpoints ──────────────────────────────────────────────
 

@@ -5,6 +5,7 @@ import { FastifyInstance } from 'fastify';
 import { authRoutes } from './authRoutes.js';
 import { userRoutes } from './userRoutes.js';
 import { userStatsRoutes } from './userStatsRoutes.js';
+import { changePasswordRoutes } from './changePasswordRoutes.js';
 import { friendRoutes } from './friendRoutes.js';
 import { matchRoutes } from './matchRoutes.js';
 import { matchHistoryRoutes } from './matchHistoryRoutes.js';
@@ -16,6 +17,7 @@ export function setupRoutes(fastify: FastifyInstance) {
   fastify.register(authRoutes, { prefix: '/auth' });
   fastify.register(userRoutes, { prefix: '/users' });
   fastify.register(userStatsRoutes, { prefix: '/users' });
+  fastify.register(changePasswordRoutes, { prefix: '/users' });
   fastify.register(friendRoutes, { prefix: '/users' });
   fastify.register(matchRoutes, { prefix: '/matches' });
   fastify.register(matchHistoryRoutes, { prefix: '/matchHistory' });

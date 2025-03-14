@@ -396,7 +396,33 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Update Password
-  // TODO
+  const oldPasswordInput = document.getElementById("oldPassword") as HTMLInputElement;
+  const newPasswordInput = document.getElementById("newPassword") as HTMLInputElement;
+  const updatePasswordBtn = document.getElementById("updatePasswordBtn") as HTMLButtonElement;
+  const passwordUpdateResponse = document.getElementById("passwordUpdateResponse") as HTMLParagraphElement;
+
+  updatePasswordBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) return;
+
+    const oldPass = oldPasswordInput.value.trim();
+    const newPass = newPasswordInput.value.trim();
+
+    if (!oldPass || !newPass) {
+      passwordUpdateResponse.textContent = "❌ Please fill both fields.";
+      return;
+    }
+
+    try {
+      const response = await api.updatePassword(loggedInUserId, oldPass, newPass);
+      passwordUpdateResponse.textContent = "✅ Password updated successfully.";
+      oldPasswordInput.value = "";
+      newPasswordInput.value = "";
+    } catch (error: any) {
+      passwordUpdateResponse.textContent = `❌ Update failed: ${error.message}`;
+    }
+  });
+
+
 
   // Function to assert a value as UserStatus
   const toUserStatus = (value: string): UserStatus => {

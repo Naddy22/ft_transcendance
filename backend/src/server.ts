@@ -30,6 +30,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 //  **! maybe make this a decoration on instance ?
+/*
+// Assume your project root is one level up from your current directory:
+const projectRoot = path.resolve(__dirname, '..');
+fastify.decorate('projectRoot', projectRoot);
+
+// In backend/src/routes/avatarRoutes.ts
+export async function avatarRoutes(fastify: FastifyInstance) {
+  const AVATAR_DIR = path.join(fastify.projectRoot, "uploads", "avatars");
+  // ... rest of the code
+}
+*/
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Ensure cert directory exists before initializing the certificates

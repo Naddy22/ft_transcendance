@@ -52,6 +52,7 @@
       Status: <span id="userStatus"></span>
     </p>
 
+    <!-- Avatar Section -->
     <div id="avatarSection" class="form-group">
       <h3>Avatar</h3>
       <!-- Display current avatar -->
@@ -116,14 +117,18 @@
     </div>
 
     <!-- Update Section -->
+
+    <!-- Update Username -->
     <div class="form-group">
       <input type="text" id="newUsername" placeholder="New Username" />
       <button id="updateUsernameBtn">Update Username</button>
     </div>
+    <!-- Update Email -->
     <div class="form-group">
       <input type="email" id="newEmail" placeholder="New Email" />
       <button id="updateEmailBtn">Update Email</button>
     </div>
+    <!-- Update Status (to remove?) -->
     <div class="form-group">
       <select id="newStatus">
         <option value="online">Online</option>
@@ -132,6 +137,13 @@
       </select>
       <button id="updateStatusBtn">Update Status</button>
     </div>
+    <!-- Update Password Section -->
+    <div class="form-group">
+      <input type="password" id="oldPassword" placeholder="Current Password" />
+      <input type="password" id="newPassword" placeholder="New Password" />
+      <button id="updatePasswordBtn">Update Password</button>
+    </div>
+    <p id="passwordUpdateResponse"></p>
     <p id="updateResponse"></p>
 
     <button id="logoutBtn" style="display: none;">Logout</button>

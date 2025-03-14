@@ -17,8 +17,7 @@ export async function userStatsRoutes(fastify: FastifyInstance) {
 
       reply.send(stats);
     } catch (error) {
-      console.error("❌ Error fetching user stats:", error);
-      reply.status(500).send({ error: "Internal Server Error" });
+      return sendError(reply, 500, "❌ Error fetching user stats", error);
     }
   });
 
