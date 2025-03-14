@@ -1,10 +1,5 @@
 // File: backend/src/routes/avatarRoutes.ts
 
-/* TOCHECK:
-- image deletion ?
-- path for default, what happens if not found
-*/
-
 import { FastifyInstance } from "fastify";
 import path from "path";
 import fs from "fs";
@@ -28,6 +23,12 @@ export async function avatarRoutes(fastify: FastifyInstance) {
 
   // Set the default avatar URL (make sure the default file exists in AVATAR_DIR)
   const DEFAULT_AVATAR_URL = "/avatars/default.png";
+
+  // const defaultAvatarPath = path.join(AVATAR_DIR, "default.png");
+  // if (!fs.existsSync(defaultAvatarPath)) {
+  //   fastify.log.warn(`Default avatar file not found at ${defaultAvatarPath}`);
+  //   // Optionally: might create a simple placeholder image or copy from a known good location.
+  // }
 
   // Serve the avatar directory statically
   await fastify.register(fastifyStatic, {
@@ -79,8 +80,25 @@ export async function avatarRoutes(fastify: FastifyInstance) {
       if (!userId || !avatarUrl) {
         return reply.status(400).send({ error: "Missing userId or avatarUrl" });
       }
-      const stmt = await fastify.db.prepare("UPDATE users SET avatar = ? WHERE id = ?");
-      await stmt.run(avatarUrl, userId);
+
+      // Fetch the current avatar from the database
+      const currentStmt = await fastify.db.prepare("SELECT avatar FROM users WHERE id = ?");
+      const currentUser = await currentStmt.get(userId);
+
+      // If the current avatar exists and is not the default, delete the file
+      if (currentUser && currentUser.avatar && currentUser.avatar !== DEFAULT_AVATAR_URL) {
+        const oldFilePath = path.join(AVATAR_DIR, path.basename(currentUser.avatar));
+        try {
+          await fs.promises.unlink(oldFilePath);
+          fastify.log.info(`Old avatar file deleted: ${oldFilePath}`);
+        } catch (unlinkError) {
+          fastify.log.error("Error deleting old avatar file", unlinkError);
+        }
+      }
+
+      // Update the user record to use the new avatar URL
+      const updateStmt = await fastify.db.prepare("UPDATE users SET avatar = ? WHERE id = ?");
+      await updateStmt.run(avatarUrl, userId);
       reply.send({ message: "Avatar updated successfully", avatarUrl });
     } catch (error) {
       return sendError(reply, 500, "Internal Server Error during avatar update", error);
