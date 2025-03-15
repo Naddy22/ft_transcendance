@@ -17,7 +17,7 @@ export interface LogoutRequest {
   id: number;
 }
 
-export type UserStatus = "online" | "offline" | "in-game";
+export type UserStatus = "online" | "offline" | "in-game" | "anonymized";
 
 export interface PublicUser {
   id: number;
@@ -137,7 +137,7 @@ export class API {
   private baseUrl: string;
 
   constructor(baseUrl: string = "") {
-    // The baseUrl should be set to the backend URL (e.g., "https://localhost:3000")
+    // Set to the backend URL (e.g., "https://localhost:3000")
     this.baseUrl = baseUrl;
   }
 
@@ -197,10 +197,31 @@ export class API {
 
   async getUsers(): Promise<PublicUser[]> {
     return this.request<PublicUser[]>("/users");
+    // const users = await this.request<PublicUser[]>("/users");
+
+    // return users.map(user => ({
+    //   ...user,
+    //   avatar: user.avatar
+    //     ? (user.avatar === "default_cat.webp"
+    //       ? `/avatars/default/${user.avatar}`
+    //       : `/avatars/uploads/${user.avatar}`)
+    //     : `/avatars/default/default_cat.webp`
+    // }));
   }
 
   async getUser(id: number): Promise<PublicUser> {
     return this.request<PublicUser>(`/users/${id}`);
+    // const user = await this.request<PublicUser>(`/users/${id}`);
+
+    // if (user.avatar) {
+    //   user.avatar = user.avatar === "default_cat.webp"
+    //     ? `/avatars/default/${user.avatar}`
+    //     : `/avatars/uploads/${user.avatar}`;
+    // } else {
+    //   user.avatar = `/avatars/default/default_cat.webp`;
+    // }
+
+    // return user;
   }
 
   async updateUser(
@@ -367,7 +388,7 @@ export class API {
 
   // Upload avatar (expects a FormData object, so do not set Content-Type manually)
   async uploadAvatar(formData: FormData): Promise<{ message: string; avatarUrl: string }> {
-    const response = await fetch(`${this.baseUrl}/avatar`, {
+    const response = await fetch(`${this.baseUrl}/avatars`, {
       method: "POST",
       body: formData, // Browser sets the Content-Type automatically
     });
@@ -381,7 +402,7 @@ export class API {
 
   // Update avatar reference in the database
   async updateAvatar(userId: number, avatarUrl: string): Promise<{ message: string; avatarUrl: string }> {
-    return this.request<{ message: string; avatarUrl: string }>(`/avatar`, {
+    return this.request<{ message: string; avatarUrl: string }>(`/avatars`, {
       method: "PUT",
       body: JSON.stringify({ userId, avatarUrl }),
     });
@@ -389,7 +410,7 @@ export class API {
 
   // Remove avatar (revert to default)
   async removeAvatar(userId: number): Promise<{ message: string; avatarUrl: string }> {
-    return this.request<{ message: string; avatarUrl: string }>(`/avatar`, {
+    return this.request<{ message: string; avatarUrl: string }>(`/avatars`, {
       method: "DELETE",
       body: JSON.stringify({ userId }),
     });

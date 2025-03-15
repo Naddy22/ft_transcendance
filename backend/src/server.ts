@@ -102,6 +102,7 @@ const loggerOptions = process.env.NODE_ENV !== 'production'
 const isHttps = process.env.USE_HTTPS === "true";
 
 const fastify = Fastify({
+  // logger: true,
   logger: loggerOptions,
   disableRequestLogging: true,
   ignoreTrailingSlash: true,
@@ -115,8 +116,7 @@ const fastify = Fastify({
 });
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Register plugins
-
+// Register Request Logger plugin
 await fastify.register(fastifyRequestLogger, {
   // logBody: false,
   logResponseTime: false,
@@ -124,7 +124,7 @@ await fastify.register(fastifyRequestLogger, {
 });
 
 // ────────────────────────────────────────────────────────────────────────────────
-// 
+// Register helmet plugin (prevent XSS)
 await fastify.register(helmet, {
   // noSniff: true,
   contentSecurityPolicy: {
@@ -132,7 +132,7 @@ await fastify.register(helmet, {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      // styleSrcElem: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Optionally, we can set styleSrcElem explicitly as well
+      // styleSrcElem: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       imgSrc: ["'self'", "data:", "blob:"], // allow blob: URLs for images
       connectSrc: ["'self'"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
@@ -153,7 +153,7 @@ await fastify.register(helmet, {
 // });
 
 // ────────────────────────────────────────────────────────────────────────────────
-// 
+// Register database plugin
 await fastify.register(fpSqlitePlugin, {
   dbFilename: dbPath
 });
@@ -163,20 +163,21 @@ await fastify.register(fpSqlitePlugin, {
 await fastify.register(fastifyMultipart);
 
 // ────────────────────────────────────────────────────────────────────────────────
-// 
+// Frontend 'dist/' folder path constant
 const FRONTEND_DIST = process.env.FRONTEND_DIST || "../../frontend/dist";
-// const frontendPath = path.resolve(__dirname, FRONTEND_DIST);
+
+const frontendPath = path.resolve(__dirname, FRONTEND_DIST);
 // console.log("Serving frontend from:", frontendPath); // Debugging output
 
-// if (!fs.existsSync(frontendPath)) {
-//   console.error("⚠️ Frontend dist folder does not exist:", frontendPath);
-//   process.exit(1);
-// }
+if (!fs.existsSync(frontendPath)) {
+  console.error("⚠️ Frontend dist folder does not exist:", frontendPath);
+  process.exit(1);
+}
 
-// Serve static frontend files
+// Serve static frontend files (from 'frontend/dist') under '/'
 await fastify.register(fastifyStatic, {
-  // root: frontendPath,
-  root: path.resolve(__dirname, FRONTEND_DIST),
+  root: frontendPath,
+  // root: path.resolve(__dirname, FRONTEND_DIST),
   prefix: '/',
   index: ['index.html'],
 });
@@ -186,32 +187,12 @@ await fastify.register(fastifyStatic, {
 await fastify.register(fastifyRoutes);
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Register JSON Schemas
-// const schemas = [userSchema, matchSchema, tournamentSchema];
-// schemas.forEach(schema => fastify.addSchema(schema));
-
-// ────────────────────────────────────────────────────────────────────────────────
 // Register routes
 setupRoutes(fastify);
 
 // Health check endpoint
 // fastify.get('/health', (req, reply) => reply.send({ message: 'Backend is running!' }));
 fastify.get('/health', (req, reply) => reply.send({ status: 'ok' }));
-
-// ────────────────────────────────────────────────────────────────────────────────
-// // Ensure proper shutdown of SQLite on Fastify close
-// fastify.addHook("onClose", async (instance) => {
-//   if (instance.db) {
-//     try {
-//       console.log("🗄️ Closing SQLite database...");
-//       await instance.db.exec("PRAGMA wal_checkpoint(FULL);"); // Ensure writes are finished
-//       await instance.db.close();
-//       console.log("✅ SQLite database closed.");
-//     } catch (error) {
-//       console.error("❌ Error closing SQLite database:", error);
-//     }
-//   }
-// });
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register `fastify-graceful-exit` AFTER `onClose` hook

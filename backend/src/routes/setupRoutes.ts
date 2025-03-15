@@ -25,7 +25,7 @@ export function setupRoutes(fastify: FastifyInstance) {
   fastify.register(matchHistoryRoutes, { prefix: '/matchHistory' });
   fastify.register(tournamentRoutes, { prefix: '/tournaments' });
   fastify.register(matchmakingRoutes, { prefix: '/matchmaking' });
-  fastify.register(avatarRoutes, { prefix: '/' }); // Endpoints will be at /avatar, /avatar (PUT), /avatar (DELETE)
+  fastify.register(avatarRoutes, { prefix: '/' }); // Endpoints will be at /avatars, /avatars (PUT), /avatars (DELETE)
   fastify.register(anonymizationRoutes, { prefix: '/users' });
   fastify.register(exportRoutes, { prefix: '/users' });
 }

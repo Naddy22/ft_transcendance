@@ -25,8 +25,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       if (!email) return reply.status(400).send({ error: "Email is required" });
       if (!password) return reply.status(400).send({ error: "Password is required" });
 
-      if (password.length < 8)
-      {
+      if (password.length < 8) {
         return reply.status(400).send({ error: "Password must be at least 8 characters long." });
       }
 
@@ -102,7 +101,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) return reply.status(401).send({ error: "Invalid password" });
 
-      // Set user status to "online"
+      // Set avatar to default and user status to "online"
       const updateStmt = await fastify.db.prepare("UPDATE users SET status = ? WHERE id = ?");
       await updateStmt.run("online", user.id);
 

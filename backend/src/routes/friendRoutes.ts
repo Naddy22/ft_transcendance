@@ -19,12 +19,12 @@ export async function friendRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { id: string } }>("/:id/friends", async (req, reply) => {
     try {
       const { id } = req.params;
-      
+
       // Query friends table for friend IDs
       const stmt = await fastify.db.prepare("SELECT friendId FROM friends WHERE userId = ?");
       const rows = await stmt.all(id);
       const friendIds = rows.map((row: any) => row.friendId);
-      
+
       if (friendIds.length === 0) return reply.send([]);
 
       // Fetch user details for these friend IDs
@@ -39,8 +39,11 @@ export async function friendRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // POST /users/:id/friends: add a friend
-  // Expects body: { friendId: number }
+  /**
+   * POST /users/:id/friends: add a friend
+   * Expects body: { friendId: number }
+   * Makes sure that if a user’s status is "anonymized", they cannot be added as a friend.
+   */
   fastify.post<{ Params: { id: string }, Body: { friendId: number } }>("/:id/friends", async (req, reply) => {
     try {
       const { id } = req.params;
@@ -48,6 +51,13 @@ export async function friendRoutes(fastify: FastifyInstance) {
       if (!friendId) return reply.status(400).send({ error: "Missing friendId" });
       if (parseInt(id) === friendId) {
         return reply.status(400).send({ error: "Cannot add yourself as a friend" });
+      }
+
+      // Check if the friend to be added is anonymized.
+      const friendStmt = await fastify.db.prepare("SELECT status FROM users WHERE id = ?");
+      const friend = await friendStmt.get(friendId);
+      if (friend && friend.status === "anonymized") {
+        return reply.status(400).send({ error: "Cannot add an anonymized user as a friend" });
       }
 
       // Check if friendship already exists

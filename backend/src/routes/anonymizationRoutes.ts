@@ -6,21 +6,19 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 
-
 // Resolve __dirname and paths correctly in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export async function anonymizationRoutes(fastify: FastifyInstance) {
 
-  // Define the uploads folder and default avatar URL (should be consistent with avatarRoutes)
-  // const AVATAR_DIR = path.join(
-  //   // Adjust relative path as needed
-  //   path.dirname(require('url').fileURLToPath(import.meta.url)),
-  //   "../../uploads/avatars"
-  // );
-  const AVATAR_DIR = path.join(__dirname, "../../uploads/avatars");
-  const DEFAULT_AVATAR_URL = "/avatars/default.png";
+  // Directories
+  const DEFAULT_AVATAR_DIR = path.join(__dirname, "../../img/avatars");
+  const AVATAR_UPLOAD_DIR = path.join(__dirname, "../../uploads/avatars");
+
+  // Define URL constants
+  const DEFAULT_AVATAR_URL = "/avatars/default/default_cat.webp";
+  const ANONYMOUS_AVATAR_URL = "/avatars/default/anonymous_cat.webp";
 
   // GDPR Anonymization Endpoint
   fastify.put<{ Params: { id: string } }>(
@@ -36,9 +34,9 @@ export async function anonymizationRoutes(fastify: FastifyInstance) {
           return reply.status(404).send({ error: "User not found" });
         }
 
-        // If the user has a custom avatar, delete it
+        // If the user has a custom avatar (not the default), delete it from uploads
         if (user.avatar && user.avatar !== DEFAULT_AVATAR_URL) {
-          const filePath = path.join(AVATAR_DIR, path.basename(user.avatar));
+          const filePath = path.join(AVATAR_UPLOAD_DIR, path.basename(user.avatar));
           try {
             await fs.promises.unlink(filePath);
             fastify.log.info(`Deleted avatar file: ${filePath}`);
@@ -47,29 +45,26 @@ export async function anonymizationRoutes(fastify: FastifyInstance) {
           }
         }
 
-        // // Build anonymized data. Using the user ID to ensure uniqueness.
-        // const anonymizedUsername = `anonymous_${id}`;
-        // const anonymizedEmail = `anonymous_${id}@example.com`; // ensures uniqueness
-        // const anonymizedAvatar = null;
-
-        // // Update the user record with anonymized values
-        // const updateStmt = await fastify.db.prepare(
-        //   "UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?"
-        // );
-        // await updateStmt.run(anonymizedUsername, anonymizedEmail, anonymizedAvatar, id);
-
         // Build anonymized data. Using the user ID to ensure uniqueness.
         const anonymizedData = {
           username: `anonymous_${id}`,
           email: `anonymous_${id}@example.com`,
-          avatar: null,
+          // avatar: null,
+          avatar: ANONYMOUS_AVATAR_URL,
+          status: "anonymized"
         };
 
         // Update the user record with anonymized values
         const updateStmt = await fastify.db.prepare(
-          `UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?`
+          `UPDATE users SET username = ?, email = ?, avatar = ?, status = ? WHERE id = ?`
         );
-        await updateStmt.run(anonymizedData.username, anonymizedData.email, anonymizedData.avatar, id);
+        await updateStmt.run(
+          anonymizedData.username,
+          anonymizedData.email,
+          anonymizedData.avatar,
+          anonymizedData.status,
+          id
+        );
 
         // Optionally, cascade changes or remove related PII from associated tables.
         // Delete friend relationships?
@@ -105,7 +100,5 @@ Documentation and User Communication:
 
 Clearly document these features in your privacy policy and in the UI,
 so users understand what happens when they request anonymization or deletion.
-
-
 
 */
