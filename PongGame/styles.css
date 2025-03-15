@@ -379,6 +379,43 @@ button.danger {
 	transition: opacity 0.5s ease-in-out;
 }
 
+/* 🔹 Conteneur flex pour aligner l'input et le bouton */
+.friend-search-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 15px; /* 📏 Espacement entre l'input et le bouton */
+	width: max-content; /* ✅ S'ajuste à la taille du contenu */
+	margin: 0 auto 10px; /* ✅ Centrage horizontal */
+}
+
+/* 🔹 Conteneur des résultats de recherche */
+#friendSearchResults {
+	list-style: none;
+	padding: 0;
+	/* margin-top: 10px; */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+/* 🔹 Chaque résultat d'ami */
+#friendSearchResults li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between; /* ✅ Place le pseudo à gauche et le bouton à droite */
+	width: 250px; /* 📏 Ajuste la largeur */
+	/* padding: 8px 12px; */
+	border-radius: 8px;
+	margin-bottom: 5px;
+}
+
+/* 🔹 Ajustement du texte (pseudo) */
+#friendSearchResults li span {
+	flex: 1; /* ✅ Prend toute la place à gauche */
+	text-align: left;
+}
+
 .history-container {
 	max-height: 300px; /* Hauteur max avant d'afficher le scroll */
 	overflow-y: auto;  /* Active le scroll si nécessaire */

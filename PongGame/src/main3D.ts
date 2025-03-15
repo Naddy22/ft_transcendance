@@ -4,7 +4,7 @@ import { Tournament } from './tournament3D';
 import { addGameToHistory, updateHistoryUI } from "./history";
 import { addGameToStats, updateStatsUI } from "./stats";
 import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
-import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, removeFriend, deleteUserAccount } from "./profile";
+import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, searchUsers, addFriend, removeFriend, deleteUserAccount } from "./profile";
 
 
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -27,6 +27,7 @@ const avatarInput = document.getElementById("avatarInput")! as HTMLInputElement;
 const uploadAvatarBtn = document.getElementById("uploadAvatarBtn") as HTMLButtonElement;
 const deleteAccountBtn = document.getElementById("deleteAccountBtn") as HTMLButtonElement;
 const friendList = document.getElementById("friendList") as HTMLUListElement;
+const friendSearchBtn = document.getElementById("friendSearchBtn") as HTMLButtonElement;
 
 const historyModal = document.getElementById("historyModal") as HTMLElement;
 const statsModal = document.getElementById("statsModal") as HTMLElement;
@@ -261,7 +262,6 @@ homeButton.addEventListener("click", () => {
 
 // 📌 Charger le profil utilisateur + amis
 function loadUserProfile() {
-
 	getCompleteProfile(currentUser!.id)
 		.then(({ profile, friends }) => {
 			console.log("✅ Profil chargé :", profile);
@@ -270,6 +270,10 @@ function loadUserProfile() {
 			(document.getElementById("newUsername")! as HTMLInputElement).value = profile.username;
 			(document.getElementById("newEmail")! as HTMLInputElement).value = profile.email;
 			(document.getElementById("userAvatar")! as HTMLImageElement).src = profile.avatar;
+			(document.getElementById("oldPassword")! as HTMLInputElement).value = "";
+			(document.getElementById("newPassword")! as HTMLInputElement).value = "";
+			(document.getElementById("friendSearchInput")! as HTMLInputElement).value = "";
+
 			updateFriendsUI(friends);
 		})
 		.catch(error => {
@@ -348,6 +352,60 @@ function updateFriendsUI(friends: { id: number; username: string }[]) {
 		li.appendChild(removeBtn);
 		friendList.appendChild(li);
 	});
+}
+
+friendSearchBtn.addEventListener("click", () => {
+	const query = (document.getElementById("friendSearchInput")! as HTMLInputElement).value.trim();
+	const friendSearchResults = document.getElementById("friendSearchResults")!;
+
+	if (!query) {
+		alert("❌ Veuillez entrer un nom ou un email pour la recherche.");
+		return;
+	}
+
+	searchUsers(query)
+		.then(results => {
+			friendSearchResults.innerHTML = ""; // Vide la liste précédente
+
+			if (results.length === 0) {
+				friendSearchResults.innerHTML = "<li>Aucun utilisateur trouvé.</li>";
+				return;
+			}
+
+			results.forEach(user => {
+				const listItem = document.createElement("li");
+			
+				// 🔹 Crée un élément pour le texte (pseudo + email)
+				const userText = document.createElement("span");
+				userText.textContent = `${user.username} (${user.email})`;
+			
+				// 🔹 Crée le bouton "Ajouter"
+				const addBtn = document.createElement("button");
+				addBtn.textContent = "Ajouter";
+				addBtn.addEventListener("click", () => addFriendUI(user.id));
+			
+				// 🔹 Ajoute le texte et le bouton dans la ligne
+				listItem.appendChild(userText);
+				listItem.appendChild(addBtn);
+			
+				friendSearchResults.appendChild(listItem);
+			});
+			
+		})
+		.catch(error => {
+			friendSearchResults.innerHTML = `<li>❌ Erreur : ${error.message}</li>`;
+		});
+});
+
+
+
+function addFriendUI(friendId: number) {
+	addFriend(currentUser!.id, friendId)
+		.then(message => {
+			alert(message);
+			loadUserProfile(); // Recharge la liste d'amis après ajout
+		})
+		.catch(error => alert(`❌ Erreur : ${error.message}`));
 }
 
 // 📌 Supprimer un ami

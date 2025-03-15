@@ -60,6 +60,29 @@ export function getFriends(userId: number) {
 		});
 }
 
+export function searchUsers(query: string) {
+	return api.getUsers()
+		.then(users => {
+			return users.filter(user => 
+				user.username.toLowerCase().includes(query.toLowerCase()) ||
+				user.email.toLowerCase().includes(query.toLowerCase())
+			);
+		})
+		.catch(error => {
+			console.error("❌ Erreur recherche amis :", error.message);
+			throw error;
+		});
+}
+
+export function addFriend(userId: number, friendId: number) {
+	return api.addFriend(userId, friendId)
+		.then(() => "✅ Ami ajouté avec succès !")
+		.catch(error => {
+			console.error("❌ Erreur ajout ami :", error.message);
+			throw error;
+		});
+}
+
 export function removeFriend(userId: number, friendId: number) {
 	return api.removeFriend(userId, friendId)
 		.then(() => "✅ Ami supprimé avec succès !")
