@@ -10,68 +10,73 @@
 </head>
 <body>
 	<div class="top-buttons">
-		<button id="authButton" class="auth-button">Connexion / Inscription</button>
+		<select id="languageSelect">
+			<option value="fr">🇫🇷 Français</option>
+			<option value="en">🇬🇧 English</option>
+			<option value="es">🇪🇸 Spanish</option>
+		</select>
+		<button id="authButton" class="auth-button" data-i18n="authButton"></button>
 		<button id="menuButton" class="menu-button" style="display: none;">☰</button>
 	</div>
 	<div id="authPage" style="display: none; text-align: center; margin-top: 15px;">
 		<div class="auth-content">
-			<h1>Connexion / Inscription</h1>
+			<h1 data-i18n="loginTitle"></h1>
 			<form id="loginForm">
-				<input type="text" id="loginIdentifier" placeholder="Email ou Nom d'utilisateur" required>
-				<input type="password" id="loginPassword" placeholder="Mot de passe" required>
+				<input type="text" id="loginIdentifier" data-i18n-placeholder="loginPlaceholder" required>
+				<input type="password" id="loginPassword" data-i18n-placeholder="passwordPlaceholder" required>
 				<p id="loginMessage" class="auth-message"></p>
-				<button type="submit">Se connecter</button>
+				<button type="submit" data-i18n="login"></button>
 			</form>
 			<form id="registerForm">
-				<input type="text" id="regUsername" placeholder="Nom d'utilisateur" required>
-				<input type="email" id="regEmail" placeholder="Email" required>
-				<input type="password" id="regPassword" placeholder="Mot de passe" required>
+				<input type="text" id="regUsername" data-i18n-placeholder="registerUsername" required>
+				<input type="email" id="regEmail" data-i18n-placeholder="registerEmail" required>
+				<input type="password" id="regPassword" data-i18n-placeholder="registerPassword" required>
 				<p id="registerMessage" class="auth-message"></p>
-				<button type="submit">S'inscrire</button>
+				<button type="submit" data-i18n="register"></button>
 			</form>
 		</div>
 	</div>
 	<div id="menuDropdown" class="menu-dropdown">
-		<a href="#" data-action="profile">Profil</a>
-		<a href="#" data-action="history">Historiques</a>
-		<a href="#" data-action="statistics">Statistiques</a>
-		<a href="#" data-action="howToPlay">Comment jouer ?</a>
-		<a href="#" data-action="privacyData">Confidentialité & Données</a>
-		<a href="#" id="logoutButton" style="display: none;">Déconnexion</a>
+		<a href="#" data-action="profile" data-i18n="menuProfile"></a>
+		<a href="#" data-action="history" data-i18n="menuHistory"></a>
+		<a href="#" data-action="statistics" data-i18n="menuStats"></a>
+		<a href="#" data-action="howToPlay" data-i18n="menuHowToPlay"></a>
+		<a href="#" data-action="privacyData" data-i18n="menuPrivacy"></a>
+		<a href="#" id="logoutButton" style="display: none;" data-i18n="logout"></a>
 	</div>
 	<!-- 📌 fenetre modale du Profil caché-->
 	<div id="profileModal" class="modal">
 		<div class="modal-content profile-modal">
 			<span class="close">&times;</span>
-			<h1 class="text-outline">👤 Mon Profil</h1>
+			<h1 class="text-outline" data-i18n="profileTitle"></h1>
 			<div class="profile-avatar">
 				<img id="userAvatar" src="/avatars/default.png" alt="Avatar">
 				<input type="file" id="avatarInput">
-				<button id="uploadAvatarBtn">📤 Changer l'avatar</button>
+				<button id="uploadAvatarBtn" data-i18n="changeAvatar"></button>
 			</div>
 			<form id="profileForm">
 				<div class="form-group">
-					<label for="newUsername">✏️ Pseudo :</label>
+					<label for="newUsername" data-i18n="labelUsername"></label>
 					<input type="text" id="newUsername">
 				</div>
 				<div class="form-group">
-					<label for="newEmail">📧 Email :</label>
+					<label for="newEmail" data-i18n="labelEmail"></label>
 					<input type="email" id="newEmail">
 				</div>
 				<div class="form-group">
-					<label for="newPassword">🔒 Nouveau mot de passe :</label>
-					<input type="password" id="oldPassword" placeholder="Ancien mot de passe">
-					<input type="password" id="newPassword" placeholder="Nouveau mot de passe">
+					<label for="newPassword" data-i18n="labelNewPassword"></label>
+					<input type="password" id="oldPassword" data-i18n-placeholder="oldPasswordPlaceholder">
+					<input type="password" id="newPassword" data-i18n-placeholder="newPasswordPlaceholder">
 				</div>
-				<h3>👥 Amis :</h3>
+				<h3 data-i18n="friendsTitle"></h3>
 				<ul id="friendList"></ul>
-				<h3>Ajouter un ami :</h3>
+				<h3 data-i18n="addFriend"></h3>
 				<div class="friend-search-container">
-					<input type="text" id="friendSearchInput" placeholder="Pseudo ou email">
-					<button id="friendSearchBtn">🔍 Rechercher</button>
+					<input type="text" id="friendSearchInput" data-i18n-placeholder="friendSearchPlaceholder">
+					<button id="friendSearchBtn" data-i18n="searchFriend"></button>
 				</div>
 				<ul id="friendSearchResults"></ul>
-				<button type="submit" id="saveChangesBtn">✅ Sauvegarder les changements</button>
+				<button type="submit" id="saveChangesBtn" data-i18n="saveChanges"></button>
 				<p id="profileMessage" class="profile-message"></p>
 			</form>
 		</div>
@@ -80,7 +85,7 @@
 	<div id="historyModal" class="modal">
 		<div class="modal-content">
 			<span class="close">&times;</span>
-			<h1 class="text-outline">📜 Historique des parties</h1>
+			<h1 class="text-outline" data-i18n="historyTitle"></h1>
 			<div class="history-container">
 				<ul id="gameHistoryList"></ul>
 			</div>
@@ -90,13 +95,13 @@
 	<div id="statsModal" class="modal">
 		<div class="modal-content">
 			<span class="close">&times;</span>
-			<h1 class="text-outline">📊 Statistiques du joueur</h1>
+			<h1 class="text-outline" data-i18n="statsTitle"></h1>
 			<div class="stats-container">
 				<div class="stats-text">
-					<p>🕹️ Total de parties : <span id="totalGames">0</span></p>
-					<p>🏆 Victoires : <span id="wins">0</span></p>
-					<p>❌ Défaites : <span id="losses">0</span></p>
-					<p>🔥 Taux de victoire : <span id="winRate">0.00</span></p>
+					<p><span data-i18n="totalGames"></span> <span id="totalGames">0</span></p>
+					<p><span data-i18n="wins"></span> <span id="wins">0</span></p>
+					<p><span data-i18n="losses"></span> <span id="losses">0</span></p>
+					<p><span data-i18n="winRate"></span> <span id="winRate">0.00%</span></p>
 				</div>
 				<div class="stats-chart-container">
 					<canvas id="statsChart"></canvas> <!-- Graphique avec chart.js -->
@@ -108,45 +113,34 @@
 	<div id="howToPlayModal" class="modal">
 		<div class="modal-content">
 			<span class="close">&times;</span>
-			<h1 class="text-outline">🎮 Comment jouer ?</h1>
-			<p>Joueur de gauche :    W (haut) / S (bas)</p>
-			<p>Joueur de droite :    ↑ (haut) / ↓ (bas)</p>
-			<p>Mode IA :  L'ordinateur joue automatiquement le joueur de droite</p>
+			<h1 class="text-outline" data-i18n="howToPlayTitle"></h1>
+			<p data-i18n="playerLeftControls"></p>
+			<p data-i18n="playerRightControls"></p>
+			<p data-i18n="aiMode"></p>
 		</div>
 	</div>
 	<!-- 📌 MODALE "PRIVACY & DATA" -->
 	<div id="privacyModal" class="modal">
 		<div class="modal-content privacy-modal">
 			<span class="close">&times;</span>
-			<h1 class="text-outline">🔐 Confidentialité & Données</h1>
-			<p>
-				Conformément au Règlement Général sur la Protection des Données (RGPD), vous avez plusieurs droits concernant vos données personnelles. 
-				Vous pouvez télécharger une copie de vos données, anonymiser votre compte ou supprimer définitivement votre compte et toutes vos informations associées.
-			</p>
-			<h3>📥 Télécharger mes données</h3>
-			<p>
-				Vous pouvez récupérer toutes les informations liées à votre compte en téléchargeant un fichier contenant vos données personnelles.
-			</p>
-			<h3>🕵️‍♂️ Anonymisation du compte</h3>
-			<p>
-				Si vous souhaitez conserver votre compte mais supprimer vos informations personnelles, vous pouvez choisir d'anonymiser votre compte.
-				Cette action remplacera vos données personnelles par des valeurs anonymes (par exemple, votre nom sera remplacé par "Utilisateur Anonyme").
-			</p>
-			<h3>❌ Suppression du compte</h3>
-			<p>
-				La suppression du compte est une action irréversible. Toutes vos données personnelles, y compris votre historique et vos préférences, 
-				seront supprimées définitivement de notre système.
-			</p>
+			<h1 class="text-outline" data-i18n="privacyTitle"></h1>
+			<p data-i18n="privacyDescription"></p>
+			<h3 data-i18n="exportData"></h3>
+			<p data-i18n="exportDataDesc"></p>
+			<h3 data-i18n="anonymization"></h3>
+			<p data-i18n="anonymizationDesc"></p>
+			<h3 data-i18n="deleteAccountTitle"></h3>
+			<p data-i18n="deleteAccountDescription"></p>
 			<!-- 📥 Télécharger ses données -->
-			<button id="exportDataBtn">📥 Télécharger mes données</button>
+			<button id="exportDataBtn" data-i18n="exportDataBtn"></button>
 			<p id="exportMessage" style="display: none;"></p>
 
 			<!-- 🕵️‍♂️ Anonymiser son compte -->
-			<button id="anonymizeBtn">🕵️‍♂️ Anonymiser mon compte</button>
+			<button id="anonymizeBtn" data-i18n="anonymizeBtn"></button>
 			<p id="anonymizeMessage" style="display: none;"></p>
 
 			<!-- ❌ Supprimer le compte -->
-			<button id="deleteAccountBtn" class="danger">⚠️ Supprimer mon compte</button>
+			<button id="deleteAccountBtn" class="danger" data-i18n="deleteAccountBtn"></button>
 			<p id="deleteMessage" style="display: none;"></p>
 		</div>
 	</div>
@@ -159,22 +153,21 @@
 	<!-- Menu -->
 	<div id="menu">
 		<h1>Cat Pong Game</h1>
-		<!-- <button id="startButton">Démarrer le jeu</button> -->
-		<button id="startButton" style="display: none;">1 vs 1</button>
-		<button id="playVsAI" style="display: none;">1 vs IA</button>
-		<button id="tournament" style="display: none;">Tournoi</button>
+		<button id="playVsGuest" style="display: none;" data-i18n="game1v1"></button>
+		<button id="playVsAI" style="display: none;" data-i18n="gameVsAI"></button>
+		<button id="tournament" style="display: none;" data-i18n="gameTournament"></button>
 	</div>
 	<!--tournament Options -->
 	<div id="tournamentOptions" style="display: none; text-align: center; margin-top: 15px;">
-		<h1>Choisissez le nombre de joueurs :</h1>
-		<button id="tournament4" class="tournament-btn">4 joueurs</button>
-		<button id="tournament8" class="tournament-btn">8 joueurs</button>
+		<h1 data-i18n="tournamentChoice"></h1>
+		<button id="tournament4" class="tournament-btn" data-i18n="tournament4"></button>
+		<button id="tournament8" class="tournament-btn" data-i18n="tournament8"></button>
 	</div>
 	<div id="playerInputs" style="display: none; text-align: center; margin-top: 15px;">
-		<h1>Entrez les pseudos des joueurs :</h1>
+		<h1 data-i18n="enterPlayerNames"></h1>
 		<form id="playersForm">
 			<div id="inputsContainer"></div>
-			<button type="submit">Lancer le tournoi</button>
+			<button type="submit" data-i18n="startTournament"></button>
 		</form>
 	</div>
 	<!-- Jeu -->
@@ -186,14 +179,14 @@
 		<canvas id="gameCanvas" width="900" height="600"></canvas>
 		<!-- <canvas id="gameCanvas" width="600" height="400"></canvas> -->
 	</div>
-	<script type="module" src="./src/main3D.ts"></script>
 	<div id="endScreen">
 		<h1 id="winnerMessage"></h1>
 		<p id="currentMatchInfo"></p>
 		<p id="nextMatchInfo"></p>
-		<button id="replayButton">Rejouer</button>
-		<button id="returnMenu">Retour au menu</button>
-		<button id="nextMatchButton" style="display: none;">Match suivant</button>
+		<button id="replayButton" data-i18n="replayButton"></button>
+		<button id="returnMenu" data-i18n="returnMenu"></button>
+		<button id="nextMatchButton" style="display: none;" data-i18n="nextMatchButton"></button>
 	</div>
+	<script type="module" src="./src/main3D.ts"></script>
 </body>
 </html>

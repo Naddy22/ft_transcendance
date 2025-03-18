@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ft_transcendance</title>
+	<link rel="stylesheet" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Klee+One&display=swap" rel="stylesheet">
+</head>
+<body>
+	<div class="top-buttons">
+		<button id="authButton" class="auth-button">Connexion / Inscription</button>
+		<button id="menuButton" class="menu-button" style="display: none;">☰</button>
+	</div>
+	<select id="languageSelect">
+		<option value="fr">🇫🇷 Français</option>
+		<option value="en">🇬🇧 English</option>
+		<option value="en">🇪🇸 Spanish</option>
+	</select>
+	<div id="authPage" style="display: none; text-align: center; margin-top: 15px;">
+		<div class="auth-content">
+			<h1>Connexion / Inscription</h1>
+			<form id="loginForm">
+				<input type="text" id="loginIdentifier" placeholder="Email ou Nom d'utilisateur" required>
+				<input type="password" id="loginPassword" placeholder="Mot de passe" required>
+				<p id="loginMessage" class="auth-message"></p>
+				<button type="submit">Se connecter</button>
+			</form>
+			<form id="registerForm">
+				<input type="text" id="regUsername" placeholder="Nom d'utilisateur" required>
+				<input type="email" id="regEmail" placeholder="Email" required>
+				<input type="password" id="regPassword" placeholder="Mot de passe" required>
+				<p id="registerMessage" class="auth-message"></p>
+				<button type="submit">S'inscrire</button>
+			</form>
+		</div>
+	</div>
+	<div id="menuDropdown" class="menu-dropdown">
+		<a href="#" data-action="profile">Profil</a>
+		<a href="#" data-action="history">Historiques</a>
+		<a href="#" data-action="statistics">Statistiques</a>
+		<a href="#" data-action="howToPlay">Comment jouer ?</a>
+		<a href="#" data-action="privacyData">Confidentialité & Données</a>
+		<a href="#" id="logoutButton" style="display: none;">Déconnexion</a>
+	</div>
+	<!-- 📌 fenetre modale du Profil caché-->
+	<div id="profileModal" class="modal">
+		<div class="modal-content profile-modal">
+			<span class="close">&times;</span>
+			<h1 class="text-outline">👤 Mon Profil</h1>
+			<div class="profile-avatar">
+				<img id="userAvatar" src="/avatars/default.png" alt="Avatar">
+				<input type="file" id="avatarInput">
+				<button id="uploadAvatarBtn">📤 Changer l'avatar</button>
+			</div>
+			<form id="profileForm">
+				<div class="form-group">
+					<label for="newUsername">✏️ Pseudo :</label>
+					<input type="text" id="newUsername">
+				</div>
+				<div class="form-group">
+					<label for="newEmail">📧 Email :</label>
+					<input type="email" id="newEmail">
+				</div>
+				<div class="form-group">
+					<label for="newPassword">🔒 Nouveau mot de passe :</label>
+					<input type="password" id="oldPassword" placeholder="Ancien mot de passe">
+					<input type="password" id="newPassword" placeholder="Nouveau mot de passe">
+				</div>
+				<h3>👥 Amis :</h3>
+				<ul id="friendList"></ul>
+				<h3>Ajouter un ami :</h3>
+				<div class="friend-search-container">
+					<input type="text" id="friendSearchInput" placeholder="Pseudo ou email">
+					<button id="friendSearchBtn">🔍 Rechercher</button>
+				</div>
+				<ul id="friendSearchResults"></ul>
+				<button type="submit" id="saveChangesBtn">✅ Sauvegarder les changements</button>
+				<p id="profileMessage" class="profile-message"></p>
+			</form>
+		</div>
+	</div>
+	<!-- Fenêtre modale historique cachée -->
+	<div id="historyModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h1 class="text-outline">📜 Historique des parties</h1>
+			<div class="history-container">
+				<ul id="gameHistoryList"></ul>
+			</div>
+		</div>
+	</div>
+	<!-- Fenêtre modale statistiques cachée -->
+	<div id="statsModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h1 class="text-outline">📊 Statistiques du joueur</h1>
+			<div class="stats-container">
+				<div class="stats-text">
+					<p>🕹️ Total de parties : <span id="totalGames">0</span></p>
+					<p>🏆 Victoires : <span id="wins">0</span></p>
+					<p>❌ Défaites : <span id="losses">0</span></p>
+					<p>🔥 Taux de victoire : <span id="winRate">0.00</span></p>
+				</div>
+				<div class="stats-chart-container">
+					<canvas id="statsChart"></canvas> <!-- Graphique avec chart.js -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Fenêtre modale Comment jouer? cachée -->
+	<div id="howToPlayModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h1 class="text-outline">🎮 Comment jouer ?</h1>
+			<p>Joueur de gauche :    W (haut) / S (bas)</p>
+			<p>Joueur de droite :    ↑ (haut) / ↓ (bas)</p>
+			<p>Mode IA :  L'ordinateur joue automatiquement le joueur de droite</p>
+		</div>
+	</div>
+	<!-- 📌 MODALE "PRIVACY & DATA" -->
+	<div id="privacyModal" class="modal">
+		<div class="modal-content privacy-modal">
+			<span class="close">&times;</span>
+			<h1 class="text-outline">🔐 Confidentialité & Données</h1>
+			<p>
+				Conformément au Règlement Général sur la Protection des Données (RGPD), vous avez plusieurs droits concernant vos données personnelles. 
+				Vous pouvez télécharger une copie de vos données, anonymiser votre compte ou supprimer définitivement votre compte et toutes vos informations associées.
+			</p>
+			<h3>📥 Télécharger mes données</h3>
+			<p>
+				Vous pouvez récupérer toutes les informations liées à votre compte en téléchargeant un fichier contenant vos données personnelles.
+			</p>
+			<h3>🕵️‍♂️ Anonymisation du compte</h3>
+			<p>
+				Si vous souhaitez conserver votre compte mais supprimer vos informations personnelles, vous pouvez choisir d'anonymiser votre compte.
+				Cette action remplacera vos données personnelles par des valeurs anonymes (par exemple, votre nom sera remplacé par "Utilisateur Anonyme").
+			</p>
+			<h3>❌ Suppression du compte</h3>
+			<p>
+				La suppression du compte est une action irréversible. Toutes vos données personnelles, y compris votre historique et vos préférences, 
+				seront supprimées définitivement de notre système.
+			</p>
+			<!-- 📥 Télécharger ses données -->
+			<button id="exportDataBtn">📥 Télécharger mes données</button>
+			<p id="exportMessage" style="display: none;"></p>
+
+			<!-- 🕵️‍♂️ Anonymiser son compte -->
+			<button id="anonymizeBtn">🕵️‍♂️ Anonymiser mon compte</button>
+			<p id="anonymizeMessage" style="display: none;"></p>
+
+			<!-- ❌ Supprimer le compte -->
+			<button id="deleteAccountBtn" class="danger">⚠️ Supprimer mon compte</button>
+			<p id="deleteMessage" style="display: none;"></p>
+		</div>
+	</div>
+	<!-- Home button -->
+	<button id="homeButton" class="home-button" style="visibility: hidden;">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#333" width="32px" height="32px">
+			<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+		</svg>
+	</button>
+	<!-- Menu -->
+	<div id="menu">
+		<h1>Cat Pong Game</h1>
+		<button id="playVsGuest" style="display: none;">1 vs 1</button>
+		<button id="playVsAI" style="display: none;">1 vs IA</button>
+		<button id="tournament" style="display: none;">Tournoi</button>
+	</div>
+	<!--tournament Options -->
+	<div id="tournamentOptions" style="display: none; text-align: center; margin-top: 15px;">
+		<h1>Choisissez le nombre de joueurs :</h1>
+		<button id="tournament4" class="tournament-btn">4 joueurs</button>
+		<button id="tournament8" class="tournament-btn">8 joueurs</button>
+	</div>
+	<div id="playerInputs" style="display: none; text-align: center; margin-top: 15px;">
+		<h1>Entrez les pseudos des joueurs :</h1>
+		<form id="playersForm">
+			<div id="inputsContainer"></div>
+			<button type="submit">Lancer le tournoi</button>
+		</form>
+	</div>
+	<!-- Jeu -->
+	<div id="game">
+		<!-- Noms des joueurs -->
+		<div id="playerNames">
+			<span id="leftPlayerName"></span><span id="rightPlayerName"></span>
+		</div>
+		<canvas id="gameCanvas" width="900" height="600"></canvas>
+		<!-- <canvas id="gameCanvas" width="600" height="400"></canvas> -->
+	</div>
+	<script type="module" src="./src/main3D.ts"></script>
+	<div id="endScreen">
+		<h1 id="winnerMessage"></h1>
+		<p id="currentMatchInfo"></p>
+		<p id="nextMatchInfo"></p>
+		<button id="replayButton">Rejouer</button>
+		<button id="returnMenu">Retour au menu</button>
+		<button id="nextMatchButton" style="display: none;">Match suivant</button>
+	</div>
+</body>
+</html>

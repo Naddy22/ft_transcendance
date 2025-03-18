@@ -39,6 +39,24 @@ body::before {
 	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+#languageSelect {
+	background-color: #f9d3d9; /* 🌸 Rose pastel */
+	border: none; /* ❌ Supprime la bordure par défaut */
+	border-radius: 20px; /* 🎀 Bords arrondis */
+	font-family: "Mochiy Pop P One", sans-serif;
+	font-size: 14px;
+	color: #333;
+	padding: 8px 15px;
+	cursor: pointer;
+	transition: all 0.3s ease-in-out;
+	outline: none; /* ❌ Supprime le contour bleu/noir au focus */
+	position: relative;
+	appearance: none; /* 🔹 Supprime l'apparence native */
+	-webkit-appearance: none;
+	-moz-appearance: none;
+
+}
+
 /* Jeu */
 #game {
 	display: none; /* Caché au début */
@@ -479,7 +497,7 @@ button.danger {
 .stats-text span {
 	font-weight: bold;
 	font-size: 20px;
-	color: #ff4b4b; /* Rouge pastel */
+	color: #333; /* Rouge pastel */
 }
 
 /* S’assurer que les <p> restent des blocs */

@@ -1,3 +1,4 @@
+import { loadLanguage, applyTranslations } from "./language";
 import { startPongGame3D as startPongGame } from './game3D';
 import { stopPongGame3D as stopPongGame } from './game3D';
 import { Tournament } from './tournament3D';
@@ -6,7 +7,7 @@ import { addGameToStats, updateStatsUI } from "./stats";
 import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
 import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, searchUsers, addFriend, removeFriend, deleteUserAccount, exportUserData, anonymizeUser} from "./profile";
 
-
+const languageSelect = document.getElementById("languageSelect") as HTMLSelectElement;
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
 const menu = document.getElementById('menu') as HTMLElement;
 const menuButton = document.getElementById("menuButton") as HTMLButtonElement;
@@ -39,7 +40,7 @@ const deleteAccountBtn = document.getElementById("deleteAccountBtn") as HTMLButt
 
 const closeButton = document.querySelectorAll(".close");
 
-const startButton = document.getElementById('startButton') as HTMLButtonElement;
+const playVsGuest = document.getElementById('playVsGuest') as HTMLButtonElement;
 const game = document.getElementById('game') as HTMLElement;
 const endScreen = document.getElementById('endScreen') as HTMLElement;
 
@@ -71,6 +72,19 @@ let playerNumber: number = 0;
 // Définir l'état initial pour le menu
 history.replaceState({ page: 'menu' }, 'Menu', '#menu');
 
+// 📌 Charge la langue sauvegardée au démarrage
+document.addEventListener("DOMContentLoaded", () => {
+	const savedLanguage = localStorage.getItem("language") || "fr";
+	languageSelect.value = savedLanguage;
+	loadLanguage(savedLanguage).then(translations => applyTranslations(translations));
+});
+
+// 📌 Met à jour les traductions quand la langue change
+languageSelect.addEventListener("change", () => {
+	const selectedLanguage = languageSelect.value;
+	loadLanguage(selectedLanguage).then(translations => applyTranslations(translations));
+});
+
 // 🔹 Vérifie si l'utilisateur est connecté au chargement de la page
 function updateAuthButton() {
 	console.log("update auth");
@@ -86,7 +100,7 @@ function updateAuthButton() {
 			menuButton.style.display = "block";
 			menuButton.style.paddingTop = "10px"; // Ajuste si le texte est trop bas
 			homeButton.style.visibility = "visible";
-			startButton.style.display = "block";
+			playVsGuest.style.display = "block";
 			playVsAIButton.style.display = "block";
 			tournamentButton.style.display = "block";
 		} else {
@@ -96,7 +110,7 @@ function updateAuthButton() {
 
 			menuButton.style.display = "none";
 			homeButton.style.visibility = "hidden";
-			startButton.style.display = "none";
+			playVsGuest.style.display = "none";
 			playVsAIButton.style.display = "none";
 			tournamentButton.style.display = "none";
 		}
@@ -120,10 +134,10 @@ registerForm.addEventListener("submit", async (event) => {
 
 	try {
 		const message = await registerUser(username, email, password);
-		registerMessage.style.color = "green"; // ✅ Change la couleur en vert
+		registerMessage.style.color = "green";
 		registerMessage.textContent =  message;
 	} catch (error: any) {
-		registerMessage.style.color = "red"; // ❌ Change la couleur en rouge
+		registerMessage.style.color = "red";
 		registerMessage.textContent = error.message; // Affiche l'erreur sous le formulaire
 	}
 });
@@ -553,8 +567,8 @@ if (closeButton) {
 }
 
 // Vérification que l'élément startButton existe avant d'ajouter l'écouteur
-if (startButton) {
-	startButton.addEventListener('click', function() {
+if (playVsGuest) {
+	playVsGuest.addEventListener('click', function() {
 		playerNames = [currentUser!.username, "Joueur 2"];
 		lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
 		showGame();
@@ -562,21 +576,6 @@ if (startButton) {
 		// Manipulation de l'historique (ajouter un état pour le jeu)
 		history.pushState({ page: 'game', isVsAI: false, isTournament: false, playerNames: [...playerNames] }, 'Jeu', '#game');
 
-		// if (playerNames.length === 4 || playerNames.length === 8) {
-		// 	console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
-		// 	isTournamentMode = true;
-		// 	currentTournament = new Tournament(playerNames);
-		// 	currentTournament.start((winner) => {
-		// 		console.log("Match terminé, gagnant :", winner);
-		// 		if (currentTournament && currentTournament.isTournamentOver()) {
-		// 			console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
-		// 			showEndScreen(winner, true, true);
-		// 		} else {
-		// 			showEndScreen(winner, true);
-		// 		}
-		// 	});
-
-		// } else if (playerNames.length === 2) {
 		if (playerNames.length === 2) {
 			console.log("Match simple entre", playerNames[0], "et", playerNames[1]);
 			isTournamentMode = false;
@@ -685,30 +684,6 @@ playersForm.addEventListener("submit", (event) => {
 	}
 	
 });
-
-// if (tournamentButton) {
-// 	tournamentButton.addEventListener('click', function() {
-// 		showGame();
-
-// 		// Manipulation de l'historique (ajouter un état pour le jeu)
-// 		history.pushState({ page: 'game' }, 'Jeu', '#game');
-
-// 		if (playerNames.length === 4 || playerNames.length === 8) {
-// 			console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
-// 			isTournamentMode = true;
-// 			currentTournament = new Tournament(playerNames);
-// 			currentTournament.start((winner) => {
-// 				console.log("Match terminé, gagnant :", winner);
-// 				if (currentTournament && currentTournament.isTournamentOver()) {
-// 					console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
-// 					showEndScreen(winner, true, true);
-// 				} else {
-// 					showEndScreen(winner, true);
-// 				}
-// 			});
-// 		}
-// 	});
-// }
 
 // Bouton "Rejouer"
 replayButton.addEventListener('click', () => {
