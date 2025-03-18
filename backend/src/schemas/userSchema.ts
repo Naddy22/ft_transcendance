@@ -41,7 +41,7 @@ export const userSchema = {
     },
     "status": {
       "type": "string",
-      "enum": ["online", "offline", "in-game"],
+      "enum": ["online", "offline", "in-game", "anonymized"],
       "description": "User's online status"
     },
     "wins": {

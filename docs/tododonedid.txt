@@ -113,6 +113,7 @@ Ce qu'on doit vérifier ensemble:
 - ou placer les assets (communs dans root/assets/ ou separés)
 - (ou placer avatar par defaut)
 - changer creation de clefs ssh dans .env ?
+- auto login quand on register ?
 
 ---
 

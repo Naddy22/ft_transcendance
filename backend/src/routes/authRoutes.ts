@@ -15,16 +15,6 @@ const SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || "12", 10);
 
 export async function authRoutes(fastify: FastifyInstance) {
 
-  // // Helper function to send errors (optionally, only detailed in development)
-  // function sendError(reply: any, statusCode: number, errorMsg: string, error?: any) {
-  //   fastify.log.error(error || errorMsg);
-  //   // Optionally, expose more info in development:
-  //   const response = process.env.NODE_ENV === 'development'
-  //     ? { error: errorMsg, details: error?.message }
-  //     : { error: errorMsg };
-  //   return reply.status(statusCode).send(response);
-  // }
-
   // User registration route
   fastify.post<{ Body: RegisterRequest }>("/register", async (req, reply) => {
     try {
@@ -34,6 +24,10 @@ export async function authRoutes(fastify: FastifyInstance) {
       if (!username) return reply.status(400).send({ error: "Username is required" });
       if (!email) return reply.status(400).send({ error: "Email is required" });
       if (!password) return reply.status(400).send({ error: "Password is required" });
+
+      if (password.length < 8) {
+        return reply.status(400).send({ error: "Password must be at least 8 characters long." });
+      }
 
       // 🛡 Sanitize user input to prevent XSS
       const sanitizedUsername = sanitizeHtml(username, { allowedTags: [], allowedAttributes: {} });
@@ -107,7 +101,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) return reply.status(401).send({ error: "Invalid password" });
 
-      // Set user status to "online"
+      // Set avatar to default and user status to "online"
       const updateStmt = await fastify.db.prepare("UPDATE users SET status = ? WHERE id = ?");
       await updateStmt.run("online", user.id);
 

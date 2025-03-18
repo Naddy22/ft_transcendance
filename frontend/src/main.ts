@@ -1,12 +1,11 @@
 // File: frontend/src/main.ts
 
-import { API } from "./api";
-import { UserStatus, PublicUser } from "./api";
+import { API, UserStatus, PublicUser } from "./api";
 import { setupToggleLoginRegister } from "./toggle";
 import { setupDarkMode } from "./darkMode";
 import { addGameToHistory, updateHistoryUI } from "./history";
-// import { updateUserStatsAfterMatch } from "./stats";
 import { addGameToStats, updateStatsUI } from "./stats";
+import { clearFields } from "./utils";
 
 const api = new API("https://localhost:3000");
 
@@ -79,6 +78,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const updateStatusBtn = document.getElementById("updateStatusBtn") as HTMLButtonElement;
   const updateResponse = document.getElementById("updateResponse") as HTMLParagraphElement;
 
+  // Helper functions
+  async function clearAllInputFields() {
+    clearFields(
+      regUsername, regEmail, regPassword, loginIdentifier, loginPassword, avatarInput, friendSearchInput, newUsername, newEmail, oldPasswordInput, newPasswordInput);
+  };
+
   // =================================================
   // Authentication & User Info Functions
   // =================================================
@@ -131,7 +136,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function updateAvatarDisplay(avatarUrl: string | null | undefined) {
 
     // If the avatarUrl is null or empty, revert to default
-    avatarImg.src = avatarUrl ? avatarUrl : "/avatars/default.png";
+    avatarImg.src = avatarUrl ? avatarUrl : "/avatars/default/default_cat.webp";
   }
 
   // Upload Avatar
@@ -175,7 +180,76 @@ document.addEventListener("DOMContentLoaded", () => {
   // Friend List & Search Functions
   // =================================================
 
-  // Function to fetch and display the current friend list
+  /**
+ * Creates a friend list item (<li>) for a given user.
+ * @param user - The PublicUser object.
+ * @param buttonFactory - Optional callback that receives the user object and returns an HTMLElement (e.g., a button).
+ * @returns An <li> element representing the friend.
+ */
+  function createFriendListItem(
+    user: PublicUser,
+    buttonFactory?: (user: PublicUser) => HTMLElement
+  ): HTMLLIElement {
+    const li = document.createElement("li");
+    li.classList.add("friend-item"); // CSS will style layout
+
+    // Create avatar image element.
+    const avatarIcon = document.createElement("img");
+    avatarIcon.classList.add("friend-avatar");
+    // Use the user's avatar if available, otherwise fallback.
+    avatarIcon.src = user.avatar ? user.avatar : "/avatars/default/default_cat.webp";
+    avatarIcon.alt = `${user.username}'s avatar`;
+
+    // Create a span element with user details.
+    const details = document.createElement("span");
+    details.textContent = `ID: ${user.id} - ${user.username} (${user.status})`;
+
+    li.appendChild(avatarIcon);
+    li.appendChild(details);
+
+    // If a button factory is provided, call it and append the returned element.
+    if (buttonFactory) {
+      const btn = buttonFactory(user);
+      li.appendChild(btn);
+    }
+    return li;
+  }
+
+  function createAddFriendButton(user: PublicUser): HTMLButtonElement {
+    const btn = document.createElement("button");
+    btn.textContent = "Add Friend";
+    btn.addEventListener("click", async () => {
+      if (!loggedInUserId) return;
+      try {
+        const res = await api.addFriend(loggedInUserId, user.id);
+        alert(res.message);
+        // Optionally refresh friend list after adding friend.
+        await fetchFriendList(loggedInUserId);
+      } catch (error: any) {
+        alert(`Error adding friend: ${error.message}`);
+      }
+    });
+    return btn;
+  }
+
+  function createRemoveFriendButton(user: PublicUser): HTMLButtonElement {
+    const btn = document.createElement("button");
+    btn.textContent = "Remove";
+    btn.classList.add("danger-btn");
+    btn.addEventListener("click", async () => {
+      if (!loggedInUserId) return;
+      try {
+        const res = await api.removeFriend(loggedInUserId, user.id);
+        alert(res.message);
+        // Refresh friend list after removal.
+        await fetchFriendList(loggedInUserId);
+      } catch (error: any) {
+        alert(`Error removing friend: ${error.message}`);
+      }
+    });
+    return btn;
+  }
+
   async function fetchFriendList(userId: number) {
     try {
       const friends = await api.getFriends(userId);
@@ -184,31 +258,62 @@ document.addEventListener("DOMContentLoaded", () => {
         friendList.innerHTML = "<li>You have no friends yet.</li>";
       } else {
         friends.forEach(friend => {
-          const li = document.createElement("li");
-          li.textContent = `ID: ${friend.id} - ${friend.username} (${friend.status})`;
-
-          // Create a button to remove friend
-          const removeBtn = document.createElement("button");
-          removeBtn.textContent = "Remove";
-          removeBtn.classList.add("danger-btn");
-          removeBtn.addEventListener("click", async () => {
-            try {
-              const res = await api.removeFriend(userId, friend.id);
-              alert(res.message);
-              // Refresh friend list (and optionally search results)
-              await fetchFriendList(userId);
-            } catch (error: any) {
-              alert(`Error removing friend: ${error.message}`);
-            }
-          });
-          li.appendChild(removeBtn);
-          friendList.appendChild(li);
+          // Pass the remove friend button factory.
+          friendList.appendChild(createFriendListItem(friend, createRemoveFriendButton));
         });
       }
     } catch (error: any) {
       friendList.innerHTML = `<li>Error fetching friends: ${error.message}</li>`;
     }
   }
+
+  // async function fetchFriendList(userId: number) {
+  //   try {
+  //     const friends = await api.getFriends(userId);
+  //     friendList.innerHTML = "";
+  //     if (friends.length === 0) {
+  //       friendList.innerHTML = "<li>You have no friends yet.</li>";
+  //     } else {
+  //       friends.forEach(friend => {
+  //         const li = document.createElement("li");
+  //         li.classList.add("friend-item"); // apply the layout styles
+
+  //         // Create an image element for the avatar icon
+  //         const avatarIcon = document.createElement("img");
+  //         avatarIcon.classList.add("friend-avatar"); // apply the styling class
+  //         avatarIcon.src = friend.avatar ? friend.avatar : "/default-avatars/default_cat.webp";
+  //         avatarIcon.alt = `${friend.username}'s avatar`;
+
+  //         // Create a span for the friend's text details
+  //         const details = document.createElement("span");
+  //         details.textContent = `ID: ${friend.id} - ${friend.username} (${friend.status})`;
+
+  //         li.appendChild(avatarIcon);
+  //         li.appendChild(details);
+
+  //         // Create a button to remove friend
+  //         const removeBtn = document.createElement("button");
+  //         removeBtn.textContent = "Remove";
+  //         removeBtn.classList.add("danger-btn");
+  //         removeBtn.addEventListener("click", async () => {
+  //           try {
+  //             const res = await api.removeFriend(userId, friend.id);
+  //             alert(res.message);
+
+  //             // Refresh friend list (and optionally search results)
+  //             await fetchFriendList(userId);
+  //           } catch (error: any) {
+  //             alert(`Error removing friend: ${error.message}`);
+  //           }
+  //         });
+  //         li.appendChild(removeBtn);
+  //         friendList.appendChild(li);
+  //       });
+  //     }
+  //   } catch (error: any) {
+  //     friendList.innerHTML = `<li>Error fetching friends: ${error.message}</li>`;
+  //   }
+  // }
 
   // Function to search users by username or email using the getUsers() endpoint
   async function searchUsers(query: string): Promise<PublicUser[]> {
@@ -220,6 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Filter out the logged-in user and any whose username or email doesn't include the query (case insensitive)
       return users.filter(user => {
         if (loggedInUserId && user.id === loggedInUserId) return false;
+        if (user.status === "anonymized") return false; // Exclude anonymized users
         return (
           user.username.toLowerCase().includes(query.toLowerCase()) ||
           user.email.toLowerCase().includes(query.toLowerCase())
@@ -231,38 +337,82 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Event listener for the friend search button
+  // // Event listener for the friend search button
+  // friendSearchBtn.addEventListener("click", async () => {
+
+  //   const query = friendSearchInput.value.trim();
+  //   if (!query) {
+  //     alert("Please enter a search term.");
+  //     return;
+  //   }
+
+  //   const results = await searchUsers(query);
+  //   friendSearchResults.innerHTML = "";
+  //   if (results.length === 0) {
+  //     friendSearchResults.innerHTML = "<li>No matching users found.</li>";
+  //   } else {
+  //     results.forEach(user => {
+  //       const listItem = document.createElement("li");
+  //       listItem.classList.add("friend-item"); // apply the layout styles
+
+  //       // Create an image for the avatar
+  //       const avatarIcon = document.createElement("img");
+  //       avatarIcon.classList.add("friend-avatar"); // apply the styling class
+  //       avatarIcon.src = user.avatar ? user.avatar : "/default-avatars/default_cat.webp";
+  //       avatarIcon.alt = `${user.username}'s avatar`;
+  //       avatarIcon.width = 30;
+  //       avatarIcon.height = 30;
+  //       avatarIcon.style.borderRadius = "50%";
+  //       avatarIcon.style.marginRight = "10px";
+
+  //       // Create a span for the user details
+  //       const details = document.createElement("span");
+  //       details.textContent = `ID: ${user.id} - ${user.username} (${user.email})`;
+
+  //       listItem.appendChild(avatarIcon);
+  //       listItem.appendChild(details);
+
+  //       // Button to add friend
+  //       const addBtn = document.createElement("button");
+  //       addBtn.textContent = "Add Friend";
+  //       addBtn.addEventListener("click", async () => {
+  //         if (!loggedInUserId) return;
+  //         try {
+  //           const res = await api.addFriend(loggedInUserId, user.id);
+  //           alert(res.message);
+
+  //           // Refresh the friend list after adding
+  //           await fetchFriendList(loggedInUserId);
+  //         } catch (error: any) {
+  //           alert(`Error adding friend: ${error.message}`);
+  //         }
+  //       });
+  //       listItem.appendChild(addBtn);
+  //       friendSearchResults.appendChild(listItem);
+  //     });
+  //   }
+  // });
+
   friendSearchBtn.addEventListener("click", async () => {
     const query = friendSearchInput.value.trim();
     if (!query) {
       alert("Please enter a search term.");
       return;
     }
-    const results = await searchUsers(query);
-    friendSearchResults.innerHTML = "";
-    if (results.length === 0) {
-      friendSearchResults.innerHTML = "<li>No matching users found.</li>";
-    } else {
-      results.forEach(user => {
-        const listItem = document.createElement("li");
-        listItem.textContent = `ID: ${user.id} - ${user.username} (${user.email})`;
-        // Button to add friend
-        const addBtn = document.createElement("button");
-        addBtn.textContent = "Add Friend";
-        addBtn.addEventListener("click", async () => {
-          if (!loggedInUserId) return;
-          try {
-            const res = await api.addFriend(loggedInUserId, user.id);
-            alert(res.message);
-            // Refresh the friend list after adding
-            await fetchFriendList(loggedInUserId);
-          } catch (error: any) {
-            alert(`Error adding friend: ${error.message}`);
-          }
+    try {
+      const results = await searchUsers(query);
+      friendSearchResults.innerHTML = "";
+      if (results.length === 0) {
+        friendSearchResults.innerHTML = "<li>No matching users found.</li>";
+      } else {
+        results.forEach(user => {
+          // Pass the add friend button factory.
+          const listItem = createFriendListItem(user, createAddFriendButton);
+          friendSearchResults.appendChild(listItem);
         });
-        listItem.appendChild(addBtn);
-        friendSearchResults.appendChild(listItem);
-      });
+      }
+    } catch (error: any) {
+      alert(`Error searching users: ${error.message}`);
     }
   });
 
@@ -283,6 +433,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const user = await api.registerUser({ username, email, password });
       registerResponse.textContent = `✅ Registration successful. User ID: ${user.id}`;
       await fetchUsers();
+      clearAllInputFields();
     } catch (error: any) {
       registerResponse.textContent = `❌ Registration failed: ${error.message}`;
     }
@@ -304,13 +455,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const response = await api.loginUser({ identifier, password });
       loggedInUserId = response.user.id;
       loggedInUserStatus = response.user.status;
-      loginResponse.textContent = `✅ Login successful: ${response.message}`;
+      loginResponse.textContent = `✅ Login successful: Hi, ${response.user.username}`;
       logoutBtn.style.display = "block";
       deleteAccountBtn.style.display = "block";
       userInfo.style.display = "block";
       await fetchUserInfo(loggedInUserId);
       await fetchUsers();
       await fetchFriendList(loggedInUserId);
+      clearAllInputFields();
     } catch (error: any) {
       loginResponse.textContent = `❌ Login failed: ${error.message}`;
     }
@@ -333,10 +485,11 @@ document.addEventListener("DOMContentLoaded", () => {
     logoutBtn.style.display = "none";
     deleteAccountBtn.style.display = "none";
     userInfo.style.display = "none";
-    loginIdentifier.value = "";
-    loginPassword.value = "";
+    // loginIdentifier.value = "";
+    // loginPassword.value = "";
     loginResponse.textContent = "🔓 Logged out. You can log in again.";
     await fetchUsers();
+    clearAllInputFields();
   });
 
   // Delete Account
@@ -354,6 +507,7 @@ document.addEventListener("DOMContentLoaded", () => {
       loginPassword.value = "";
       loginResponse.textContent = "🔓 Account deleted. You can register again.";
       await fetchUsers();
+      clearAllInputFields();
     } catch (error: any) {
       deleteResponse.textContent = `❌ Deletion failed: ${error.message}`;
     }
@@ -374,6 +528,7 @@ document.addEventListener("DOMContentLoaded", () => {
       await api.updateUser(loggedInUserId, { username: newUsername.value });
       updateResponse.textContent = "✅ Username updated.";
       await fetchUserInfo(loggedInUserId);
+      clearAllInputFields();
     } catch (error: any) {
       updateResponse.textContent = `❌ Update failed: ${error.message}`;
     }
@@ -390,13 +545,39 @@ document.addEventListener("DOMContentLoaded", () => {
       await api.updateUser(loggedInUserId, { email: newEmail.value });
       updateResponse.textContent = "✅ Email updated.";
       await fetchUserInfo(loggedInUserId);
+      clearAllInputFields();
     } catch (error: any) {
       updateResponse.textContent = `❌ Update failed: ${error.message}`;
     }
   });
 
   // Update Password
-  // TODO
+  const oldPasswordInput = document.getElementById("oldPassword") as HTMLInputElement;
+  const newPasswordInput = document.getElementById("newPassword") as HTMLInputElement;
+  const updatePasswordBtn = document.getElementById("updatePasswordBtn") as HTMLButtonElement;
+  const passwordUpdateResponse = document.getElementById("passwordUpdateResponse") as HTMLParagraphElement;
+
+  updatePasswordBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) return;
+
+    const oldPass = oldPasswordInput.value.trim();
+    const newPass = newPasswordInput.value.trim();
+
+    if (!oldPass || !newPass) {
+      passwordUpdateResponse.textContent = "❌ Please fill both fields.";
+      return;
+    }
+
+    try {
+      const response = await api.updatePassword(loggedInUserId, oldPass, newPass);
+      passwordUpdateResponse.textContent = "✅ Password updated successfully.";
+      clearAllInputFields();
+    } catch (error: any) {
+      passwordUpdateResponse.textContent = `❌ Update failed: ${error.message}`;
+    }
+  });
+
+
 
   // Function to assert a value as UserStatus
   const toUserStatus = (value: string): UserStatus => {
@@ -404,6 +585,7 @@ document.addEventListener("DOMContentLoaded", () => {
       case "online":
       case "offline":
       case "in-game":
+      case "anonymized":
         return value;
       default:
         throw new Error(`Invalid status value: ${value}`);
@@ -531,6 +713,64 @@ document.addEventListener("DOMContentLoaded", () => {
       // Hide the game history list
       gameHistoryList.style.display = "none";
       loadGameHistoryBtn.textContent = "Load Game History";
+    }
+  });
+
+  // 
+  // 
+  // Create references for the Privacy Settings elements
+  const exportDataBtn = document.getElementById("exportDataBtn") as HTMLButtonElement;
+  const anonymizeBtn = document.getElementById("anonymizeBtn") as HTMLButtonElement;
+  const privacyResponse = document.getElementById("privacyResponse") as HTMLParagraphElement;
+
+  // Event listener for data export (stub example)
+  exportDataBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) {
+      privacyResponse.textContent = "❌ You must be logged in to export your data.";
+      return;
+    }
+    try {
+      // If you implement an export endpoint, call it here.
+      const data = await api.exportUserData(loggedInUserId);
+      // For example, convert data to JSON and trigger a download.
+      const dataStr = JSON.stringify(data, null, 2);
+      const blob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "my_data_export.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      privacyResponse.textContent = "✅ Data export initiated.";
+    } catch (error: any) {
+      privacyResponse.textContent = `❌ Data export failed: ${error.message}`;
+    }
+  });
+
+  // Event listener for permanent anonymization
+  anonymizeBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) {
+      privacyResponse.textContent = "❌ You must be logged in to anonymize your data.";
+      return;
+    }
+    // Confirm with the user before proceeding
+    if (!confirm("WARNING: This action will permanently anonymize your account. You will lose your original login credentials. Proceed?")) {
+      return;
+    }
+    try {
+      const response = await api.anonymizeUser(loggedInUserId);
+      privacyResponse.textContent = `✅ ${response.message}`;
+      // Optionally force a logout and update UI since the account is now anonymized.
+      loggedInUserId = null;
+      loggedInUserStatus = null;
+      logoutBtn.style.display = "none";
+      deleteAccountBtn.style.display = "none";
+      userInfo.style.display = "none";
+      clearAllInputFields();
+      loginResponse.textContent = "Your account has been anonymized. Please register a new account if you wish to continue using the service.";
+    } catch (error: any) {
+      privacyResponse.textContent = `❌ Anonymization failed: ${error.message}`;
     }
   });
 

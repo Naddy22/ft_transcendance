@@ -113,3 +113,21 @@ section {
   gap: 10px;
   margin-top: 10px;
 }
+
+/* friend-avatar: Styles the avatar image */
+.friend-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* friend-item: Uses flexbox to arrange the avatar and text in a row */
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}

@@ -1,17 +1,11 @@
 // File: backend/src/routes/avatarRoutes.ts
 
-/* TOCHECK:
-- image deletion ?
-- path for default, what happens if not found
-*/
-
 import { FastifyInstance } from "fastify";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import sharp from "sharp";
 import fastifyStatic from '@fastify/static';
-
 import { sendError } from "../utils/error.js";
 
 // Resolve __dirname and paths correctly in ES Modules
@@ -20,25 +14,37 @@ const __dirname = path.dirname(__filename);
 
 export async function avatarRoutes(fastify: FastifyInstance) {
 
-  // Define where to store avatars
-  const AVATAR_DIR = path.join(__dirname, "../../uploads/avatars");
-  if (!fs.existsSync(AVATAR_DIR)) {
-    fs.mkdirSync(AVATAR_DIR, { recursive: true });
+  // Directory for default avatars
+  const DEFAULT_AVATAR_DIR = path.join(__dirname, "../../img/avatars");
+
+  // Directory for storing avatars
+  const AVATAR_UPLOAD_DIR = path.join(__dirname, "../../uploads/avatars");
+
+  // Default avatar URL
+  const DEFAULT_AVATAR_URL = "/avatars/default/default_cat.webp";
+
+  // Ensure the uploads directory exists
+  if (!fs.existsSync(AVATAR_UPLOAD_DIR)) {
+    fs.mkdirSync(AVATAR_UPLOAD_DIR, { recursive: true });
   }
 
-  // Set the default avatar URL (make sure the default file exists in AVATAR_DIR)
-  const DEFAULT_AVATAR_URL = "/avatars/default.png";
-
-  // Serve the avatar directory statically
+  // Serve default avatars (from 'backend/img/avatars') under '/avatars/default/'
   await fastify.register(fastifyStatic, {
-    root: AVATAR_DIR,
-    prefix: "/avatars/",
+    root: DEFAULT_AVATAR_DIR,
+    prefix: "/avatars/default/",
+    decorateReply: false,
+  });
+
+  // Serve uploaded avatars (from 'backend/uploads/avatars') under '/avatars/uploads/'
+  await fastify.register(fastifyStatic, {
+    root: AVATAR_UPLOAD_DIR,
+    prefix: "/avatars/uploads/",
     decorateReply: false,
   });
 
   // Endpoint: Upload an avatar
   // (This uses multipart/form-data; do not manually set Content-Type header on the client)
-  fastify.post("/avatar", async (req, reply) => {
+  fastify.post("/avatars", async (req, reply) => {
     try {
       const data = await req.file();
       if (!data) {
@@ -53,7 +59,7 @@ export async function avatarRoutes(fastify: FastifyInstance) {
 
       // Generate a unique filename
       const fileName = `${Date.now()}-${data.filename}`;
-      const filePath = path.join(AVATAR_DIR, fileName);
+      const filePath = path.join(AVATAR_UPLOAD_DIR, fileName);
 
       // Resize image to a maximum of 256x256 pixels (maintaining aspect ratio)
       const buffer = await data.toBuffer();
@@ -64,8 +70,8 @@ export async function avatarRoutes(fastify: FastifyInstance) {
       // Save the file
       await fs.promises.writeFile(filePath, resizedBuffer);
 
-      // Return the public URL for the uploaded avatar
-      const avatarUrl = `/avatars/${fileName}`;
+      // // Return the public URL for the uploaded avatar
+      const avatarUrl = `/avatars/uploads/${fileName}`;
       reply.send({ message: "Avatar uploaded successfully", avatarUrl });
     } catch (error) {
       return sendError(reply, 500, "Internal Server Error during avatar upload", error);
@@ -73,14 +79,31 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   });
 
   // Endpoint: Update the user's avatar reference in the database
-  fastify.put<{ Body: { userId: number; avatarUrl: string } }>("/avatar", async (req, reply) => {
+  fastify.put<{ Body: { userId: number; avatarUrl: string } }>("/avatars", async (req, reply) => {
     try {
       const { userId, avatarUrl } = req.body;
       if (!userId || !avatarUrl) {
         return reply.status(400).send({ error: "Missing userId or avatarUrl" });
       }
-      const stmt = await fastify.db.prepare("UPDATE users SET avatar = ? WHERE id = ?");
-      await stmt.run(avatarUrl, userId);
+
+      // Fetch the current avatar from the database
+      const currentStmt = await fastify.db.prepare("SELECT avatar FROM users WHERE id = ?");
+      const currentUser = await currentStmt.get(userId);
+
+      // If the current avatar exists and is not the default, delete the file
+      if (currentUser && currentUser.avatar && currentUser.avatar !== DEFAULT_AVATAR_URL) {
+        const oldFilePath = path.join(AVATAR_UPLOAD_DIR, path.basename(currentUser.avatar));
+        try {
+          await fs.promises.unlink(oldFilePath);
+          fastify.log.info(`Old avatar file deleted: ${oldFilePath}`);
+        } catch (unlinkError) {
+          fastify.log.error("Error deleting old avatar file", unlinkError);
+        }
+      }
+
+      // Update the user record to use the new avatar URL
+      const updateStmt = await fastify.db.prepare("UPDATE users SET avatar = ? WHERE id = ?");
+      await updateStmt.run(avatarUrl, userId);
       reply.send({ message: "Avatar updated successfully", avatarUrl });
     } catch (error) {
       return sendError(reply, 500, "Internal Server Error during avatar update", error);
@@ -88,7 +111,7 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   });
 
   // Endpoint: Remove avatar (reset to default)
-  fastify.delete<{ Body: { userId: number } }>("/avatar", async (req, reply) => {
+  fastify.delete<{ Body: { userId: number } }>("/avatars", async (req, reply) => {
     try {
       const { userId } = req.body;
       if (!userId) return reply.status(400).send({ error: "Missing userId" });
@@ -100,10 +123,13 @@ export async function avatarRoutes(fastify: FastifyInstance) {
 
       // If an avatar exists and it's not the default, attempt to delete the file
       if (user.avatar && user.avatar !== DEFAULT_AVATAR_URL) {
-        const filePath = path.join(AVATAR_DIR, path.basename(user.avatar));
-        fs.unlink(filePath, (err) => {
-          if (err) fastify.log.error("Error deleting avatar file", err);
-        });
+        const filePath = path.join(AVATAR_UPLOAD_DIR, path.basename(user.avatar));
+        try {
+          await fs.promises.unlink(filePath);
+          fastify.log.info(`Deleted avatar file: ${filePath}`);
+        } catch (unlinkError) {
+          fastify.log.error("Error deleting avatar file", unlinkError);
+        }
       }
 
       // Update the user record to revert to the default avatar

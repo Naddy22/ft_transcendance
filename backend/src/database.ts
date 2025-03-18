@@ -77,8 +77,8 @@ export async function setupDatabase(fastify: FastifyInstance) {
 	  );
   `);
 
-  // Reset all users to "offline" on server restart
-  await db.exec("UPDATE users SET status = 'offline'");
+  // Reset all non-anonymized users to "offline" on server restart
+  await db.exec("UPDATE users SET status = 'offline' WHERE status <> 'anonymized'");
   // console.log("🛠️ Reset all users to offline on server startup.");
 
   // console.log("✅ Database setup complete.");
