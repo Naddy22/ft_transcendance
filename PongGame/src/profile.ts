@@ -53,6 +53,7 @@ export function getFriends(userId: number) {
 		.then(friends => friends.map(friend => ({
 			id: friend.id,
 			username: friend.username,
+			status: friend.status
 		})))
 		.catch(error => {
 			console.error("❌ Erreur récupération amis :", error.message);

@@ -379,6 +379,17 @@ button.danger {
 	transition: opacity 0.5s ease-in-out;
 }
 
+/* 🔹 Aligner le pseudo et le bouton "❌" sur la même ligne */
+#friendList li {
+	display: flex;
+	align-items: center; /* ✅ Centre le texte et le bouton verticalement */
+	justify-content: space-between; /* ✅ Sépare bien les éléments */
+	width: max-content; /* ✅ Ajuste la largeur au contenu */
+	text-align: center; /* ✅ S'assure que le texte est bien centré */
+	margin: 0 auto; /* ✅ Force le centrage de chaque élément */
+	gap: 15px;
+}
+
 /* 🔹 Conteneur flex pour aligner l'input et le bouton */
 .friend-search-container {
 	display: flex;
@@ -397,6 +408,8 @@ button.danger {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center; /* ✅ Centre le contenu */
+	width: 100%; /* ✅ Prend toute la largeur dispo */
 }
 
 /* 🔹 Chaque résultat d'ami */
@@ -404,16 +417,17 @@ button.danger {
 	display: flex;
 	align-items: center;
 	justify-content: space-between; /* ✅ Place le pseudo à gauche et le bouton à droite */
-	width: 250px; /* 📏 Ajuste la largeur */
-	/* padding: 8px 12px; */
-	border-radius: 8px;
-	margin-bottom: 5px;
+	width: max-content; /* ✅ Ajuste la largeur au contenu */
+	margin: 0 auto;
 }
 
 /* 🔹 Ajustement du texte (pseudo) */
 #friendSearchResults li span {
 	flex: 1; /* ✅ Prend toute la place à gauche */
 	text-align: left;
+	margin-right: 10px; /* ✅ Ajoute un espace entre le texte et le bouton */
+	display: inline; /* ✅ Force le texte à rester en ligne */
+	white-space: nowrap; /* ✅ Empêche les retours à la ligne automatiques */
 }
 
 .history-container {

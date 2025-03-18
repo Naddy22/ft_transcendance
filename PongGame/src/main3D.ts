@@ -273,6 +273,7 @@ function loadUserProfile() {
 			(document.getElementById("oldPassword")! as HTMLInputElement).value = "";
 			(document.getElementById("newPassword")! as HTMLInputElement).value = "";
 			(document.getElementById("friendSearchInput")! as HTMLInputElement).value = "";
+			(document.getElementById("friendSearchResults")!).innerHTML = ""; // ✅ Efface les résultats de recherche
 
 			updateFriendsUI(friends);
 		})
@@ -285,6 +286,10 @@ function loadUserProfile() {
 // 📌 Mettre à jour le profil
 profileForm.addEventListener("submit", (event) => {
 	event.preventDefault();
+
+	// Vérifier quel bouton a été cliqué
+	const clickedButton = event.submitter as HTMLButtonElement;
+	if (clickedButton.id !== "saveChangesBtn") return; // 🔥 Vérifie si c'est "Sauvegarder"
 
 	const updatedData = {
 		username: (document.getElementById("newUsername")! as HTMLInputElement).value.trim(),
@@ -333,7 +338,7 @@ uploadAvatarBtn.addEventListener("click", () => {
 });
 
 // 📌 Mettre à jour l'affichage des amis
-function updateFriendsUI(friends: { id: number; username: string }[]) {
+function updateFriendsUI(friends: { id: number; username: string; status: string }[]) {
 	friendList.innerHTML = "";
 	if (friends.length === 0) {
 		friendList.innerHTML = "<li>Aucun ami pour le moment.</li>";
@@ -342,7 +347,7 @@ function updateFriendsUI(friends: { id: number; username: string }[]) {
 
 	friends.forEach(friend => {
 		const li = document.createElement("li");
-		li.textContent = friend.username;
+		li.textContent = `${friend.username} (${friend.status})`;
 		li.id = `friend-${friend.id}`;
 
 		const removeBtn = document.createElement("button");
@@ -377,7 +382,7 @@ friendSearchBtn.addEventListener("click", () => {
 			
 				// 🔹 Crée un élément pour le texte (pseudo + email)
 				const userText = document.createElement("span");
-				userText.textContent = `${user.username} (${user.email})`;
+				userText.textContent = `${user.username} (${user.email}) (${user.status})`;
 			
 				// 🔹 Crée le bouton "Ajouter"
 				const addBtn = document.createElement("button");
@@ -402,7 +407,7 @@ friendSearchBtn.addEventListener("click", () => {
 function addFriendUI(friendId: number) {
 	addFriend(currentUser!.id, friendId)
 		.then(message => {
-			alert(message);
+			// alert(message);
 			loadUserProfile(); // Recharge la liste d'amis après ajout
 		})
 		.catch(error => alert(`❌ Erreur : ${error.message}`));
@@ -412,7 +417,7 @@ function addFriendUI(friendId: number) {
 function removeFriendUI(friendId: number) {
 	removeFriend(currentUser!.id, friendId)
 		.then(message => {
-			alert(message);
+			// alert(message);
 			document.getElementById(`friend-${friendId}`)?.remove();
 		})
 		.catch(error => alert(`❌ Erreur : ${error.message}`));
@@ -440,7 +445,7 @@ if (menuDropdown) {
 		if (target.dataset.action === "profile" && profileModal) {
 			event.preventDefault();
 			loadUserProfile();
-			profileModal.style.display = "block";
+			profileModal.style.display = "flex";
 		}
 		if (target.dataset.action === "history" && historyModal) {
 			event.preventDefault();
