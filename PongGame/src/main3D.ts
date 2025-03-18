@@ -4,7 +4,7 @@ import { Tournament } from './tournament3D';
 import { addGameToHistory, updateHistoryUI } from "./history";
 import { addGameToStats, updateStatsUI } from "./stats";
 import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
-import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, searchUsers, addFriend, removeFriend, deleteUserAccount } from "./profile";
+import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, searchUsers, addFriend, removeFriend, deleteUserAccount, exportUserData, anonymizeUser} from "./profile";
 
 
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -25,13 +25,18 @@ const profileForm = document.getElementById("profileForm") as HTMLFormElement;
 const profileMessage = document.getElementById("profileMessage") as HTMLParagraphElement;
 const avatarInput = document.getElementById("avatarInput")! as HTMLInputElement;
 const uploadAvatarBtn = document.getElementById("uploadAvatarBtn") as HTMLButtonElement;
-const deleteAccountBtn = document.getElementById("deleteAccountBtn") as HTMLButtonElement;
 const friendList = document.getElementById("friendList") as HTMLUListElement;
 const friendSearchBtn = document.getElementById("friendSearchBtn") as HTMLButtonElement;
 
 const historyModal = document.getElementById("historyModal") as HTMLElement;
 const statsModal = document.getElementById("statsModal") as HTMLElement;
 const howToPlayModal = document.getElementById("howToPlayModal") as HTMLElement;
+
+const privacyModal = document.getElementById("privacyModal") as HTMLElement;
+const exportDataBtn = document.getElementById("exportDataBtn") as HTMLButtonElement;
+const anonymizeBtn = document.getElementById("anonymizeBtn") as HTMLButtonElement;
+const deleteAccountBtn = document.getElementById("deleteAccountBtn") as HTMLButtonElement;
+
 const closeButton = document.querySelectorAll(".close");
 
 const startButton = document.getElementById('startButton') as HTMLButtonElement;
@@ -248,6 +253,9 @@ window.addEventListener("click", function(event) {
 	if (howToPlayModal && event.target === howToPlayModal) {
 		howToPlayModal.style.display = "none";
 	}
+	if (privacyModal && event.target === privacyModal) {
+		privacyModal.style.display = "none";
+	}
 });
 
 homeButton.addEventListener("click", () => {
@@ -423,6 +431,51 @@ function removeFriendUI(friendId: number) {
 		.catch(error => alert(`❌ Erreur : ${error.message}`));
 }
 
+// 📥 Télécharger les données
+document.getElementById("exportDataBtn")!.addEventListener("click", () => {
+	exportUserData(currentUser!.id)
+		.then(blob => {
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = `user_data_${currentUser!.id}.json`;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+
+			document.getElementById("exportMessage")!.textContent = "✅ Données téléchargées avec succès.";
+
+			setTimeout(() => {
+				document.getElementById("exportMessage")!.style.display = "none";
+			}, 10000);
+		})
+		.catch(error => {
+			document.getElementById("exportMessage")!.textContent = `❌ Erreur : ${error.message}`;
+			setTimeout(() => {
+				document.getElementById("exportMessage")!.style.display = "none";
+			}, 10000);
+		});
+		document.getElementById("exportMessage")!.style.display = "block";
+});
+
+// 🕵️‍♂️ Anonymiser le compte
+document.getElementById("anonymizeBtn")!.addEventListener("click", () => {
+	anonymizeUser(currentUser!.id)
+		.then(message => {
+			document.getElementById("anonymizeMessage")!.textContent = message;
+			setTimeout(() => {
+				document.getElementById("anonymizeMessage")!.style.display = "none";
+			}, 10000);
+		})
+		.catch(error => {
+			document.getElementById("anonymizeMessage")!.textContent = `❌ Erreur : ${error.message}`;
+			setTimeout(() => {
+				document.getElementById("anonymizeMessage")!.style.display = "none";
+			}, 10000);
+		});
+		document.getElementById("anonymizeMessage")!.style.display = "block";
+});
+
 // 📌 Supprimer son compte
 deleteAccountBtn.addEventListener("click", () => {
 	if (!currentUser!.id || !confirm("⚠️ Es-tu sûr de vouloir supprimer ton compte ?")) return;
@@ -432,7 +485,9 @@ deleteAccountBtn.addEventListener("click", () => {
 			alert(message);
 			window.location.reload();
 		})
-		.catch(error => alert(`❌ Erreur : ${error.message}`));
+		.catch(error => {
+		document.getElementById("deleteMessage")!.textContent = `❌ Erreur : ${error.message}`;
+		});
 });
 
 menuButton.addEventListener("click", () => {
@@ -457,11 +512,14 @@ if (menuDropdown) {
 			howToPlayModal.style.display = "flex";
 		}
 		if (target.dataset.action === "statistics" && statsModal) {
-			console.log("Ajout de l'écouteur pour le bouton Statistiques");
 			event.preventDefault();
 			updateStatsUI(currentUser!.id); // Met à jour les nombres
 			// renderStatsChart(); // Génère le graphique
 			statsModal.style.display = "flex";
+		}
+		if (target.dataset.action === "privacyData" && privacyModal) {
+			event.preventDefault();
+			privacyModal.style.display = "flex";
 		}
 		if (target.id === "logoutButton") {
 			event.preventDefault();
@@ -822,3 +880,4 @@ window.addEventListener("popstate", (event) => {
 
 // window.addEventListener('resize', resizeCanvas);
 // // resizeCanvas(); // Appel initial
+ 

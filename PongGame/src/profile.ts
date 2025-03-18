@@ -8,7 +8,7 @@ export function getUserProfile(userId: number) {
 			id: user.id,
 			username: user.username,
 			email: user.email,
-			avatar: user.avatar || "/avatars/default.png",
+			avatar: user.avatar || "/avatars/default/default_cat.webp",
 		}))
 		.catch(error => {
 			console.error("❌ Erreur récupération profil :", error.message);
@@ -26,12 +26,12 @@ export function updateUserProfile(userId: number, data: { username?: string; ema
 }
 
 export function updatePassword(userId: number, oldPassword: string, newPassword: string) {
-	// return api.updatePassword(userId, oldPassword, newPassword)
-	// 	.then(() => "✅ Mot de passe mis à jour avec succès !")
-	// 	.catch(error => {
-	// 		console.error("❌ Erreur mise à jour du mot de passe :", error.message);
-	// 		throw error;
-	// 	});
+	return api.updatePassword(userId, oldPassword, newPassword)
+		.then(() => "✅ Mot de passe mis à jour avec succès !")
+		.catch(error => {
+			console.error("❌ Erreur mise à jour du mot de passe :", error.message);
+			throw error;
+		});
 }
 
 export function uploadAvatar(userId: number, file: File) {
@@ -93,14 +93,6 @@ export function removeFriend(userId: number, friendId: number) {
 		});
 }
 
-export function deleteUserAccount(userId: number) {
-	return api.deleteUser(userId)
-		.then(() => "✅ Compte supprimé avec succès !")
-		.catch(error => {
-			console.error("❌ Erreur suppression compte :", error.message);
-			throw error;
-		});
-}
 
 /** ✅ Fonction qui charge tout le profil d'un coup (profil + amis) */
 export function getCompleteProfile(userId: number) {
@@ -116,4 +108,33 @@ export function getCompleteProfile(userId: number) {
 		console.error("❌ Erreur récupération profil complet :", error.message);
 		throw error;
 	});
+}
+
+// 📥 Télécharger ses données personnelles
+export function exportUserData(userId: number): Promise<Blob> {
+	return api.exportUserData(userId)
+		.then(data => new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }))
+		.catch(error => {
+			console.error("❌ Erreur lors de l'export :", error);
+			throw error;
+		});
+}
+
+// 🕵️‍♂️ Anonymiser son compte
+export function anonymizeUser(userId: number): Promise<string> {
+	return api.anonymizeUser(userId)
+		.then(() => "✅ Votre compte a été anonymisé.")
+		.catch(error => {
+			console.error("❌ Erreur anonymisation :", error.message);
+			throw error;
+		});
+}
+
+export function deleteUserAccount(userId: number) {
+	return api.deleteUser(userId)
+		.then(() => "✅ Compte supprimé avec succès !")
+		.catch(error => {
+			console.error("❌ Erreur suppression compte :", error.message);
+			throw error;
+		});
 }

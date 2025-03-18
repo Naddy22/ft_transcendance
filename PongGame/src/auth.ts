@@ -24,7 +24,7 @@ export async function registerUser(username: string, email: string, password: st
 	try {
 		const user = await api.registerUser({ username, email, password });
 		console.log(`✅ Utilisateur enregistré: ${user.username}`);
-		return `✅ Inscription réussie ! Bienvenue ${user.username}`;
+		return `✅ Inscription réussie ! Bienvenue ${user.username}, vous pouvez à présent vous connecter !`;
 	} catch (error: any) {
 		console.error("❌ Erreur d'inscription :", error.message);
 		throw new Error(`❌ Inscription échouée : ${error.message}`);

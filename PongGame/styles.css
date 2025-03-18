@@ -505,3 +505,24 @@ button.danger {
 	width: 100% !important;
 	height: auto !important;
 }
+
+/* 🔹 Spécifique pour la modale du profil */
+#privacyModal .privacy-modal {
+	width: 800px;  /* 📏 Change la largeur de la modale du profil */
+	height: auto;   /* Ajuste la hauteur selon le contenu */
+	max-height: 80vh; /* Pour éviter qu'elle soit trop grande */
+	overflow-y: auto;
+	margin: auto; /* Centre la modale */
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%); /* Centre parfaitement */
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#privacyModal .privacy-modal button {
+	width: auto;
+	/* font-size: 14px; */
+}

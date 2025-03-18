@@ -36,6 +36,7 @@
 		<a href="#" data-action="history">Historiques</a>
 		<a href="#" data-action="statistics">Statistiques</a>
 		<a href="#" data-action="howToPlay">Comment jouer ?</a>
+		<a href="#" data-action="privacyData">Confidentialité & Données</a>
 		<a href="#" id="logoutButton" style="display: none;">Déconnexion</a>
 	</div>
 	<!-- 📌 fenetre modale du Profil caché-->
@@ -73,7 +74,6 @@
 				<button type="submit" id="saveChangesBtn">✅ Sauvegarder les changements</button>
 				<p id="profileMessage" class="profile-message"></p>
 			</form>
-			<button id="deleteAccountBtn" class="danger">⚠️ Supprimer mon compte</button>
 		</div>
 	</div>
 	<!-- Fenêtre modale historique cachée -->
@@ -112,6 +112,42 @@
 			<p>Joueur de gauche :    W (haut) / S (bas)</p>
 			<p>Joueur de droite :    ↑ (haut) / ↓ (bas)</p>
 			<p>Mode IA :  L'ordinateur joue automatiquement le joueur de droite</p>
+		</div>
+	</div>
+	<!-- 📌 MODALE "PRIVACY & DATA" -->
+	<div id="privacyModal" class="modal">
+		<div class="modal-content privacy-modal">
+			<span class="close">&times;</span>
+			<h1 class="text-outline">🔐 Privacy & Data Management</h1>
+			<p>
+				Conformément au Règlement Général sur la Protection des Données (RGPD), vous avez plusieurs droits concernant vos données personnelles. 
+				Vous pouvez télécharger une copie de vos données, anonymiser votre compte ou supprimer définitivement votre compte et toutes vos informations associées.
+			</p>
+			<h3>📥 Télécharger mes données</h3>
+			<p>
+				Vous pouvez récupérer toutes les informations liées à votre compte en téléchargeant un fichier contenant vos données personnelles.
+			</p>
+			<h3>🕵️‍♂️ Anonymisation du compte</h3>
+			<p>
+				Si vous souhaitez conserver votre compte mais supprimer vos informations personnelles, vous pouvez choisir d'anonymiser votre compte.
+				Cette action remplacera vos données personnelles par des valeurs anonymes (par exemple, votre nom sera remplacé par "Utilisateur Anonyme").
+			</p>
+			<h3>❌ Suppression du compte</h3>
+			<p>
+				La suppression du compte est une action irréversible. Toutes vos données personnelles, y compris votre historique et vos préférences, 
+				seront supprimées définitivement de notre système.
+			</p>
+			<!-- 📥 Télécharger ses données -->
+			<button id="exportDataBtn">📥 Télécharger mes données</button>
+			<p id="exportMessage" style="display: none;"></p>
+
+			<!-- 🕵️‍♂️ Anonymiser son compte -->
+			<button id="anonymizeBtn">🕵️‍♂️ Anonymiser mon compte</button>
+			<p id="anonymizeMessage" style="display: none;"></p>
+
+			<!-- ❌ Supprimer le compte -->
+			<button id="deleteAccountBtn" class="danger">⚠️ Supprimer mon compte</button>
+			<p id="deleteMessage" style="display: none;"></p>
 		</div>
 	</div>
 	<!-- Home button -->
