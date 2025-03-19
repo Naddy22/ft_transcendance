@@ -1,4 +1,5 @@
 import { API } from "./api";
+import { getTranslation } from "./language";
 
 const api = new API("https://localhost:3000");
 
@@ -18,19 +19,21 @@ export function getUserProfile(userId: number) {
 
 export function updateUserProfile(userId: number, data: { username?: string; email?: string }) {
 	return api.updateUser(userId, data)
-		.then(() => "✅ Profil mis à jour avec succès !")
+		.then(() => getTranslation("profileUpdateSuccess"))
 		.catch(error => {
 			console.error("❌ Erreur mise à jour profil :", error.message);
-			throw error;
+			const errorMessage = getTranslation("profileUpdateError").replace("{error}", error.message);
+			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
 		});
 }
 
 export function updatePassword(userId: number, oldPassword: string, newPassword: string) {
 	return api.updatePassword(userId, oldPassword, newPassword)
-		.then(() => "✅ Mot de passe mis à jour avec succès !")
+		.then(() => getTranslation("passwordUpdateSuccess"))
 		.catch(error => {
 			console.error("❌ Erreur mise à jour du mot de passe :", error.message);
-			throw error;
+			const errorMessage = getTranslation("passwordUpdateError").replace("{error}", error.message);
+			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
 		});
 }
 
@@ -77,7 +80,7 @@ export function searchUsers(query: string) {
 
 export function addFriend(userId: number, friendId: number) {
 	return api.addFriend(userId, friendId)
-		.then(() => "✅ Ami ajouté avec succès !")
+		// .then(() => "✅ Ami ajouté avec succès !")
 		.catch(error => {
 			console.error("❌ Erreur ajout ami :", error.message);
 			throw error;
@@ -86,7 +89,7 @@ export function addFriend(userId: number, friendId: number) {
 
 export function removeFriend(userId: number, friendId: number) {
 	return api.removeFriend(userId, friendId)
-		.then(() => "✅ Ami supprimé avec succès !")
+		// .then(() => "✅ Ami supprimé avec succès !")
 		.catch(error => {
 			console.error("❌ Erreur suppression ami :", error.message);
 			throw error;
@@ -123,16 +126,17 @@ export function exportUserData(userId: number): Promise<Blob> {
 // 🕵️‍♂️ Anonymiser son compte
 export function anonymizeUser(userId: number): Promise<string> {
 	return api.anonymizeUser(userId)
-		.then(() => "✅ Votre compte a été anonymisé.")
+		.then(() => getTranslation("anonymizeSuccess"))
 		.catch(error => {
 			console.error("❌ Erreur anonymisation :", error.message);
-			throw error;
+			const errorMessage = getTranslation("anonymizeError").replace("{error}", error.message);
+			throw new Error(errorMessage);
 		});
 }
 
 export function deleteUserAccount(userId: number) {
 	return api.deleteUser(userId)
-		.then(() => "✅ Compte supprimé avec succès !")
+		// .then(() => "✅ Compte supprimé avec succès !")
 		.catch(error => {
 			console.error("❌ Erreur suppression compte :", error.message);
 			throw error;

@@ -1,4 +1,5 @@
 {
+	"_commenthtml": "fichier html",
 	"authButton": "Connexion / Inscription",
 	"languageSelect": "Langue",
 	"loginTitle": "Connexion / Inscription",
@@ -59,8 +60,47 @@
 	"startTournament": "Lancer le tournoi",
 	"replayButton": "Rejouer",
 	"returnMenu": "Retour au menu",
-	"nextMatchButton": "Match suivant"
+	"nextMatchButton": "Match suivant",
 
+	"_commentauth": "fichier auth.ts",
+	"registerSuccess": "✅ Inscription réussie ! Bienvenue {username}, vous pouvez à présent vous connecter !",
+	"registerError": "❌ Inscription échouée : {error}",
+	"loginSuccess": "✅ Connexion réussie ! Bienvenue {username}",
+	"loginError": "❌ Connexion échouée : {error}",
 
-	
+	"_commentgame": "fichier game3D.ts",
+	"startGameMessage": "Appuyez sur ESPACE pour commencer",
+	"loadingGameText": "Chargement en cours...",
+
+	"_commentstats": "fichier stats.ts",
+	"win": "Victoires",
+	"loss": "Défaites",
+
+	"_commentprofil": "fichier profile.ts",
+	"profileUpdateSuccess": "✅ Profil mis à jour avec succès !",
+	"profileUpdateError": "❌ Erreur lors de la mise à jour du profil : {error}",
+	"passwordUpdateSuccess": "✅ Mot de passe mis à jour avec succès !",
+	"passwordUpdateError": "❌ Erreur lors de la mise à jour du mot de passe : {error}",
+	"anonymizeSuccess": "✅ Votre compte a été anonymisé.",
+	"anonymizeError": "❌ Erreur lors de l'anonymisation : {error}",
+
+	"_commentamin3D": "fichier main3D.ts",
+	"playerPlaceholder": "Joueur {num}",
+	"tournamentWin": "🏆 {winner} a gagné le tournoi !",
+	"matchWin": "🎉 {winner} a gagné le match !",
+	"nextMatch": "Match suivant : {player1} vs {player2}",
+	"nextMatchUpcoming": "Prochain match : {player1} vs {player2}",
+	"tournamentFinal": "🏆 Félicitations !",
+	"matchPreparation": "Préparation du prochain match...",
+	"profileLoadError": "❌ Erreur lors du chargement du profil.",
+	"noFriends": "Aucun ami pour le moment.",
+	"noUserFound": "Aucun utilisateur trouvé.",
+	"addFriendBtn": "Ajouter",
+	"exportSuccess": "✅ Données téléchargées avec succès.",
+	"exportError": "❌ Erreur lors du téléchargement des données : {error}",
+	"deleteConfirm": "⚠️ Es-tu sûr de vouloir supprimer ton compte ? Cette action est irréversible.",
+	"playerTwo": "Joueur 2",
+	"AIPlayer": "IA",
+	"uniquePlayerNames": "Tous les pseudos doivent être uniques !"
+
 }

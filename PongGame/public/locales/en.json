@@ -59,5 +59,47 @@
 	"startTournament": "Start Tournament",
 	"replayButton": "Replay",
 	"returnMenu": "Return to Menu",
-	"nextMatchButton": "Next Match"
+	"nextMatchButton": "Next Match",
+
+	"_commentauth": "file auth.ts",
+	"registerSuccess": "✅ Registration successful! Welcome {username}, you can now log in!",
+	"registerError": "❌ Registration failed: {error}",
+	"loginSuccess": "✅ Login successful! Welcome {username}",
+	"loginError": "❌ Login failed: {error}",
+
+	"_commentgame": "file game3D.ts",
+	"startGameMessage": "Press SPACE to start",
+	"loadingGameText": "Loading in progress...",
+	
+	"_commentstats": "file stats.ts",
+	"win": "Wins",
+	"loss": "Losses",
+
+	"_commentprofile": "file profile.ts",
+	"profileUpdateSuccess": "✅ Profile successfully updated!",
+	"profileUpdateError": "❌ Error updating profile: {error}",
+	"passwordUpdateSuccess": "✅ Password successfully updated!",
+	"passwordUpdateError": "❌ Error updating password: {error}",
+	"anonymizeSuccess": "✅ Your account has been anonymized.",
+	"anonymizeError": "❌ Error anonymizing account: {error}",
+
+	"_commentmain3D": "file main3D.ts",
+	"playerPlaceholder": "Player {num}",
+	"tournamentWin": "🏆 {winner} won the tournament!",
+	"matchWin": "🎉 {winner} won the match!",
+	"nextMatch": "Next match: {player1} vs {player2}",
+	"nextMatchUpcoming": "Upcoming match: {player1} vs {player2}",
+	"tournamentFinal": "🏆 Congratulations!",
+	"matchPreparation": "Preparing for the next match...",
+	"profileLoadError": "❌ Error loading profile.",
+	"noFriends": "No friends at the moment.",
+	"noUserFound": "No users found.",
+	"addFriendBtn": "Add",
+	"exportSuccess": "✅ Data successfully downloaded.",
+	"exportError": "❌ Error downloading data: {error}",
+	"deleteConfirm": "⚠️ Are you sure you want to delete your account? This action is irreversible.",
+	"playerTwo": "Player 2",
+	"AIPlayer": "AI",
+	"uniquePlayerNames": "All player names must be unique!"
+
 }

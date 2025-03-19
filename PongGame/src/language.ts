@@ -2,11 +2,13 @@ export let currentLanguage = "fr"; // 🌍 Langue par défaut
 
 // 📥 Charge le fichier JSON de la langue choisie
 export function loadLanguage(lang: string): Promise<Record<string, string>> {
+	console.log(`🚀 Chargement de la langue : ${lang}`);
 	return fetch(`/locales/${lang}.json`)
 		.then(response => response.json())
 		.then(translations => {
 			currentLanguage = lang;
 			localStorage.setItem("language", lang); // 🔄 Sauvegarde la langue choisie
+			localStorage.setItem("translations", JSON.stringify(translations)); // 🔄 Sauvegarde aussi les traductions
 			return translations; // Renvoie les traductions
 		})
 		.catch(error => {
@@ -32,4 +34,9 @@ export function applyTranslations(translations: Record<string, string>) {
 			(el as HTMLInputElement).placeholder = translations[key];
 		}
 	});
+}
+
+export function getTranslation(key: string): string {
+	const translations = JSON.parse(localStorage.getItem("translations") || "{}");
+	return translations[key] || key; // Retourne la clé si la traduction n'existe pas
 }

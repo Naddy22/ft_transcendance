@@ -3,6 +3,7 @@ import * as GUI from 'babylonjs-gui';
 import { Ball3D } from './ball3D.js';
 import { Paddle3D } from './paddle3D.js';
 import { Player3D } from './player3D.js';
+import { getTranslation } from './language.js';
 
 let engine: BABYLON.Engine;
 let guiTexture: GUI.AdvancedDynamicTexture;
@@ -62,7 +63,7 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 		
 		const startMessage = new GUI.TextBlock("startMessage");
-		startMessage.text = "Appuyez sur ESPACE pour commencer";
+		startMessage.text = getTranslation("startGameMessage"); // 🔥 Texte dynamique
 		startMessage.color = "#f9d3d9"; //rose pastel
 		startMessage.fontSize = 20;
 		startMessage.fontFamily = "Mochiy Pop P One"; // Police kawaii
@@ -81,13 +82,19 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		advancedTexture.addControl(loadingBackground);
 	
 		const loadingText = new GUI.TextBlock("loadingText");
-		loadingText.text = "Chargement en cours...";
+		loadingText.text = getTranslation("loadingGameText"); // 🔥 Texte dynamique
 		loadingText.color = "black";
 		loadingText.fontSize = 30;
 		loadingText.fontFamily = "Mochiy Pop P One";
 		loadingText.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
 		loadingText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
 		loadingBackground.addControl(loadingText);
+
+		// 🔹 Mettre à jour les traductions quand la langue change
+		document.addEventListener("languageChanged", () => {
+			startMessage.text = getTranslation("startGameMessage");
+			loadingText.text = getTranslation("loadingGameText");
+		});
 		
 		return advancedTexture;
 	}
@@ -256,19 +263,6 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 			const paddleCenterY = aiPaddle.mesh.position.y;
 			const threshold = 1; // Zone morte plus large pour stabilité
 
-			// // Vérifier si la balle va réellement vers l'IA
-			// if (ball.dx <= 0) {
-			// 	console.log("🎮 IA: La balle s'éloigne, retour à la position initiale");
-			// 	ballFutureY = aiPaddle.initialY; // Retour à la position initiale en cas d’éloignement
-			// } else {
-			// 	// Calculer où la balle arrivera lorsque qu'elle atteindra l'IA
-			// 	let timeToReach = (aiPaddle.mesh.position.x - ball.mesh.position.x) / ball.dx;
-			// 	if (timeToReach < 0 || !isFinite(timeToReach)) {
-			// 		ballFutureY = ball.mesh.position.y
-			// 	} else {
-			// 		ballFutureY = calculateFuturBallY(ball, leftPaddle, aiPaddle, sceneHeight);
-			// 	}
-
 			const closeDistance = sceneWidth / 10;
 			if (ball.dx <= 0) {
 				console.log("IA: La balle s’éloigne, retour à initialY");
@@ -333,46 +327,7 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 			rightPaddle.update(sceneHeightUnits);
 		}
 
-		// Fonction pour afficher le gagnant et arrêter le jeu
 		function endGame(winner: string) {
-			// // Vérifier si l'écran de fin existe déjà
-			// let endPanel = guiTexture.getControlByName("endPanel") as GUI.StackPanel;
-			// if (!endPanel) {
-			// 	// Créer un panneau pour contenir les éléments de l'écran de fin
-			// 	endPanel = new GUI.StackPanel("endPanel");
-			// 	endPanel.width = "400px";
-			// 	endPanel.height = "200px";
-			// 	endPanel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
-			// 	endPanel.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
-			// 	endPanel.background = "black"; // ou une couleur avec opacité
-			// 	guiTexture.addControl(endPanel);
-				
-			// 	// Créer un TextBlock pour afficher le message du gagnant
-			// 	const endMessage = new GUI.TextBlock("endMessage");
-			// 	endMessage.text = `${winner} a gagné !`;
-			// 	endMessage.color = "white";
-			// 	endMessage.fontSize = 30;
-			// 	endMessage.height = "100px";
-			// 	endPanel.addControl(endMessage);
-				
-			// 	// // Créer un bouton pour rejouer
-			// 	// const restartButton = GUI.Button.CreateSimpleButton("restartButton", "Rejouer");
-			// 	// restartButton.width = "200px";
-			// 	// restartButton.height = "50px";
-			// 	// restartButton.color = "white";
-			// 	// restartButton.background = "gray";
-			// 	// restartButton.onPointerUpObservable.add(() => {
-			// 	// 	// Lorsque le bouton est cliqué, on appelle le resetGame
-			// 	// 	resetGame();
-			// 	// 	// Masquer l'écran de fin
-			// 	// 	endPanel.isVisible = false;
-			// 	// });
-			// 	// endPanel.addControl(restartButton);
-			// }
-			// // Rendre visible l'écran de fin
-			// endPanel.isVisible = true;
-
-			// // Arrête complètement le jeu
 			stopPongGame3D();
 
 			// resetGame(); // a ajouté si je veux reset avant d'Avoir msg de fin

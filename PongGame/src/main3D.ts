@@ -6,6 +6,7 @@ import { addGameToHistory, updateHistoryUI } from "./history";
 import { addGameToStats, updateStatsUI } from "./stats";
 import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
 import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, searchUsers, addFriend, removeFriend, deleteUserAccount, exportUserData, anonymizeUser} from "./profile";
+import { getTranslation } from "./language";
 
 const languageSelect = document.getElementById("languageSelect") as HTMLSelectElement;
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -83,6 +84,17 @@ document.addEventListener("DOMContentLoaded", () => {
 languageSelect.addEventListener("change", () => {
 	const selectedLanguage = languageSelect.value;
 	loadLanguage(selectedLanguage).then(translations => applyTranslations(translations));
+
+	// 🔥 Déclenche un événement global pour prévenir BabylonJS et d'autres parties du code
+	const languageChangedEvent = new Event("languageChanged");
+	document.dispatchEvent(languageChangedEvent);
+});
+
+// 🔥 Désactive les flèches haut/bas sur le sélecteur de langue
+languageSelect.addEventListener("keydown", (event) => {
+	if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+		event.preventDefault(); // 🚫 Empêche de changer la langue avec les flèches
+	}
 });
 
 // 🔹 Vérifie si l'utilisateur est connecté au chargement de la page
@@ -178,7 +190,8 @@ function showPlayerInputs(players: number) {
 	inputsContainer.innerHTML += `<input type="text" value="${currentUser?.username}" id="player1"><br>`;
 
 	for (let i = 2; i <= players; i++) {
-		inputsContainer.innerHTML += `<input type="text" placeholder="Joueur ${i}" id="player${i}" required><br>`;
+		const placeholderText = String(getTranslation("playerPlaceholder")).replace("{num}", String(i)); // 🎯 Remplace {num} par le numéro du joueur
+		inputsContainer.innerHTML += `<input type="text" placeholder="${placeholderText}" id="player${i}" required><br>`;
 	}
 	playerInputs.style.display = 'block'; // Afficher les inputs
 }
@@ -216,7 +229,7 @@ function showGame(): void {
 }
 
 function showEndScreen(winner: string, isTournament: boolean = false, isFinal: boolean = false): void {
-	winnerMessage.textContent = isFinal ? `${winner} a gagné le tournoi !` : `${winner} a gagné le match !`;
+	winnerMessage.textContent = isFinal ? getTranslation("tournamentWin").replace("{winner}", winner) : getTranslation("matchWin").replace("{winner}", winner);
 	menu.style.display = 'none';
 	authPage.style.display = "none";
 	tournamentOptions.style.display = 'none';
@@ -230,11 +243,11 @@ function showEndScreen(winner: string, isTournament: boolean = false, isFinal: b
 		const currentMatch = currentTournament.getCurrentMatch();
 		const nextMatch = currentTournament.getNextMatch();
 		currentMatchInfo.textContent = currentMatch 
-			? `Match suivant : ${currentMatch.player1} vs ${currentMatch.player2}` 
+			? getTranslation("nextMatch").replace("{player1}", currentMatch.player1).replace("{player2}", currentMatch.player2)
 			: "";
 		nextMatchInfo.textContent = nextMatch 
-			? `Prochain match : ${nextMatch.player1} vs ${nextMatch.player2}` 
-			: isFinal ? "Félicitation !" : "Préparation du prochain match...";
+			? getTranslation("nextMatchUpcoming").replace("{player1}", nextMatch.player1).replace("{player2}", nextMatch.player2)
+			: isFinal ? getTranslation("tournamentFinal") : getTranslation("matchPreparation");
 	} else {
 		currentMatchInfo.textContent = "";
 		nextMatchInfo.textContent = "";
@@ -301,7 +314,7 @@ function loadUserProfile() {
 		})
 		.catch(error => {
 			console.error("❌ Erreur chargement profil :", error.message);
-			alert("Erreur lors du chargement du profil.");
+			alert(getTranslation("profileLoadError"));
 		});
 }
 
@@ -336,7 +349,7 @@ profileForm.addEventListener("submit", (event) => {
 	})
 	.catch(error => {
 		profileMessage.style.color = "red";
-		profileMessage.textContent = `❌ Erreur : ${error.message}`;
+		profileMessage.textContent = `${error.message}`;
 
 		// 🔹 Supprime le message après 5 secondes
 		setTimeout(() => {
@@ -354,16 +367,16 @@ uploadAvatarBtn.addEventListener("click", () => {
 	uploadAvatar(currentUser!.id, avatarInput.files[0])
 		.then(newAvatarUrl => {
 			(document.getElementById("userAvatar")! as HTMLImageElement).src = newAvatarUrl;
-			alert("✅ Avatar mis à jour !");
+			// alert("✅ Avatar mis à jour !");
 		})
-		.catch(error => alert(`❌ Erreur : ${error.message}`));
+		.catch(error => alert(`${error.message}`));
 });
 
 // 📌 Mettre à jour l'affichage des amis
 function updateFriendsUI(friends: { id: number; username: string; status: string }[]) {
 	friendList.innerHTML = "";
 	if (friends.length === 0) {
-		friendList.innerHTML = "<li>Aucun ami pour le moment.</li>";
+		friendList.innerHTML = `<li>${getTranslation("noFriends")}</li>`;
 		return;
 	}
 
@@ -386,7 +399,7 @@ friendSearchBtn.addEventListener("click", () => {
 	const friendSearchResults = document.getElementById("friendSearchResults")!;
 
 	if (!query) {
-		alert("❌ Veuillez entrer un nom ou un email pour la recherche.");
+		// alert("❌ Veuillez entrer un nom ou un email pour la recherche.");
 		return;
 	}
 
@@ -395,7 +408,7 @@ friendSearchBtn.addEventListener("click", () => {
 			friendSearchResults.innerHTML = ""; // Vide la liste précédente
 
 			if (results.length === 0) {
-				friendSearchResults.innerHTML = "<li>Aucun utilisateur trouvé.</li>";
+				friendSearchResults.innerHTML = `<li>${getTranslation("noUserFound")}</li>`;
 				return;
 			}
 
@@ -408,7 +421,7 @@ friendSearchBtn.addEventListener("click", () => {
 			
 				// 🔹 Crée le bouton "Ajouter"
 				const addBtn = document.createElement("button");
-				addBtn.textContent = "Ajouter";
+				addBtn.textContent = getTranslation("addFriendBtn");
 				addBtn.addEventListener("click", () => addFriendUI(user.id));
 			
 				// 🔹 Ajoute le texte et le bouton dans la ligne
@@ -420,7 +433,7 @@ friendSearchBtn.addEventListener("click", () => {
 			
 		})
 		.catch(error => {
-			friendSearchResults.innerHTML = `<li>❌ Erreur : ${error.message}</li>`;
+			friendSearchResults.innerHTML = `<li>${error.message}</li>`;
 		});
 });
 
@@ -432,7 +445,7 @@ function addFriendUI(friendId: number) {
 			// alert(message);
 			loadUserProfile(); // Recharge la liste d'amis après ajout
 		})
-		.catch(error => alert(`❌ Erreur : ${error.message}`));
+		.catch(error => alert(`${error.message}`));
 }
 
 // 📌 Supprimer un ami
@@ -442,7 +455,7 @@ function removeFriendUI(friendId: number) {
 			// alert(message);
 			document.getElementById(`friend-${friendId}`)?.remove();
 		})
-		.catch(error => alert(`❌ Erreur : ${error.message}`));
+		.catch(error => alert(`${error.message}`));
 }
 
 // 📥 Télécharger les données
@@ -457,14 +470,17 @@ document.getElementById("exportDataBtn")!.addEventListener("click", () => {
 			a.click();
 			document.body.removeChild(a);
 
-			document.getElementById("exportMessage")!.textContent = "✅ Données téléchargées avec succès.";
+			// 🔥 Utilisation de la traduction
+			const exportMessage = document.getElementById("exportMessage")!;
+			exportMessage.textContent = getTranslation("exportSuccess");
 
 			setTimeout(() => {
 				document.getElementById("exportMessage")!.style.display = "none";
 			}, 10000);
 		})
 		.catch(error => {
-			document.getElementById("exportMessage")!.textContent = `❌ Erreur : ${error.message}`;
+			const exportMessage = document.getElementById("exportMessage")!;
+			exportMessage.textContent = getTranslation("exportError").replace("{error}", error.message);
 			setTimeout(() => {
 				document.getElementById("exportMessage")!.style.display = "none";
 			}, 10000);
@@ -482,7 +498,7 @@ document.getElementById("anonymizeBtn")!.addEventListener("click", () => {
 			}, 10000);
 		})
 		.catch(error => {
-			document.getElementById("anonymizeMessage")!.textContent = `❌ Erreur : ${error.message}`;
+			document.getElementById("anonymizeMessage")!.textContent = `${error.message}`;
 			setTimeout(() => {
 				document.getElementById("anonymizeMessage")!.style.display = "none";
 			}, 10000);
@@ -492,15 +508,16 @@ document.getElementById("anonymizeBtn")!.addEventListener("click", () => {
 
 // 📌 Supprimer son compte
 deleteAccountBtn.addEventListener("click", () => {
-	if (!currentUser!.id || !confirm("⚠️ Es-tu sûr de vouloir supprimer ton compte ?")) return;
+	const confirmationMessage = getTranslation("deleteConfirm");
+	if (!currentUser!.id || !confirm(confirmationMessage)) return;
 
 	deleteUserAccount(currentUser!.id)
 		.then(message => {
-			alert(message);
+			// alert(message);
 			window.location.reload();
 		})
 		.catch(error => {
-		document.getElementById("deleteMessage")!.textContent = `❌ Erreur : ${error.message}`;
+			document.getElementById("deleteMessage")!.textContent = `${error.message}`;
 		});
 });
 
@@ -539,18 +556,12 @@ if (menuDropdown) {
 			event.preventDefault();
 			logoutUser().then(() => {
 				updateAuthButton(); // Met à jour l'affichage des boutons
-		
 				// 🔄 Ajoute un nouvel état propre après la déconnexion
 				history.pushState({ page: "menu" }, "Menu", "#menu");
-		
-				console.log("🔄 Historique mis à jour : ", history.state, "URL actuelle : ", window.location.hash);
-		
 				showMenu(); // Affiche le menu
-				console.log("📺 Après showMenu");
 			});
 		}
 		menuDropdown.classList.remove("active");
-		console.log("🔽 Menu déroulant fermé");
 	});
 }
 
@@ -569,7 +580,7 @@ if (closeButton) {
 // Vérification que l'élément startButton existe avant d'ajouter l'écouteur
 if (playVsGuest) {
 	playVsGuest.addEventListener('click', function() {
-		playerNames = [currentUser!.username, "Joueur 2"];
+		playerNames = [currentUser!.username, getTranslation("playerTwo")];
 		lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
 		showGame();
 
@@ -587,11 +598,11 @@ if (playVsGuest) {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-				addGameToStats(currentUser!.id, winner === playerNames[0] ? "Victoire" : "Défaite");
+				addGameToStats(currentUser!.id, winner === playerNames[0] ? "win" : "loss");
 				showEndScreen(winner);
 			});
 		} else {
-			alert("Pas assez de joueurs pour jouer !");
+			// alert("Pas assez de joueurs pour jouer !");
 			showMenu();
 		}
 	});
@@ -602,7 +613,7 @@ playVsAIButton.addEventListener("click", () => {
 	isTournamentMode = false;
 	isVsAIMode = true;
 
-	playerNames = [currentUser!.username, "IA"];
+	playerNames = [currentUser!.username, getTranslation("AIPlayer")];
 	lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
 
 	showGame();
@@ -615,17 +626,13 @@ playVsAIButton.addEventListener("click", () => {
 		let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 		// Ajouter à l’historique
 		addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-		addGameToStats(currentUser!.id, winner === playerNames[0] ? "Victoire" : "Défaite");
+		addGameToStats(currentUser!.id, winner === playerNames[0] ? "win" : "loss");
 		showEndScreen(winner);
 	});
 });
 
 // Quand on clique sur "Tournoi", afficher les options
 tournamentButton.addEventListener("click", () => {
-	if (!currentUser) {
-		alert("Vous devez vous connecter");
-		return ;
-	}
 	showTournamentOption();
 	history.pushState({ page: 'tournamentOption' }, 'Tournament', '#tournamentOption');
 });
@@ -633,12 +640,12 @@ tournamentButton.addEventListener("click", () => {
 tournament4.addEventListener("click", () => {
 	playerNumber = 4;
 	showPlayerInputs(playerNumber);
-	history.pushState({ page: 'tournamentForm' }, 'Saisie des joueurs', '#tournamentForm');
+	history.pushState({ page: 'tournamentForm' }, 'tournamentForm', '#tournamentForm');
 });
 tournament8.addEventListener("click", () => {
 	playerNumber = 8;
 	showPlayerInputs(playerNumber);
-	history.pushState({ page: 'tournamentForm' }, 'Saisie des joueurs', '#tournamentForm');
+	history.pushState({ page: 'tournamentForm' }, 'tournamentForm', '#tournamentForm');
 });
 
 // Gérer le clic sur "lancer le tournoi"
@@ -652,7 +659,7 @@ playersForm.addEventListener("submit", (event) => {
 	// Vérification des noms dupliqués
 	const uniqueNames = new Set(playerNames); // Convertit la liste en "Set" (qui ne peut pas avoir de doublons)
 	if (uniqueNames.size !== playerNames.length) {
-		alert("Tous les pseudos doivent être uniques !");
+		alert(getTranslation("uniquePlayerNames"));
 		return;
 	}
 	console.log("Joueurs enregistrés :", playerNames);
@@ -675,7 +682,7 @@ playersForm.addEventListener("submit", (event) => {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-				addGameToStats(currentUser!.id, winner === playerNames[0] ? "Victoire" : "Défaite");
+				addGameToStats(currentUser!.id, winner === playerNames[0] ? "win" : "loss");
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -696,7 +703,7 @@ replayButton.addEventListener('click', () => {
 		let result = winner === lastPlayers[0] ? "✅ Victoire" : "❌ Défaite";
 		// Ajouter à l’historique
 		addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-		addGameToStats(currentUser!.id, winner === lastPlayers[0] ? "Victoire" : "Défaite");
+		addGameToStats(currentUser!.id, winner === lastPlayers[0] ? "win" : "loss");
 		showEndScreen(winner);
 	});
 });
@@ -720,7 +727,7 @@ nextMatchButton.addEventListener('click', () => {
 				let result = winner === playerNames[0] ? "✅ Victoire" : "❌ Défaite";
 				// Ajouter à l’historique
 				addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-				addGameToStats(currentUser!.id, winner === playerNames[0] ? "Victoire" : "Défaite");
+				addGameToStats(currentUser!.id, winner === playerNames[0] ? "win" : "loss");
 				showEndScreen(winner, true, true);
 			} else {
 				showEndScreen(winner, true);
@@ -785,7 +792,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
+					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "win" : "loss");
 					showEndScreen(winner);
 				});
 			}
@@ -802,7 +809,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
+					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "win" : "loss");
 					showEndScreen(winner, true, true);
 				} else {
 					showEndScreen(winner, true);
@@ -821,7 +828,7 @@ window.addEventListener("popstate", (event) => {
 					let result = winner === StatePlayerNames[0] ? "✅ Victoire" : "❌ Défaite";
 					// Ajouter à l’historique
 					addGameToHistory(currentUser!.id, isTournamentMode ? "Tournament" : isVsAIMode ? "vs AI" : "1vs1", result);
-					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "Victoire" : "Défaite");
+					addGameToStats(currentUser!.id, winner === StatePlayerNames[0] ? "win" : "loss");
 					showEndScreen(winner);
 				});
 			}

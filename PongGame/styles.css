@@ -497,7 +497,7 @@ button.danger {
 .stats-text span {
 	font-weight: bold;
 	font-size: 20px;
-	color: #333; /* Rouge pastel */
+	color: #333;
 }
 
 /* S’assurer que les <p> restent des blocs */
