@@ -1,5 +1,5 @@
 import { API } from "./api";
-import { getTranslation } from "./language";
+import { getTranslation, getErrorMessage } from "./language";
 
 const api = new API("https://localhost:3000");
 
@@ -22,7 +22,7 @@ export function updateUserProfile(userId: number, data: { username?: string; ema
 		.then(() => getTranslation("profileUpdateSuccess"))
 		.catch(error => {
 			console.error("❌ Erreur mise à jour profil :", error.message);
-			const errorMessage = getTranslation("profileUpdateError").replace("{error}", error.message);
+			const errorMessage = getTranslation("profileUpdateError").replace("{error}", getErrorMessage(error.message));
 			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
 		});
 }
@@ -32,7 +32,7 @@ export function updatePassword(userId: number, oldPassword: string, newPassword:
 		.then(() => getTranslation("passwordUpdateSuccess"))
 		.catch(error => {
 			console.error("❌ Erreur mise à jour du mot de passe :", error.message);
-			const errorMessage = getTranslation("passwordUpdateError").replace("{error}", error.message);
+			const errorMessage = getTranslation("passwordUpdateError").replace("{error}", getErrorMessage(error.message));
 			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
 		});
 }

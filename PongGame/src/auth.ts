@@ -1,5 +1,5 @@
 import { API, PublicUser } from "./api";
-import { getTranslation } from "./language";
+import { getTranslation, getErrorMessage } from "./language";
 
 const api = new API("https://localhost:3000"); // URL du backend
 
@@ -30,7 +30,7 @@ export async function registerUser(username: string, email: string, password: st
 		return successMessage;
 	} catch (error: any) {
 		// Traduction du message d'erreur
-		const errorMessage = getTranslation("registerError").replace("{error}", error.message);
+		const errorMessage = getTranslation("registerError").replace("{error}", getErrorMessage(error.message));
 		throw new Error(errorMessage);
 	}
 }
@@ -43,7 +43,7 @@ export async function loginUser(identifier: string, password: string): Promise<s
 		return successMessage;
 	} catch (error: any) {
 		console.error("❌ Erreur de connexion :", error.message);
-		const errorMessage = getTranslation("loginError").replace("{error}", error.message);
+		const errorMessage = getTranslation("loginError").replace("{error}", getErrorMessage(error.message));
 		throw new Error(errorMessage);
 	}
 }

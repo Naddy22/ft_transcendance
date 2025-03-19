@@ -101,6 +101,16 @@
 	"deleteConfirm": "⚠️ Es-tu sûr de vouloir supprimer ton compte ? Cette action est irréversible.",
 	"playerTwo": "Joueur 2",
 	"AIPlayer": "IA",
-	"uniquePlayerNames": "Tous les pseudos doivent être uniques !"
+	"uniquePlayerNames": "Tous les pseudos doivent être uniques !",
 
+	"_commenterreur": "erreur",
+	"errorFetch": "Impossible de se connecter au serveur.",
+	"errorUsernameTaken": "Ce pseudo est déjà utilisé.",
+	"errorEmailTaken": "Cet email est déjà enregistré.",
+	"errorPasswordShort": "Le mot de passe doit contenir au moins 8 caractères.",
+	"errorInvalidUsernameEmail": "Nom d'utilisateur ou email invalide.",
+	"errorInvalidPassword": "Mot de passe incorrect.",
+	"errorNewPasswordShort": "Le nouveau mot de passe doit contenir au moins 8 caractères.",
+	"errorOldPasswordWrong": "L'ancien mot de passe est incorrect.",
+	"errorGeneric": "Une erreur est survenue (Code : {code})"
 }

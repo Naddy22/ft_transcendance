@@ -40,3 +40,39 @@ export function getTranslation(key: string): string {
 	const translations = JSON.parse(localStorage.getItem("translations") || "{}");
 	return translations[key] || key; // Retourne la clé si la traduction n'existe pas
 }
+
+/** 📌 Convertit un message d'erreur en version traduite */
+export function getErrorMessage(error: string): string {
+	const errorTranslations: Record<string, string> = {
+		// 📌 Messages communs
+		"Failed to fetch": getTranslation("errorFetch"),
+		"Username is already taken": getTranslation("errorUsernameTaken"),
+		"Email is already registered": getTranslation("errorEmailTaken"),
+
+		// 📌 Register
+		"Password must be at least 8 characters long": getTranslation("errorPasswordShort"),
+
+		// 📌 Login
+		"Invalid username or email": getTranslation("errorInvalidUsernameEmail"),
+		"Invalid password": getTranslation("errorInvalidPassword"),
+
+		// 📌 Update Password
+		"New password must be at least 8 characters long.": getTranslation("errorNewPasswordShort"),
+		"Old password is incorrect.": getTranslation("errorOldPasswordWrong")
+	};
+
+	// 🔹 Recherche de l'erreur exacte ou partielle
+	for (const key in errorTranslations) {
+		if (error.includes(key)) { 
+			return errorTranslations[key];
+		}
+	}
+
+	// 🔹 Gestion des erreurs génériques type "Error [code]: Message"
+	const errorCodeMatch = error.match(/Error\s*(\d+)/);
+	if (errorCodeMatch) {
+		return getTranslation("errorGeneric").replace("{code}", errorCodeMatch[1]);
+	}
+	// 🔹 Si aucune traduction trouvée, retourne l'erreur originale
+	return error;
+}

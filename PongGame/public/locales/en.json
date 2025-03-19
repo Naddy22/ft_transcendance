@@ -100,6 +100,16 @@
 	"deleteConfirm": "⚠️ Are you sure you want to delete your account? This action is irreversible.",
 	"playerTwo": "Player 2",
 	"AIPlayer": "AI",
-	"uniquePlayerNames": "All player names must be unique!"
+	"uniquePlayerNames": "All player names must be unique!",
 
+	"_commenterror": "error",
+	"errorFetch": "Unable to connect to the server.",
+	"errorUsernameTaken": "This username is already taken.",
+	"errorEmailTaken": "This email is already registered.",
+	"errorPasswordShort": "Password must be at least 8 characters long.",
+	"errorInvalidUsernameEmail": "Invalid username or email.",
+	"errorInvalidPassword": "Incorrect password.",
+	"errorNewPasswordShort": "New password must be at least 8 characters long.",
+	"errorOldPasswordWrong": "The old password is incorrect.",
+	"errorGeneric": "An error occurred (Code: {code})"
 }
