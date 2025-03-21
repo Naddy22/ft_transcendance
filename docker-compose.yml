@@ -1,78 +1,134 @@
 
 version: "3.8"
 
-networks:
-  ft_transcendence-network:
-    driver: bridge
-
-volumes:
-  ssl_certs:
-
 services:
-
   backend:
-    container_name: backend
     build:
       context: ./backend
       dockerfile: backend.Dockerfile
-    # env_file:
-      # - backend/.env
+    restart: unless-stopped
+    expose:
+      - "3000"
     environment:
-      # DATABASE_URL: "file:/app/database/database.sqlite"
-      - PORT=3000
-      - USE_HTTPS=true
-      - JWT_SECRET=super_secret_key
       - NODE_ENV=production
-      - FRONTEND_DIST=../../frontend/dist
-      # JWT_SECRET: ${JWT_SECRET:-default_secret}
-      # NODE_ENV: ${NODE_ENV:-development}
-    # ports:
-      # - "3000:3000"
+      - JWT_SECRET=supersecretkey
     volumes:
-      # - ./backend/data:/app/data
-      # - ./backend/certs:/app/certs
-      # - ./backend/uploads:/app/uploads
-      - ssl_certs:/app/certs
+      - backend_uploads:/app/uploads
+      - backend_data:/app/data
     networks:
-      - ft_transcendence-network
-    # restart: unless-stopped
-    restart: always
-    # healthcheck:
-    #   test: ["CMD", "sh", "-c", "/app/healthcheck.sh"]
-    #   interval: 10s
-    #   retries: 5
-  
+      - ft_net
+
   frontend:
-    container_name: frontend
     build:
-      context: ./frontend
+      # context: ./frontend
+      context: ./PongGame
       dockerfile: frontend.Dockerfile
+    depends_on:
+      - backend
     networks:
-      - ft_transcendence-network
-    # restart: unless-stopped
-    restart: always
-    # depends_on:
-    #   - backend
-      # backend:
-      #   condition: service_healthy  # Wait until backend is ready
+      - ft_net
 
   nginx:
-    container_name: nginx
     build:
-      context: ./nginx
+      context: .
       dockerfile: nginx/nginx.Dockerfile
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      # - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      # - ./backend/certs:/etc/nginx/ssl
-      # - ./backend/certs:/etc/nginx/certs:ro
-      - ssl_certs:/etc/nginx/certs
-    networks:
-      - ft_transcendence-network
+      - nginx_certs:/etc/nginx/ssl
     depends_on:
       - backend
-      - frontend
-    # restart: unless-stopped
-    restart: always
+    networks:
+      - ft_net
+
+volumes:
+  backend_uploads:
+  backend_data:
+  nginx_certs:
+
+networks:
+  ft_net:
+
+
+
+
+
+
+# version: "3.8"
+
+# networks:
+#   ft_transcendence-network:
+#     driver: bridge
+
+# volumes:
+#   ssl_certs:
+
+# services:
+
+#   backend:
+#     container_name: backend
+#     build:
+#       context: ./backend
+#       dockerfile: backend.Dockerfile
+#     # env_file:
+#       # - backend/.env
+#     environment:
+#       # DATABASE_URL: "file:/app/database/database.sqlite"
+#       - PORT=3000
+#       - USE_HTTPS=true
+#       - JWT_SECRET=super_secret_key
+#       - NODE_ENV=production
+#       - FRONTEND_DIST=../../frontend/dist
+#       # JWT_SECRET: ${JWT_SECRET:-default_secret}
+#       # NODE_ENV: ${NODE_ENV:-development}
+#     # ports:
+#       # - "3000:3000"
+#     volumes:
+#       # - ./backend/data:/app/data
+#       # - ./backend/certs:/app/certs
+#       # - ./backend/uploads:/app/uploads
+#       - ssl_certs:/app/certs
+#     networks:
+#       - ft_transcendence-network
+#     # restart: unless-stopped
+#     restart: always
+#     # healthcheck:
+#     #   test: ["CMD", "sh", "-c", "/app/healthcheck.sh"]
+#     #   interval: 10s
+#     #   retries: 5
+  
+#   frontend:
+#     container_name: frontend
+#     build:
+#       context: ./frontend
+#       dockerfile: frontend.Dockerfile
+#     networks:
+#       - ft_transcendence-network
+#     # restart: unless-stopped
+#     restart: always
+#     # depends_on:
+#     #   - backend
+#       # backend:
+#       #   condition: service_healthy  # Wait until backend is ready
+
+#   nginx:
+#     container_name: nginx
+#     build:
+#       context: ./nginx
+#       dockerfile: nginx/nginx.Dockerfile
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       # - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+#       # - ./backend/certs:/etc/nginx/ssl
+#       # - ./backend/certs:/etc/nginx/certs:ro
+#       - ssl_certs:/etc/nginx/certs
+#     networks:
+#       - ft_transcendence-network
+#     depends_on:
+#       - backend
+#       - frontend
+#     # restart: unless-stopped
+#     restart: always

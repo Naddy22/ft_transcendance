@@ -122,17 +122,3 @@ export const disable2FASchema = {
 } as const;
 
 export type Disable2FARequest = FromSchema<typeof disable2FASchema>;
-
-// Schema for sending the code by email (optional?):
-export const send2FACodeSchema = {
-  "$id": "send2FACodeSchema",
-  "type": "object",
-  "properties": {
-    "userId": { "type": "integer" },
-    "email": { "type": "string", "format": "email" }
-  },
-  "required": ["userId", "email"],
-  "additionalProperties": false
-} as const;
-
-export type Send2FACodeRequest = FromSchema<typeof send2FACodeSchema>;

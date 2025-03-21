@@ -7,7 +7,11 @@ import { addGameToHistory, updateHistoryUI } from "./history";
 import { addGameToStats, updateStatsUI } from "./stats";
 import { clearFields } from "./utils";
 
-const api = new API("https://localhost:3000");
+// const api = new API("http://localhost:3000");
+// const api = new API("http://localhost");
+// const api = new API("/");
+const api = new API("");
+// const api = new API("window.location.origin");
 
 document.addEventListener("DOMContentLoaded", () => {
 

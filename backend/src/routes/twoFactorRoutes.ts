@@ -8,7 +8,6 @@ import {
   Setup2FARequest,
   Verify2FARequest,
   Disable2FARequest,
-  Send2FACodeRequest,
 } from "../schemas/authSchema.js";
 
 export async function twoFactorRoutes(fastify: FastifyInstance) {
@@ -101,42 +100,5 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
       message: "2FA Disabled Successfully"
     });
   });
-
-  // /**
-  //  * (Optional?) Send email with a one-time 2FA code
-  //  */
-  // fastify.post<{ Body: Send2FACodeRequest }>(
-  //   '/send-2fa-code',
-  //   { preValidation: [fastify.authenticate] },
-  //   async (req, reply) => {
-  //   const { userId, email } = req.body;
-
-  //   // Fetch user's 2FA secret
-  //   const stmt = await fastify.db.prepare(`
-  //     SELECT twoFactorSecret FROM users WHERE id = ?
-  //   `);
-  //   const user = await stmt.get(userId);
-
-  //   if (!user || !user.twoFactorSecret) {
-  //     return reply.status(400).send({
-  //       error: "2FA not enabled"
-  //     });
-  //   }
-
-  //   // Generate a one-time 2FA code
-  //   const token = speakeasy.totp({
-  //     secret: user.twoFactorSecret,
-  //     encoding: 'base32'
-  //   });
-
-  //   // Send email with the 2FA code
-  //   await fastify.mailer.sendMail({
-  //     to: email,
-  //     subject: "Your 2FA Code",
-  //     text: `Your 2FA code is: ${token}`,
-  //   });
-
-  //   reply.send({ message: "2FA Code Sent" });
-  // });
 
 }
