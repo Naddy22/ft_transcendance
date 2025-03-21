@@ -1064,7 +1064,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      await api.verify2FA(loggedInUserId, code);
+      await api.confirm2FASetup(loggedInUserId, code);
       setup2FAResponse.textContent = "✅ 2FA setup confirmed and enabled.";
 
       // Optionally keep the message for 3 seconds before hiding the UI

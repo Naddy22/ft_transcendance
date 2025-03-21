@@ -468,6 +468,14 @@ export class API {
     return response;
   }
 
+  // Confirm and enable 2FA after QR scan
+  async confirm2FASetup(userId: number, token: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/auth/confirm-2fa`, {
+      method: "POST",
+      body: JSON.stringify({ userId, token }),
+    });
+  }
+
   // Verify 2FA Token
   async verify2FA(userId: number, token: string): Promise<{ message: string; token?: string }> {
     return this.request<{ message: string; token?: string }>(`/auth/verify-2fa`, {

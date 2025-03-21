@@ -73,6 +73,7 @@ tree: ## Show file structure (without node_modules/)
 # ==============================
 
 all: env build up ## Build and start containers
+	@$(OPEN) http://localhost
 
 # Comment/Uncomment these to log outputs
 # ENABLE_BACK_LOG		:= > logs/$(BACKEND_LOG_FILE) $(STDERR_STDOUT)
