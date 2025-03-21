@@ -6,7 +6,10 @@ import { sendError } from '../utils/error.js';
 export async function userStatsRoutes(fastify: FastifyInstance) {
 
   //  Get a specific user's match stats
-  fastify.get<{ Params: { id: string } }>("/:id/stats", async (req, reply) => {
+  fastify.get<{ Params: { id: string } }>(
+    "/:id/stats",
+    // { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id } = req.params;
 
@@ -31,6 +34,7 @@ export async function userStatsRoutes(fastify: FastifyInstance) {
   // 
   fastify.put<{ Params: { id: string }, Body: { wins?: number; losses?: number; matchesPlayed?: number } }>(
     "/:id/stats",
+    { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       try {
         const { id } = req.params;

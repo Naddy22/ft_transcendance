@@ -39,6 +39,16 @@
     <p id="loginResponse"></p>
   </div>
 
+  <!-- 2FA Login Verification Modal (initially hidden) -->
+  <div id="twoFactorLoginModal" class="modal hidden">
+    <div class="modal-content">
+      <h4>2FA Verification</h4>
+      <input type="text" id="login2FACode" placeholder="Enter 6-digit code" />
+      <button id="verify2FAForLoginBtn">Verify 2FA</button>
+      <p id="login2FAResponse"></p>
+    </div>
+  </div>
+
   <!-- All Users List -->
   <pre id="allUsersResponse" class="container hidden"></pre>
 
@@ -52,13 +62,39 @@
       Status: <span id="userStatus"></span>
     </p>
 
+    <!-- Two-Factor Authentication Section -->
+    <div id="twoFactorSection" class="container" style="display: none;">
+      <h3>Two-Factor Authentication (2FA)</h3>
+
+      <!-- Setup Section (visible only when 2FA is not enabled) -->
+      <div id="twoFactorSetupSection" style="display: none;">
+        <button id="setup2FABtn">Enable 2FA</button>
+        <!-- This container appears after clicking "Enable 2FA" -->
+        <div id="qrAndConfirmContainer" style="display: none;">
+          <img id="qrCodeImg" style="width: 150px; height: 150px;" alt="QR Code" />
+          <p id="twoFactorResponse"></p>
+          <input type="text" id="setup2FACode" placeholder="Enter 6-digit code" />
+          <button id="confirm2FASetupBtn">Confirm 2FA Setup</button>
+          <p id="setup2FAResponse"></p>
+        </div>
+      </div>
+
+      <!-- Disable Section (visible only when 2FA is enabled) -->
+      <div id="twoFactorDisableSection" style="display: none;">
+        <h4>Disable 2FA</h4>
+        <button id="disable2FABtn" class="danger-btn">Disable 2FA</button>
+        <p id="disable2FAResponse"></p>
+      </div>
+    </div>
+
     <!-- Privacy Settings Section -->
     <div id="privacySettings" class="container">
       <h3>Privacy Settings</h3>
       <p>
         In accordance with GDPR, you have the right to manage your personal data.
         You can export your data, or if you choose, permanently anonymize your account.
-        <strong>Note:</strong> Once anonymized, your original credentials will be lost and you will no longer be able to log in.
+        <strong>Note:</strong> Once anonymized, your original credentials will be lost and you will no longer be able to
+        log in.
       </p>
       <div class="form-group">
         <button id="exportDataBtn">Export My Data</button>

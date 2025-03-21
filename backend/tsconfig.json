@@ -15,12 +15,13 @@
 	},
 	"include": [
 		"src"
-	], // Only compile `src/` folder
+		// "types" // to include custom types
+	],
 	"exclude": [
 		"node_modules",
 		"dist",
-		"../_local"
-	] // Ignore `node_modules` and `dist/`
+		"../_local" // toremove (personal directory to escape auto-path adjustments)
+	]
 }
 
 /* Using CommonJs */

@@ -24,7 +24,9 @@ export async function setupDatabase(fastify: FastifyInstance) {
 	    status TEXT DEFAULT 'offline',
 	    wins INTEGER DEFAULT 0,
 	    losses INTEGER DEFAULT 0,
-  	  matchesPlayed INTEGER DEFAULT 0
+  	  matchesPlayed INTEGER DEFAULT 0,
+      twoFactorSecret TEXT,
+      isTwoFactorEnabled INTEGER DEFAULT 0
   	);
   `);
 

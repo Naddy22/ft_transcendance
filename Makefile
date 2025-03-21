@@ -23,7 +23,9 @@ LOG_DIRS			:= $(BACKEND_DIR)/logs $(FRONTEND_DIR)/logs
 BACKEND_LOG_FILE	:= backend_$(TIMESTAMP).log
 FRONTEND_LOG_FILE	:= frontend_$(TIMESTAMP).log
 
-BACKEND_PID_FILE	:= $(BACKEND_DIR)/logs/backend.pid
+# Database
+DATABASE_DIR	:= $(BACKEND_DIR)/data/
+DATABASE		:= $(DATABASE_DIR)/database.sqlite
 
 # Configuration Files
 MK_PATH	:= utils/makefiles
@@ -116,7 +118,10 @@ fclean: clean ## Full Clean, including log files
 
 ffclean: fclean ## Remove all generated files and folders
 	@$(MAKE) pdf-clean $(NPD)
-# @$(MAKE) env-clean $(NPD)
+#	@$(MAKE) env-clean $(NPD)
+#	@$(REMOVE) $(DATABASE_DIR)
+#	@$(REMOVE) $(FRONTEND_DIR)/dist/
+#	@$(REMOVE) $(BACKEND_DIR)/dist/
 
 re: down build-no-cache up ## Restart all services
 

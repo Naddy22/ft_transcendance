@@ -44,7 +44,10 @@ export async function avatarRoutes(fastify: FastifyInstance) {
 
   // Endpoint: Upload an avatar
   // (This uses multipart/form-data; do not manually set Content-Type header on the client)
-  fastify.post("/avatars", async (req, reply) => {
+  fastify.post(
+    "/avatars",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const data = await req.file();
       if (!data) {
@@ -79,7 +82,10 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   });
 
   // Endpoint: Update the user's avatar reference in the database
-  fastify.put<{ Body: { userId: number; avatarUrl: string } }>("/avatars", async (req, reply) => {
+  fastify.put<{ Body: { userId: number; avatarUrl: string } }>(
+    "/avatars",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { userId, avatarUrl } = req.body;
       if (!userId || !avatarUrl) {
@@ -111,7 +117,10 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   });
 
   // Endpoint: Remove avatar (reset to default)
-  fastify.delete<{ Body: { userId: number } }>("/avatars", async (req, reply) => {
+  fastify.delete<{ Body: { userId: number } }>(
+    "/avatars",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { userId } = req.body;
       if (!userId) return reply.status(400).send({ error: "Missing userId" });

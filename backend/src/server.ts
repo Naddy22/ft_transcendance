@@ -2,18 +2,20 @@
 // Main Fastify server setup, including routes, database, and shutdown handling.
 
 import Fastify from 'fastify';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import fastifyGracefulExit from "@mgcrea/fastify-graceful-exit";
 import fastifyStatic from '@fastify/static'; // https://github.com/fastify/fastify-static
-// import fastifyWebsocket from '@fastify/websocket';
 import fastifyMultipart from "@fastify/multipart";
 import fastifyRoutes from '@fastify/routes';
-// import fastifyRateLimit from "@fastify/rate-limit";
+import fastifyJwt from '@fastify/jwt';
 import helmet from '@fastify/helmet';
 import dotenv from "dotenv";
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { fpSqlitePlugin } from 'fastify-sqlite-typed';
+
+// import fastifyMailer from 'fastify-mailer';
 
 import fastifyRequestLogger from "@mgcrea/fastify-request-logger";
 import prettifier from "@mgcrea/pino-pretty-compact";
@@ -45,6 +47,7 @@ export async function avatarRoutes(fastify: FastifyInstance) {
 // ────────────────────────────────────────────────────────────────────────────────
 // Ensure cert directory exists before initializing the certificates
 const sslDir = path.join(__dirname, '../certs');
+// const sslDir = "/app/certs"; // Shared with NGINX
 if (!fs.existsSync(sslDir)) {
   console.log('Creating directory for SSL certificates...');
   fs.mkdirSync(sslDir, { recursive: true });
@@ -124,6 +127,44 @@ await fastify.register(fastifyRequestLogger, {
 });
 
 // ────────────────────────────────────────────────────────────────────────────────
+// Register JWT plugin
+await fastify.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET || 'supersecretkey',
+  sign: { expiresIn: '1h' },
+});
+/*
+fastify.jwt.sign() to generate tokens
+request.jwtVerify() in protected routes.
+*/
+
+// Authentication decorator to require valid JWT on protected endpoints
+fastify.decorate("authenticate", async function(request: FastifyRequest, reply: FastifyReply) {
+  try {
+    await request.jwtVerify();
+  } catch (err) {
+    reply.send(err);
+  }
+});
+/*
+fastify.get('/protected', { preValidation: [fastify.authenticate] }, async (req, reply) => {
+  return { secretData: "This data is protected" };
+});
+*/
+
+// ────────────────────────────────────────────────────────────────────────────────
+// 
+// await fastify.register(fastifyMailer, {
+//   defaults: { from: process.env.EMAIL_FROM || "no-reply@catpong.com" },
+//   transport: {
+//     service: "gmail", // Or use SMTP settings
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASS
+//     }
+//   }
+// });
+
+// ────────────────────────────────────────────────────────────────────────────────
 // Register helmet plugin (prevent XSS)
 await fastify.register(helmet, {
   // noSniff: true,
@@ -141,16 +182,6 @@ await fastify.register(helmet, {
     },
   },
 });
-
-// ────────────────────────────────────────────────────────────────────────────────
-// 
-// await fastify.register(fastifyRateLimit, {
-//   max: 5, // Allow only 5 login attempts per minute per IP
-//   timeWindow: "1 minute",
-//   errorResponseBuilder: () => {
-//     return { error: "Too many requests. Please try again later." };
-//   }
-// });
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register database plugin

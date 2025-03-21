@@ -6,7 +6,10 @@ import { sendError } from "../utils/error.js";
 export async function exportRoutes(fastify: FastifyInstance) {
 
   // GET /users/:id/export – exports all personal data for the user
-  fastify.get<{ Params: { id: string } }>("/:id/export", async (req, reply) => {
+  fastify.get<{ Params: { id: string } }>(
+    "/:id/export",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id } = req.params;
       

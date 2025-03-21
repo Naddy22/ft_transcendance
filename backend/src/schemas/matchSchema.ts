@@ -52,7 +52,8 @@ export const matchSchema = {
       "description": "Match end timestamp"
     },
     "matchType": {
-      "type": "string", "enum": ["1vs1", "vs AI", "Tournament"],
+      // "type": "string", "enum": ["1vs1", "vs AI", "Tournament"],
+      "type": "string",
       "description": "Type of match"
     },
     "tournamentId": {

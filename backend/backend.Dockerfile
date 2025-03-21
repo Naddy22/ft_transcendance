@@ -7,20 +7,27 @@ RUN apt-get update && \
 	apt-get install -y --no-install-recommends dumb-init && \
 	rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
+# Create a non-root user
 RUN useradd --create-home --shell /bin/bash appuser
-USER appuser
 
-# Install dependencies first for better caching
+# Copy package files and install dependencies
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
+# Copy the source code
 COPY . .
+
+# Build the backend (if using TypeScript)
 RUN npm run build
 
-# Expose API port
+# Change ownership of files if needed (this should be safe since everything was copied by root)
+RUN chown -R appuser:appuser /app
+
+# Expose the backend port
 EXPOSE 3000
 
-# Ensures proper process handling
+# Run as non-root user and use dumb-init for proper signal handling
+USER appuser
 ENTRYPOINT ["dumb-init", "--"]
 CMD ["node", "dist/server.js"]
+# CMD ["npm", "run", "start"]
