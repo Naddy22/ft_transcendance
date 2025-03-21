@@ -12,7 +12,7 @@ const api = new API("https://localhost:3000");
 document.addEventListener("DOMContentLoaded", () => {
 
   // =================================================
-  // Global Variables & Element References
+  // Global State & Element References
   // =================================================
   let loggedInUserId: number | null = null;
   let loggedInUserStatus: string | null = null;
@@ -46,6 +46,23 @@ document.addEventListener("DOMContentLoaded", () => {
   const userNameElem = document.getElementById("userName") as HTMLSpanElement;
   const userEmailElem = document.getElementById("userEmail") as HTMLSpanElement;
   const userStatusElem = document.getElementById("userStatus") as HTMLSpanElement;
+
+  // 2FA UI
+  const twoFactorSection = document.getElementById("twoFactorSection") as HTMLDivElement;
+  const setup2FABtn = document.getElementById("setup2FABtn") as HTMLButtonElement;
+  const qrCodeImg = document.getElementById("qrCodeImg") as HTMLImageElement;
+  const twoFactorResponse = document.getElementById("twoFactorResponse") as HTMLParagraphElement;
+
+  const setup2FACode = document.getElementById("setup2FACode") as HTMLInputElement;
+  const confirm2FASetupBtn = document.getElementById("confirm2FASetupBtn") as HTMLButtonElement;
+  const setup2FAResponse = document.getElementById("setup2FAResponse") as HTMLParagraphElement;
+
+  const login2FACode = document.getElementById("login2FACode") as HTMLInputElement;
+  const verify2FAForLoginBtn = document.getElementById("verify2FAForLoginBtn") as HTMLButtonElement;
+  const login2FAResponse = document.getElementById("login2FAResponse") as HTMLParagraphElement;
+
+  const disable2FABtn = document.getElementById("disable2FABtn") as HTMLButtonElement;
+  const disable2FAResponse = document.getElementById("disable2FAResponse") as HTMLParagraphElement;
 
   // Avatar
   const avatarImg = document.getElementById("userAvatar") as HTMLImageElement;
@@ -81,7 +98,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // Helper functions
   async function clearAllInputFields() {
     clearFields(
-      regUsername, regEmail, regPassword, loginIdentifier, loginPassword, avatarInput, friendSearchInput, newUsername, newEmail, oldPasswordInput, newPasswordInput);
+      regUsername,
+      regEmail,
+      regPassword,
+      loginIdentifier,
+      loginPassword,
+      avatarInput,
+      friendSearchInput,
+      newUsername,
+      newEmail,
+      oldPasswordInput,
+      newPasswordInput
+    );
   };
 
   // =================================================
@@ -91,14 +119,33 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fetch & display user info
   async function fetchUserInfo(userId: number) {
     try {
-      const userData = await api.getUser(userId);
-      userIdElem.textContent = userData.id.toString();
-      userNameElem.textContent = userData.username;
-      userEmailElem.textContent = userData.email;
-      userStatusElem.textContent = userData.status;
+      const user = await api.getUser(userId);
+      console.log("User info:", user); // debug
+      userIdElem.textContent = user.id.toString();
+      userNameElem.textContent = user.username;
+      userEmailElem.textContent = user.email;
+      userStatusElem.textContent = user.status;
 
-      await updateAvatarDisplay(userData.avatar);
+      // show 2FA section now that user is logged in
+      twoFactorSection.style.display = "block";
+
+      // Show/hide 2FA buttons depending on user's 2FA status
+      if (user.isTwoFactorEnabled) {
+        // Hide the setup section and show the disable section
+        hideTwoFactorSetup();
+        showTwoFactorDisable();
+        hideQRAndConfirm();
+        hideTwoFactorLogin();
+      } else {
+        // When not enabled, show the setup section and hide the disable section
+        showTwoFactorSetup();
+        hideTwoFactorDisable();
+      }
+
+      // Possibly update avatar, stats, friends, etc.
+      await updateAvatarDisplay(user.avatar);
       await updateStatsUI(userId);
+      fetchFriendList(userId);
 
     } catch (error: any) {
       console.error("Error fetching user info:", error.message);
@@ -420,92 +467,202 @@ document.addEventListener("DOMContentLoaded", () => {
   // Authentication Event Listeners
   // =================================================
 
-  // Registration
+  // ================================================
+  // Registration Handler
+  // ================================================
   registerBtn.addEventListener("click", async () => {
-    const username = regUsername.value;
-    const email = regEmail.value;
+    const username = regUsername.value.trim();
+    const email = regEmail.value.trim();
     const password = regPassword.value;
+
     if (!username || !email || !password) {
       registerResponse.textContent = "❌ Please fill all fields.";
       return;
     }
+
     try {
-      const user = await api.registerUser({ username, email, password });
-      registerResponse.textContent = `✅ Registration successful. User ID: ${user.id}`;
+      const newUser = await api.registerUser({ username, email, password });
+      registerResponse.textContent = `✅ Registration successful. Your ID: ${newUser.id}`;
+
+      // Optionally clear fields, refresh user list, etc.
       await fetchUsers();
-      clearAllInputFields();
+      // clearAllInputFields();
+
+      clearFields(regUsername, regEmail, regPassword);
     } catch (error: any) {
       registerResponse.textContent = `❌ Registration failed: ${error.message}`;
     }
   });
 
   // Login
+  // loginBtn.addEventListener("click", async () => {
+  //   const identifier = loginIdentifier.value;
+  //   const password = loginPassword.value;
+  //   if (!identifier || !password) {
+  //     loginResponse.textContent = "❌ Please enter username/email and password.";
+  //     return;
+  //   }
+  //   if (loggedInUserStatus === "online") {
+  //     loginResponse.textContent = "✅ Already logged in.";
+  //     return;
+  //   }
+  //   try {
+  //     const response = await api.loginUser({ identifier, password });
+  //     loggedInUserId = response.user.id;
+  //     loggedInUserStatus = response.user.status;
+  //     loginResponse.textContent = `✅ Login successful: Hi, ${response.user.username}`;
+  //     logoutBtn.style.display = "block";
+  //     deleteAccountBtn.style.display = "block";
+  //     userInfo.style.display = "block";
+  //     await fetchUserInfo(loggedInUserId);
+  //     await fetchUsers();
+  //     await fetchFriendList(loggedInUserId);
+  //     clearAllInputFields();
+  //   } catch (error: any) {
+  //     loginResponse.textContent = `❌ Login failed: ${error.message}`;
+  //   }
+  // });
+
+  // ================================================
+  // Login Handler (with 2FA support)
+  // ================================================
   loginBtn.addEventListener("click", async () => {
-    const identifier = loginIdentifier.value;
+    const identifier = loginIdentifier.value.trim();
     const password = loginPassword.value;
     if (!identifier || !password) {
-      loginResponse.textContent = "❌ Please enter username/email and password.";
+      loginResponse.textContent = "❌ Missing username/email or password.";
       return;
     }
-    if (loggedInUserStatus === "online") {
-      loginResponse.textContent = "✅ Already logged in.";
-      return;
-    }
+
     try {
-      const response = await api.loginUser({ identifier, password });
-      loggedInUserId = response.user.id;
-      loggedInUserStatus = response.user.status;
-      loginResponse.textContent = `✅ Login successful: Hi, ${response.user.username}`;
-      logoutBtn.style.display = "block";
-      deleteAccountBtn.style.display = "block";
-      userInfo.style.display = "block";
-      await fetchUserInfo(loggedInUserId);
-      await fetchUsers();
-      await fetchFriendList(loggedInUserId);
-      clearAllInputFields();
+      // Attempt to login
+      const response = await api.loginUser({
+        identifier,
+        password
+        // twoFactorCode is omitted here; 
+        // the backend will let us know if 2FA is required.
+      });
+
+      console.log("Login response:", response);
+
+      // Check if 2FA is required
+      // If the response indicates 2FA is required, show the modal
+      if (response.requires2FA && response.user) {
+        // Display 2FA code input for the user
+        loggedInUserId = response.user.id; // Store user ID for subsequent 2FA verification
+        loginResponse.textContent = "⚠️ 2FA Required. Please enter your 6-digit code.";
+        // Remove the hidden class to display the modal
+        document.getElementById("twoFactorLoginModal")!.classList.remove("hidden");
+        // showTwoFactorLogin();
+        return;
+      }
+      // if (response.requires2FA) {
+      //   if (response.user) loggedInUserId = response.user.id;
+      //   loginResponse.textContent = "⚠️ 2FA Required. Please enter your 6-digit code.";
+      //   showTwoFactorLogin();
+      //   return;
+      // }
+
+      // If we get here, either 2FA is not required or not enabled
+      if (response.user) {
+        completeLogin(response.user);
+      } else {
+        throw new Error("No user data returned from login.");
+      }
     } catch (error: any) {
       loginResponse.textContent = `❌ Login failed: ${error.message}`;
     }
   });
 
+  // ================================================
+  // Verify 2FA for Login
+  // ================================================
+  verify2FAForLoginBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) {
+      login2FAResponse.textContent = "❌ No user to verify.";
+      return;
+    }
+
+    const code = login2FACode.value.trim();
+    if (!code) {
+      login2FAResponse.textContent = "❌ Enter the 2FA code."; // 6-digit code.";
+      return;
+    }
+
+    try {
+      // Call the verify2FA endpoint
+      const verificationResponse = await api.verify2FA(loggedInUserId, code);
+
+      // Store the token from verification in localStorage
+      if (verificationResponse.token) {
+        localStorage.setItem('token', verificationResponse.token);
+      }
+
+      // If verification succeeds, fetch the user again
+      const user = await api.getUser(loggedInUserId);
+      completeLogin(user);
+      login2FAResponse.textContent = "✅ 2FA Verification succeeded!";
+      // Hide the modal after success
+      document.getElementById("twoFactorLoginModal")!.classList.add("hidden");
+      // hideTwoFactorLogin();
+    } catch (error: any) {
+      login2FAResponse.textContent = `❌ 2FA Verification Failed: ${error.message}`;
+    }
+  });
+
+  // ================================================
   // Logout
+  // ================================================
   logoutBtn.addEventListener("click", async () => {
     if (!loggedInUserId) {
       logoutResponse.textContent = "❌ No user is logged in.";
       return;
     }
     try {
-      const response = await api.logoutUser({ id: loggedInUserId });
-      logoutResponse.textContent = `✅ Logged out: ${response.message}`;
+      const res = await api.logoutUser({ id: loggedInUserId });
+      logoutResponse.textContent = `✅ ${res.message}`;
+
+      // Reset global state
+      loggedInUserId = null;
+      loggedInUserStatus = null;
+
+      // Hide the user info & 2FA
+      userInfo.style.display = "none";
+
+      // Hide buttons
+      logoutBtn.style.display = "none";
+      deleteAccountBtn.style.display = "none";
+
+      // Clear the login inputs
+      loginIdentifier.value = "";
+      loginPassword.value = "";
+      loginResponse.textContent = "🔓 Logged out.";
     } catch (error: any) {
       logoutResponse.textContent = `❌ Logout failed: ${error.message}`;
     }
-    loggedInUserId = null;
-    loggedInUserStatus = null;
-    logoutBtn.style.display = "none";
-    deleteAccountBtn.style.display = "none";
-    userInfo.style.display = "none";
-    // loginIdentifier.value = "";
-    // loginPassword.value = "";
-    loginResponse.textContent = "🔓 Logged out. You can log in again.";
-    await fetchUsers();
-    clearAllInputFields();
   });
 
+  // ================================================
   // Delete Account
+  // ================================================
   deleteAccountBtn.addEventListener("click", async () => {
-    if (!loggedInUserId || !confirm("⚠️ Delete your account?")) return;
+    if (!loggedInUserId) return;
+    if (!confirm("Are you sure you want to delete your account?")) return;
+    // if (!loggedInUserId || !confirm("⚠️ Delete your account?")) return;
+
     try {
       const response = await api.deleteUser(loggedInUserId);
       deleteResponse.textContent = `✅ Account deleted: ${response.message}`;
+
+      // Reset everything
       loggedInUserId = null;
       loggedInUserStatus = null;
+      userInfo.style.display = "none";
       logoutBtn.style.display = "none";
       deleteAccountBtn.style.display = "none";
-      userInfo.style.display = "none";
-      loginIdentifier.value = "";
-      loginPassword.value = "";
+
       loginResponse.textContent = "🔓 Account deleted. You can register again.";
+
       await fetchUsers();
       clearAllInputFields();
     } catch (error: any) {
@@ -730,9 +887,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     try {
-      // If you implement an export endpoint, call it here.
       const data = await api.exportUserData(loggedInUserId);
-      // For example, convert data to JSON and trigger a download.
+      // Convert data to JSON and trigger a download.
       const dataStr = JSON.stringify(data, null, 2);
       const blob = new Blob([dataStr], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -773,5 +929,175 @@ document.addEventListener("DOMContentLoaded", () => {
       privacyResponse.textContent = `❌ Anonymization failed: ${error.message}`;
     }
   });
+
+  // ================================================
+  // Helper to fully “complete” login
+  // so we can reuse after verifying 2FA
+  // ================================================
+  function completeLogin(user: PublicUser) {
+    loggedInUserId = user.id;
+    loggedInUserStatus = user.status;
+
+    loginResponse.textContent = `✅ Welcome, ${user.username}`;
+
+    // Show user info & logout/delete buttons
+    userInfo.style.display = "block";
+    logoutBtn.style.display = "block";
+    deleteAccountBtn.style.display = "block";
+
+    // Hide the 2FA modal if it is open
+    document.getElementById("twoFactorLoginModal")!.classList.add("hidden");
+
+    // Hide any 2FA elements (both login and setup)
+    // hideAll2FASections();
+    // hideTwoFactorLogin();
+    // hideTwoFactorSetup();
+    // hideQRAndConfirm();
+
+    // Then fetch the user info, including 2FA status, stats, etc.
+    fetchUserInfo(user.id);
+  }
+
+  // ================================================
+  // 2FA UI Show/Hide Helpers
+  // ================================================
+  // function showLogin2FASection() {
+  //   login2FACode.style.display = "block";
+  //   verify2FAForLoginBtn.style.display = "block";
+  //   login2FAResponse.textContent = "Enter the 6-digit code from your authenticator app.";
+  // }
+  // function hideLogin2FASection() {
+  //   login2FACode.style.display = "none";
+  //   verify2FAForLoginBtn.style.display = "none";
+  //   login2FAResponse.textContent = "";
+  //   login2FACode.value = "";
+  // }
+  // function showSetup2FASection() {
+  //   setup2FACode.style.display = "block";
+  //   confirm2FASetupBtn.style.display = "block";
+  //   setup2FAResponse.textContent = "Enter the 6-digit code to confirm setup.";
+  // }
+  // function hideSetup2FASection() {
+  //   setup2FACode.style.display = "none";
+  //   confirm2FASetupBtn.style.display = "none";
+  //   setup2FAResponse.textContent = "";
+  //   setup2FACode.value = "";
+  // }
+  // function hideAll2FASections() {
+  //   hideLogin2FASection();
+  //   hideSetup2FASection();
+  //   qrCodeImg.style.display = "none";
+  //   twoFactorResponse.textContent = "";
+  // }
+  // function hideTwoFactorSection() {
+  //   twoFactorSection.style.display = "none";
+  //   hideAll2FASections();
+  // }
+  function showTwoFactorSetup() {
+    (document.getElementById("twoFactorSetupSection") as HTMLDivElement).style.display = "block";
+  }
+  function hideTwoFactorSetup() {
+    (document.getElementById("twoFactorSetupSection") as HTMLDivElement).style.display = "none";
+  }
+
+  function showQRAndConfirm() {
+    (document.getElementById("qrAndConfirmContainer") as HTMLDivElement).style.display = "block";
+  }
+  function hideQRAndConfirm() {
+    (document.getElementById("qrAndConfirmContainer") as HTMLDivElement).style.display = "none";
+  }
+
+  function showTwoFactorLogin() {
+    (document.getElementById("twoFactorLoginSection") as HTMLDivElement).style.display = "block";
+  }
+  function hideTwoFactorLogin() {
+    (document.getElementById("twoFactorLoginSection") as HTMLDivElement).style.display = "none";
+  }
+
+  function showTwoFactorDisable() {
+    (document.getElementById("twoFactorDisableSection") as HTMLDivElement).style.display = "block";
+  }
+  function hideTwoFactorDisable() {
+    (document.getElementById("twoFactorDisableSection") as HTMLDivElement).style.display = "none";
+  }
+
+  function hideAll2FASections() {
+    hideTwoFactorSetup();
+    hideQRAndConfirm();
+    hideTwoFactorLogin();
+    hideTwoFactorDisable();
+  }
+
+  // ================================================
+  // Setup 2FA Flow
+  // ================================================
+  setup2FABtn.addEventListener("click", async () => {
+    if (!loggedInUserId) return;
+
+    try {
+      const res = await api.setup2FA(loggedInUserId);
+      // Display the QR code for scanning
+      qrCodeImg.src = res.qrCode;
+      showQRAndConfirm();
+      // qrCodeImg.style.display = "block";
+      twoFactorResponse.textContent =
+        "Scan this QR code with Google Authenticator or Authy, then enter the 6-digit code below.";
+    } catch (error: any) {
+      twoFactorResponse.textContent = `❌ 2FA Setup Failed: ${error.message}`;
+    }
+  });
+
+  // Confirm the 2FA setup by verifying the code
+  confirm2FASetupBtn.addEventListener("click", async () => {
+    if (!loggedInUserId) return;
+
+    const code = setup2FACode.value.trim();
+    if (!code) {
+      setup2FAResponse.textContent = "❌ Please enter the 6-digit code.";
+      return;
+    }
+
+    try {
+      await api.verify2FA(loggedInUserId, code);
+      setup2FAResponse.textContent = "✅ 2FA setup confirmed and enabled.";
+
+      // Optionally keep the message for 3 seconds before hiding the UI
+      setTimeout(async () => {
+        hideQRAndConfirm();
+        hideTwoFactorSetup();
+        showTwoFactorDisable();
+        fetchUserInfo(loggedInUserId!);
+      }, 3000);
+
+      // hideQRAndConfirm();
+      // hideTwoFactorSetup();
+      // showTwoFactorDisable();
+
+      // Refresh user info to reflect that 2FA is now enabled
+      await fetchUserInfo(loggedInUserId);
+    } catch (error: any) {
+      setup2FAResponse.textContent = `❌ Setup Verification Failed: ${error.message}`;
+    }
+  });
+
+  // Disable 2FA
+  disable2FABtn.addEventListener("click", async () => {
+    if (!loggedInUserId) return;
+
+    try {
+      const res = await api.disable2FA(loggedInUserId);
+      disable2FAResponse.textContent = `✅ ${res.message}`;
+
+      hideTwoFactorDisable();
+      showTwoFactorSetup();
+
+      // Refresh user info to reflect that 2FA is now disabled
+      await fetchUserInfo(loggedInUserId);
+    } catch (error: any) {
+      disable2FAResponse.textContent = `❌ 2FA Disable Failed: ${error.message}`;
+    }
+  });
+
+
 
 });

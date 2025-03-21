@@ -3,18 +3,21 @@ FROM nginx:stable-alpine
 # FROM nginx:1.24.0-alpine
 # WORKDIR /etc/nginx
 
-# Install dumb-init without extra recommended packages
+# Install dumb-init
 RUN apk add --no-cache dumb-init
 
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy custom nginx.conf into the container
+# COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./nginx.conf /etc/nginx/nginx.conf
 
-# Copy built frontend files to serve the static website
+# Copy the built frontend files from the "frontend" service (multi-stage copy)
+# Note: This requires the frontend image to be built first and referenced by its service name.
 COPY --from=ft_transcendence-frontend /app/dist /usr/share/nginx/html
 
-# Ensure the SSL certificates are copied (assuming they're generated in backend)
-COPY --chown=nginx:nginx /backend/certs /etc/nginx/ssl
+# # Copy SSL certificates from the backend container (assuming they are in ./backend/certs)
+# COPY ./backend/certs /etc/nginx/certs:ro
 
-# Change ownership of copied files (important for running as non-root)
+# Change ownership of copied files and required directories for nginx
 RUN chown -R nginx:nginx /usr/share/nginx/html /var/cache/nginx /var/run /etc/nginx
 
 # Switch to non-root user
@@ -23,7 +26,8 @@ USER nginx
 # Expose HTTP and HTTPS ports
 EXPOSE 80 443
 
-# Handles signals properly
+
+# Use dumb-init for proper signal handling
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["nginx", "-g", "daemon off;"]
 

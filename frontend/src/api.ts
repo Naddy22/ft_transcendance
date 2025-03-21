@@ -11,6 +11,7 @@ export interface RegisterRequest {
 export interface LoginRequest {
   identifier: string;
   password: string;
+  twoFactorCode?: string | null;
 }
 
 export interface LogoutRequest {
@@ -28,6 +29,12 @@ export interface PublicUser {
   wins: number;
   losses: number;
   matchesPlayed: number;
+  isTwoFactorEnabled: boolean;
+}
+
+export interface Setup2FAResponse {
+  secret: string;
+  qrCode: string;
 }
 
 export interface UpdateUserRequest {
@@ -146,14 +153,27 @@ export class API {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem('token');
+
+    const headers = {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {})
+    };
+
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      headers: { "Content-Type": "application/json" },
+      headers,
       ...options,
     });
 
     const responseData = await response.json();
 
     if (!response.ok) {
+      // Clear token if unauthorized
+      // if (response.status === 401) {
+      //   localStorage.removeItem('token');
+      // }
       // Preserve detailed error messages from the backend
       const errorMessage = responseData.error || response.statusText;
       throw new Error(`Error ${response.status}: ${errorMessage}`);
@@ -177,20 +197,44 @@ export class API {
     });
   }
 
+  // async loginUser(
+  //   data: LoginRequest
+  // ): Promise<{ message: string; user: PublicUser }> {
+  //   return this.request<{ message: string; user: PublicUser }>("/auth/login", {
+  //     method: "POST",
+  //     body: JSON.stringify(data),
+  //   });
+  // }
+
+  // Login with 2FA support
   async loginUser(
     data: LoginRequest
-  ): Promise<{ message: string; user: PublicUser }> {
-    return this.request<{ message: string; user: PublicUser }>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+  ): Promise<{ message: string; user?: PublicUser; requires2FA?: boolean }> {
+    const response = await this.request<{ message: string; token?: string; user?: PublicUser; requires2FA?: boolean }>(
+      "/auth/login",
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      }
+    );
+
+    // If the login response contains a token, save it
+    if (response && response.token) {
+      localStorage.setItem('token', response.token);
+    }
+
+    return response;
   }
 
   async logoutUser(data: LogoutRequest): Promise<{ message: string }> {
-    return this.request<{ message: string }>("/auth/logout", {
+    const response = await this.request<{ message: string }>("/auth/logout", {
       method: "POST",
       body: JSON.stringify(data),
     });
+
+    // Clear token on logout
+    localStorage.removeItem('token');
+    return response;
   }
 
   // ── User Endpoints ──────────────────────────────────────────────
@@ -388,10 +432,21 @@ export class API {
 
   // Upload avatar (expects a FormData object, so do not set Content-Type manually)
   async uploadAvatar(formData: FormData): Promise<{ message: string; avatarUrl: string }> {
+
+    // Retrieve token from localStorage
+    const token = localStorage.getItem('token');
+
+    const headers: HeadersInit = {};
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${this.baseUrl}/avatars`, {
       method: "POST",
+      headers,
       body: formData, // Browser sets the Content-Type automatically
     });
+
     const data = await response.json();
     if (!response.ok) {
       const errorMessage = data.error || response.statusText;
@@ -434,6 +489,54 @@ export class API {
     });
   }
 
+  // ── 2FA ───────────────────────────────────────────────────────────────
+
+  // Setup 2FA
+  // async setup2FA(userId: number): Promise<{ secret: string; qrCode: string }> {
+  //   return this.request<{ secret: string; qrCode: string }>(`/auth/setup-2fa`, {
+  //     method: "POST",
+  //     body: JSON.stringify({ userId }),
+  //   });
+  // }
+  // async setup2FA(userId: number): Promise<Setup2FAResponse> {
+  //   return this.request<Setup2FAResponse>("/auth/setup-2fa", {
+  //     method: "POST",
+  //     body: JSON.stringify({ userId }),
+  //   });
+  // }
+  async setup2FA(userId: number): Promise<{ secret: string; qrCode: string }> {
+    const response = await this.request<{ secret: string; qrCode: string }>(`/auth/setup-2fa`, {
+      method: "POST",
+      body: JSON.stringify({ userId }),
+    });
+
+    console.log("Saved 2FA Secret:", response.secret); // ✅ Check this
+    return response;
+  }
+
+  // Verify 2FA Token
+  async verify2FA(userId: number, token: string): Promise<{ message: string; token?: string }> {
+    return this.request<{ message: string; token?: string }>(`/auth/verify-2fa`, {
+      method: "POST",
+      body: JSON.stringify({ userId, token }),
+    });
+  }
+
+  // Disable 2FA
+  async disable2FA(userId: number): Promise<{ message: string }> {
+    return this.request<{ message: string }>("/auth/disable-2fa", {
+      method: "POST",
+      body: JSON.stringify({ userId }),
+    });
+  }
+
+  // // Send 2FA Code via Email
+  // async send2FACode(userId: number, email: string): Promise<{ message: string }> {
+  //   return this.request<{ message: string }>("/auth/send-2fa-code", {
+  //     method: "POST",
+  //     body: JSON.stringify({ userId, email }),
+  //   });
+  // }
 
 }
 

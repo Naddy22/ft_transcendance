@@ -6,7 +6,10 @@ import { sendError } from '../utils/error.js';
 export async function matchHistoryRoutes(fastify: FastifyInstance) {
 
   // Endpoint to create a new match history entry
-  fastify.post("/", async (req, reply) => {
+  fastify.post(
+    "/",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { userId, type, result } = req.body as {
         userId: number;
@@ -33,7 +36,10 @@ export async function matchHistoryRoutes(fastify: FastifyInstance) {
   });
 
   // Endpoint to get a user's match history
-  fastify.get<{ Params: { userId: string } }>("/:userId", async (req, reply) => {
+  fastify.get<{ Params: { userId: string } }>(
+    "/:userId",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { userId } = req.params;
       const stmt = await fastify.db.prepare(`

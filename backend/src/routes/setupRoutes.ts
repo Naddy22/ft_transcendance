@@ -15,8 +15,13 @@ import { avatarRoutes } from './avatarRoutes.js';
 import { anonymizationRoutes } from './anonymizationRoutes.js';
 import { exportRoutes } from './exportRoutes.js';
 
+import { twoFactorRoutes } from './twoFactorRoutes.js';
+
 export function setupRoutes(fastify: FastifyInstance) {
   fastify.register(authRoutes, { prefix: '/auth' });
+
+  fastify.register(twoFactorRoutes, { prefix: '/auth' });
+  
   fastify.register(userRoutes, { prefix: '/users' });
   fastify.register(userStatsRoutes, { prefix: '/users' });
   fastify.register(changePasswordRoutes, { prefix: '/users' });

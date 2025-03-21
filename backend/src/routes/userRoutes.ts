@@ -16,7 +16,7 @@ export async function userRoutes(fastify: FastifyInstance) {
       // const users: PublicUser[] = await stmt.all();
 
       const users: PublicUser[] = await fastify.db.all(
-        "SELECT id, username, email, avatar, status, wins, losses, matchesPlayed FROM users"
+        "SELECT id, username, email, avatar, status, wins, losses, matchesPlayed, isTwoFactorEnabled FROM users"
       );
 
       reply.send(users);
@@ -28,13 +28,18 @@ export async function userRoutes(fastify: FastifyInstance) {
   /**
    * Get a specific user's profile by id (Excludes password)
    */
-  fastify.get<{ Params: { id: string } }>("/:id", async (req, reply) => {
+  fastify.get<{ Params: { id: string } }>(
+    "/:id",
+    // { preValidation: [fastify.authenticate] }, tocheck *!!
+    async (req, reply) => {
     try {
       const { id } = req.params;
 
-      const stmt = await fastify.db.prepare(
-        "SELECT id, username, email, avatar, status FROM users WHERE id = ?"
-      );
+      const stmt = await fastify.db.prepare(`
+        SELECT id, username, email, avatar, status, wins, losses, matchesPlayed, isTwoFactorEnabled 
+        FROM users 
+        WHERE id = ?
+      `);
       const user = await stmt.get(id) as PublicUser | undefined;
 
       if (!user) return reply.status(404).send({ error: "User not found" });
@@ -48,7 +53,10 @@ export async function userRoutes(fastify: FastifyInstance) {
   /**
    * Update a user (Username, Email, Status)
    */
-  fastify.put<{ Params: { id: string }, Body: UpdateUserRequest }>('/:id', async (req, reply) => {
+  fastify.put<{ Params: { id: string }, Body: UpdateUserRequest }>(
+    '/:id',
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id } = req.params;
       const { username, email, avatar, status } = req.body;
@@ -140,7 +148,10 @@ export async function userRoutes(fastify: FastifyInstance) {
   /**
    * Delete a user
    */
-  fastify.delete<{ Params: { id: string } }>('/:id', async (req, reply) => {
+  fastify.delete<{ Params: { id: string } }>(
+    '/:id',
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id } = req.params;
 

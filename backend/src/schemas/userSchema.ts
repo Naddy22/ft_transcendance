@@ -58,6 +58,14 @@ export const userSchema = {
       "type": "integer",
       "minimum": 0,
       "description": "Total matches played"
+    },
+    "isTwoFactorEnabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "twoFactorSecret": {
+      "type": ["string", "null"],
+      "nullable": true
     }
   },
   "required": ["username", "email", "password"],
@@ -65,5 +73,6 @@ export const userSchema = {
 } as const;
 
 export type User = FromSchema<typeof userSchema>;
-export type PublicUser = Omit<User, "password">;
+// export type PublicUser = Omit<User, "password">;
+export type PublicUser = Omit<User, "password" | "twoFactorSecret">;
 export type UpdateUserRequest = Partial<Pick<User, "username" | "email" | "avatar" | "status">>;

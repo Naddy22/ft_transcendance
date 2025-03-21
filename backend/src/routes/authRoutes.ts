@@ -5,6 +5,7 @@ import { FastifyInstance } from 'fastify';
 import dotenv from "dotenv";
 import sanitizeHtml from 'sanitize-html';
 import bcrypt from 'bcrypt';
+import speakeasy from 'speakeasy';
 import { RegisterRequest, LoginRequest, LogoutRequest } from '../schemas/authSchema.js';
 import { User } from "../schemas/userSchema.js";
 import { sendError } from "../utils/error.js";
@@ -82,33 +83,95 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // User login route
+  /**
+   * User login route
+   */
   fastify.post<{ Body: LoginRequest }>("/login", async (req, reply) => {
     try {
-      const { identifier, password } = req.body;
+      const { identifier, password, twoFactorCode } = req.body;
 
       // Validate required fields
-      if (!identifier) return reply.status(400).send({ error: "Username or email is required" });
-      if (!password) return reply.status(400).send({ error: "Password is required" });
+      if (!identifier) {
+        return reply.status(400).send({
+          error: "Username or email is required"
+        });
+      }
+      if (!password) {
+        return reply.status(400).send({
+          error: "Password is required"
+        });
+      }
 
       // 🔍 Search for user by either username or email
-      const stmt = await fastify.db.prepare("SELECT * FROM users WHERE username = ? OR email = ?");
-      const user = await stmt.get(identifier, identifier) as User | undefined;
-
-      if (!user) return reply.status(401).send({ error: "Invalid username or email" });
+      // const stmt = await fastify.db.prepare(`
+      //   SELECT * FROM users 
+      //   WHERE username = ? OR email = ?
+      // `);
+      const stmt = await fastify.db.prepare(`
+        SELECT id, username, email, password, twoFactorSecret, isTwoFactorEnabled
+        FROM users 
+        WHERE LOWER(email) = LOWER(?) OR username = ?
+      `);
+      // const user = await stmt.get(identifier, identifier) as User | undefined;
+      const user = await stmt.get(identifier, identifier);
+      if (!user) {
+        return reply.status(401).send({
+          error: "Invalid username or email"
+        });
+      }
 
       // 🔒 Verify password
       const passwordMatch = await bcrypt.compare(password, user.password);
-      if (!passwordMatch) return reply.status(401).send({ error: "Invalid password" });
+      if (!passwordMatch) {
+        return reply.status(401).send({
+          error: "Invalid password"
+        });
+      }
 
-      // Set avatar to default and user status to "online"
-      const updateStmt = await fastify.db.prepare("UPDATE users SET status = ? WHERE id = ?");
+      // Check if 2FA is enabled
+      if (user.isTwoFactorEnabled) {
+        // Ensure that a 2FA code was provided
+        // If no 2FA code provided, prompt the client that 2FA is required.
+        if (!twoFactorCode) {
+          return reply.send({
+            message: "2FA Required",
+            requires2FA: true,
+            user: { id: user.id },
+          });
+        }
+
+        // // Ensure that the user's 2FA secret exists
+        // if (!user.twoFactorSecret) {
+        //   return reply.status(400).send({ error: "2FA secret is not set for this user." });
+        // }
+
+        // Verify the 2FA code
+        const is2FAValid = speakeasy.totp.verify({
+          secret: user.twoFactorSecret,
+          encoding: "base32",
+          token: twoFactorCode!,
+        });
+        if (!is2FAValid) {
+          return reply.status(401).send({
+            error: "Invalid 2FA code"
+          });
+        }
+      }
+
+      // Generate JWT token if all checks pass
+      const token = fastify.jwt.sign({ id: user.id, username: user.username });
+
+      // Update user status to "online"
+      const updateStmt = await fastify.db.prepare(`
+        UPDATE users SET status = ? 
+        WHERE id = ?
+      `);
       await updateStmt.run("online", user.id);
 
-      // Exclude password field from response
-      const { password: _, ...safeUser } = user;
+      // Exclude sensitive fields before sending response
+      const { password: _, twoFactorSecret, isTwoFactorEnabled, ...safeUser } = user;
 
-      reply.send({ message: "✅ Login successful", user: safeUser });
+      reply.send({ message: "✅ Login successful", token, user: safeUser });
 
     } catch (error) {
       console.error("❌ Error during login:", error);
@@ -116,23 +179,30 @@ export async function authRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // User logout route
-  fastify.post<{ Body: LogoutRequest }>("/logout", async (req, reply) => {
-    try {
-      const { id } = req.body;
+  /**
+   * User logout route
+   */
+  fastify.post<{ Body: LogoutRequest }>(
+    "/logout",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
+      try {
+        const { id } = req.body;
 
-      if (!id) return reply.status(400).send({ error: "Missing user ID" });
+        if (!id) return reply.status(400).send({ error: "Missing user ID" });
 
-      // Set user status to "offline"
-      const stmt = await fastify.db.prepare("UPDATE users SET status = ? WHERE id = ?");
-      const user = await stmt.run("offline", id);
+        // Set user status to "offline"
+        const stmt = await fastify.db.prepare(`
+        UPDATE users SET status = ? WHERE id = ?
+      `);
+        const user = await stmt.run("offline", id);
 
-      reply.send({ message: "👋 User logged out successfully" });
-    } catch (error) {
-      console.error("❌ Error during logout:", error);
-      reply.status(500).send({ error: "Internal Server Error" });
-      // return sendError(reply, 500, "Internal Server Error during logout", error);
-    }
-  });
+        reply.send({ message: "👋 User logged out successfully" });
+      } catch (error) {
+        console.error("❌ Error during logout:", error);
+        reply.status(500).send({ error: "Internal Server Error" });
+        // return sendError(reply, 500, "Internal Server Error during logout", error);
+      }
+    });
 
 }

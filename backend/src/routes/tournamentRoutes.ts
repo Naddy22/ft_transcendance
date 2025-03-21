@@ -8,7 +8,10 @@ import { sendError } from "../utils/error.js";
 export async function tournamentRoutes(fastify: FastifyInstance) {
 
   // Get all tournaments
-  fastify.get("/", async (req, reply) => {
+  fastify.get(
+    "/",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const stmt = await fastify.db.prepare("SELECT * FROM tournaments");
       const tournaments: Tournament[] = await stmt.all();
@@ -19,7 +22,10 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
   });
 
   // Get specific tournament details by tournamentId
-  fastify.get<{ Params: { id: string } }>("/:id", async (req, reply) => {
+  fastify.get<{ Params: { id: string } }>(
+    "/:id",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id: tournamentId } = req.params;
       const stmt = await fastify.db.prepare("SELECT * FROM tournaments WHERE tournamentId = ?");
@@ -34,7 +40,10 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
   });
 
   // Create a tournament
-  fastify.post<{ Body: NewTournamentRequest }>("/", async (req, reply) => {
+  fastify.post<{ Body: NewTournamentRequest }>(
+    "/",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { name, players } = req.body;
       // Insert tournament with default status 'pending'
@@ -57,7 +66,10 @@ export async function tournamentRoutes(fastify: FastifyInstance) {
   });
 
   // Update tournament status or winner
-  fastify.put<{ Params: { id: string }, Body: TournamentUpdateRequest }>("/:id", async (req, reply) => {
+  fastify.put<{ Params: { id: string }, Body: TournamentUpdateRequest }>(
+    "/:id",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id: tournamentId } = req.params;
       const { status, winner } = req.body;

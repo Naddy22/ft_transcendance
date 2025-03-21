@@ -16,12 +16,17 @@ import { sendError } from "../utils/error.js";
 export async function friendRoutes(fastify: FastifyInstance) {
 
   // GET /users/:id/friends: get friend list for a user
-  fastify.get<{ Params: { id: string } }>("/:id/friends", async (req, reply) => {
+  fastify.get<{ Params: { id: string } }>(
+    "/:id/friends",
+    // { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id } = req.params;
 
       // Query friends table for friend IDs
-      const stmt = await fastify.db.prepare("SELECT friendId FROM friends WHERE userId = ?");
+      const stmt = await fastify.db.prepare(
+        "SELECT friendId FROM friends WHERE userId = ?"
+      );
       const rows = await stmt.all(id);
       const friendIds = rows.map((row: any) => row.friendId);
 
@@ -44,7 +49,10 @@ export async function friendRoutes(fastify: FastifyInstance) {
    * Expects body: { friendId: number }
    * Makes sure that if a user’s status is "anonymized", they cannot be added as a friend.
    */
-  fastify.post<{ Params: { id: string }, Body: { friendId: number } }>("/:id/friends", async (req, reply) => {
+  fastify.post<{ Params: { id: string }, Body: { friendId: number } }>(
+    "/:id/friends",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id } = req.params;
       const { friendId } = req.body;
@@ -79,7 +87,10 @@ export async function friendRoutes(fastify: FastifyInstance) {
   });
 
   // DELETE /users/:id/friends/:friendId: remove a friend
-  fastify.delete<{ Params: { id: string, friendId: string } }>("/:id/friends/:friendId", async (req, reply) => {
+  fastify.delete<{ Params: { id: string, friendId: string } }>(
+    "/:id/friends/:friendId",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id, friendId } = req.params;
       const stmtDelete = await fastify.db.prepare(

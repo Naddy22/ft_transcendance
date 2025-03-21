@@ -23,6 +23,7 @@ export async function anonymizationRoutes(fastify: FastifyInstance) {
   // GDPR Anonymization Endpoint
   fastify.put<{ Params: { id: string } }>(
     '/:id/anonymize',
+    { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       try {
         const { id } = req.params;

@@ -10,7 +10,10 @@ let waitingPlayer: Player | null = null;
 
 export async function matchmakingRoutes(fastify: FastifyInstance) {
 
-  fastify.post<{ Body: MatchmakingRequest, Reply: MatchmakingResponse }>("/join", async (req, reply) => {
+  fastify.post<{ Body: MatchmakingRequest, Reply: MatchmakingResponse }>(
+    "/join",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { userId, username } = req.body;
       // if (!userId || !username) {

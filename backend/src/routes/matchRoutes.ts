@@ -8,7 +8,10 @@ import { sendError } from "../utils/error.js";
 export async function matchRoutes(fastify: FastifyInstance) {
 
   // Get all past matches
-  fastify.get("/", async (req, reply) => {
+  fastify.get(
+    "/",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const stmt = await fastify.db.prepare("SELECT * FROM matches");
       const matches: Match[] = await stmt.all();
@@ -37,7 +40,10 @@ export async function matchRoutes(fastify: FastifyInstance) {
   });
 
   // Create a new match
-  fastify.post<{ Body: NewMatchRequest }>("/", async (req, reply) => {
+  fastify.post<{ Body: NewMatchRequest }>(
+    "/",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { player1, player2, score, startTime, tournamentId, matchType } = req.body;
 
@@ -59,7 +65,10 @@ export async function matchRoutes(fastify: FastifyInstance) {
 
 
   // Update match results
-  fastify.put<{ Params: { id: string }, Body: MatchUpdateRequest }>("/:id", async (req, reply) => {
+  fastify.put<{ Params: { id: string }, Body: MatchUpdateRequest }>(
+    "/:id",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { id: matchId } = req.params;
       const { winner, score, endTime } = req.body;
@@ -94,7 +103,10 @@ export async function matchRoutes(fastify: FastifyInstance) {
   });
 
   // Get match history for a given user (only type, result, and date)
-  fastify.get<{ Params: { userId: string } }>("/history/:userId", async (req, reply) => {
+  fastify.get<{ Params: { userId: string } }>(
+    "/history/:userId",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { userId } = req.params;
 
@@ -172,7 +184,10 @@ export async function matchRoutes(fastify: FastifyInstance) {
   // });
 
   // Submit match result
-  fastify.post<{ Body: { matchId: number; winner: number; scorePlayer1?: number; scorePlayer2?: number } }>("/result", async (req, reply) => {
+  fastify.post<{ Body: { matchId: number; winner: number; scorePlayer1?: number; scorePlayer2?: number } }>(
+    "/result",
+    { preValidation: [fastify.authenticate] },
+    async (req, reply) => {
     try {
       const { matchId, winner, scorePlayer1, scorePlayer2 } = req.body;
       if (!matchId || !winner) {
