@@ -55,6 +55,7 @@ export function getErrorMessage(error: string): string {
 		// 📌 Login
 		"Invalid username or email": getTranslation("errorInvalidUsernameEmail"),
 		"Invalid password": getTranslation("errorInvalidPassword"),
+		"This account is anonymized": getTranslation("errorAnonymizedAccount"),
 
 		// 📌 Update Password
 		"New password must be at least 8 characters long.": getTranslation("errorNewPasswordShort"),

@@ -31,8 +31,8 @@
 	"historyTitle": "📜 Historique des parties",
 	"statsTitle": "📊 Statistiques du joueur",
 	"totalGames": "🕹️ Total de parties :",
-	"wins": "🏆 Victoires :",
-	"losses": "❌ Défaites :",
+	"winsTitle": "🏆 Victoires :",
+	"lossesTitle": "❌ Défaites :",
 	"winRate": "🔥 Taux de victoire :",
 	"howToPlayTitle": "🎮 Comment jouer ?",
 	"playerLeftControls": "Joueur de gauche : W (haut) / S (bas)",
@@ -72,9 +72,13 @@
 	"startGameMessage": "Appuyez sur ESPACE pour commencer",
 	"loadingGameText": "Chargement en cours...",
 
+	"_commenthistory": "fichier history.ts",
+	"win": "Victoire",
+	"loss": "Défaite",
+
 	"_commentstats": "fichier stats.ts",
-	"win": "Victoires",
-	"loss": "Défaites",
+	"wins": "Victoires",
+	"losses": "Défaites",
 
 	"_commentprofil": "fichier profile.ts",
 	"profileUpdateSuccess": "✅ Profil mis à jour avec succès !",
@@ -84,7 +88,7 @@
 	"anonymizeSuccess": "✅ Votre compte a été anonymisé.",
 	"anonymizeError": "❌ Erreur lors de l'anonymisation : {error}",
 
-	"_commentamin3D": "fichier main3D.ts",
+	"_commentmain3D": "fichier main3D.ts",
 	"playerPlaceholder": "Joueur {num}",
 	"tournamentWin": "🏆 {winner} a gagné le tournoi !",
 	"matchWin": "🎉 {winner} a gagné le match !",
@@ -112,5 +116,6 @@
 	"errorInvalidPassword": "Mot de passe incorrect.",
 	"errorNewPasswordShort": "Le nouveau mot de passe doit contenir au moins 8 caractères.",
 	"errorOldPasswordWrong": "L'ancien mot de passe est incorrect.",
-	"errorGeneric": "Une erreur est survenue (Code : {code})"
+	"errorGeneric": "Une erreur est survenue (Code : {code})",
+	"errorAnonymizedAccount": "Ce compte a été anonymisé."
 }

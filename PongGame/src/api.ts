@@ -69,13 +69,15 @@ export interface Match {
 
 export interface MatchHistory {
   date: string;
-  type: "1vs1" | "vs AI" | "Tournament";
+  // type: "1vs1" | "vs AI" | "Tournament";
+  type: string;
   result: string;
 }
 
 export interface NewMatchHistoryEntry {
   userId: number;
-  type: "1vs1" | "vs AI" | "Tournament";
+  // type: "1vs1" | "vs AI" | "Tournament";
+  type: string;
   result: string;
 }
 

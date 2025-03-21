@@ -31,8 +31,8 @@
 	"historyTitle": "📜 Historial de partidas",
 	"statsTitle": "📊 Estadísticas del jugador",
 	"totalGames": "🕹️ Partidas totales:",
-	"wins": "🏆 Victorias:",
-	"losses": "❌ Derrotas:",
+	"winsTitle": "🏆 Victorias:",
+	"lossesTitle": "❌ Derrotas:",
 	"winRate": "🔥 Tasa de victorias:",
 	"howToPlayTitle": "🎮 ¿Cómo jugar?",
 	"playerLeftControls": "Jugador izquierdo: W (arriba) / S (abajo)",
@@ -72,9 +72,13 @@
 	"startGameMessage": "Presiona ESPACIO para comenzar",
 	"loadingGameText": "Cargando...",
 
+	"_commenthistory": "archivo history.ts",
+	"win": "Victoria",
+	"loss": "Derrota",
+
 	"_commentstats": "archivo stats.ts",
-	"win": "Victorias",
-	"loss": "Derrotas",
+	"wins": "Victorias",
+	"losses": "Derrotas",
 
 	"_commentprofil": "archivo profile.ts",
 	"profileUpdateSuccess": "✅ Perfil actualizado con éxito.",
@@ -84,7 +88,7 @@
 	"anonymizeSuccess": "✅ Tu cuenta ha sido anonimizada.",
 	"anonymizeError": "❌ Error en la anonimización: {error}",
 
-	"_commentamin3D": "archivo main3D.ts",
+	"_commentmain3D": "archivo main3D.ts",
 	"playerPlaceholder": "Jugador {num}",
 	"tournamentWin": "🏆 {winner} ha ganado el torneo!",
 	"matchWin": "🎉 {winner} ha ganado el partido!",
@@ -112,5 +116,6 @@
 	"errorInvalidPassword": "Contraseña incorrecta.",
 	"errorNewPasswordShort": "La nueva contraseña debe tener al menos 8 caracteres.",
 	"errorOldPasswordWrong": "La contraseña anterior es incorrecta.",
-	"errorGeneric": "Ocurrió un error (Código: {code})"
+	"errorGeneric": "Ocurrió un error (Código: {code})",
+	"errorAnonymizedAccount": "Esta cuenta ha sido anonimizada."
 }

@@ -30,8 +30,8 @@
 	"historyTitle": "📜 Match History",
 	"statsTitle": "📊 Player Statistics",
 	"totalGames": "🕹️ Total Matches:",
-	"wins": "🏆 Wins:",
-	"losses": "❌ Losses:",
+	"winsTitle": "🏆 Wins:",
+	"lossesTitle": "❌ Losses:",
 	"winRate": "🔥 Win Rate:",
 	"howToPlayTitle": "🎮 How to Play?",
 	"playerLeftControls": "Left Player: W (up) / S (down)",
@@ -70,10 +70,14 @@
 	"_commentgame": "file game3D.ts",
 	"startGameMessage": "Press SPACE to start",
 	"loadingGameText": "Loading in progress...",
+
+	"_commenthistory": "file history.ts",
+	"win": "Win",
+	"loss": "Loss",
 	
 	"_commentstats": "file stats.ts",
-	"win": "Wins",
-	"loss": "Losses",
+	"wins": "Wins",
+	"losses": "Losses",
 
 	"_commentprofile": "file profile.ts",
 	"profileUpdateSuccess": "✅ Profile successfully updated!",
@@ -111,5 +115,6 @@
 	"errorInvalidPassword": "Incorrect password.",
 	"errorNewPasswordShort": "New password must be at least 8 characters long.",
 	"errorOldPasswordWrong": "The old password is incorrect.",
-	"errorGeneric": "An error occurred (Code: {code})"
+	"errorGeneric": "An error occurred (Code: {code})",
+	"errorAnonymizedAccount": "This account has been anonymized."
 }

@@ -6,7 +6,7 @@ const api = new API("https://localhost:3000");
 
 let statsChart: Chart | null = null; // Variable pour stocker le graphique
 
-export function addGameToStats(userId: number, result: "win" | "loss"): void {
+export function addGameToStats(userId: number, result: string): void {
 	const statsIncrement = result.includes("win")
 		? { wins: 1, losses: 0, matchesPlayed: 1 }
 		: { wins: 0, losses: 1, matchesPlayed: 1 };
@@ -57,7 +57,7 @@ export function renderStatsChart(stats: UserStats): void {
 	statsChart = new Chart(ctx, {
 		type: "doughnut",
 		data: {
-			labels: [getTranslation("win"), getTranslation("loss")],
+			labels: [getTranslation("wins"), getTranslation("losses")],
 			datasets: [
 				{
 					data: [stats.wins, stats.losses],
