@@ -773,7 +773,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!loggedInUserId) return;
 
     // Get match type and result from the dropdowns
-    const matchType = matchTypeInput.value as "1vs1" | "vs AI" | "Tournament";
+    // const matchType = matchTypeInput.value as "1vs1" | "vs AI" | "Tournament";
+    const matchType = matchTypeInput.value;
     const matchResultStr = matchResultInput.value; // e.g., ("✅ Victory" or "❌ Defeat") or ("✅ Victoire" or "❌ Défaite")
     const player1 = loggedInUserId;
     const player2 = 9999; // Dummy opponent
@@ -794,7 +795,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Determine winner based on the selected result
       // const winner = matchResultStr.includes("Victory") ? player1 : player2;
       // const winner = matchResultStr.includes("Victoire") ? player1 : player2;
-      const didWin = matchResultStr.includes("Victoire");
+      // const didWin = matchResultStr.includes("Victoire");
+      const didWin = matchResultStr.includes("Vict");
       const winner = didWin ? player1 : player2;
 
       // Update the match with the result

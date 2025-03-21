@@ -7,7 +7,8 @@ const api = new API("https://localhost:3000");
 
 export async function addGameToHistory(
   userId: number,
-  type: "1vs1" | "vs AI" | "Tournament",
+  // type: "1vs1" | "vs AI" | "Tournament",
+  type: string,
   result: string
 ): Promise<void> {
   try {

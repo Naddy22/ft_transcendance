@@ -70,30 +70,30 @@ export interface Match {
   score: MatchScore;
   startTime: string;
   endTime?: string | null;
-  matchType: "1vs1" | "vs AI" | "Tournament";
+  matchType: string;
   tournamentId?: number | null;
 }
 
 export interface MatchHistory {
   date: string;
-  type: "1vs1" | "vs AI" | "Tournament";
+  type: string;
   result: string;
 }
 
 export interface NewMatchHistoryEntry {
   userId: number;
-  type: "1vs1" | "vs AI" | "Tournament";
+  type: string;
   result: string;
 }
 
-// export type MatchHistoryEntry = Pick<Match, "startTime" | "matchType" | "winner">;
 
 export interface NewMatchRequest {
   player1: number;
   player2: number;
   score: MatchScore;
   startTime: string;
-  matchType: "1vs1" | "vs AI" | "Tournament";
+  // matchType: "1vs1" | "vs AI" | "Tournament";
+  matchType: string;
   tournamentId?: number | null;
 
 }
@@ -197,15 +197,6 @@ export class API {
     });
   }
 
-  // async loginUser(
-  //   data: LoginRequest
-  // ): Promise<{ message: string; user: PublicUser }> {
-  //   return this.request<{ message: string; user: PublicUser }>("/auth/login", {
-  //     method: "POST",
-  //     body: JSON.stringify(data),
-  //   });
-  // }
-
   // Login with 2FA support
   async loginUser(
     data: LoginRequest
@@ -241,31 +232,10 @@ export class API {
 
   async getUsers(): Promise<PublicUser[]> {
     return this.request<PublicUser[]>("/users");
-    // const users = await this.request<PublicUser[]>("/users");
-
-    // return users.map(user => ({
-    //   ...user,
-    //   avatar: user.avatar
-    //     ? (user.avatar === "default_cat.webp"
-    //       ? `/avatars/default/${user.avatar}`
-    //       : `/avatars/uploads/${user.avatar}`)
-    //     : `/avatars/default/default_cat.webp`
-    // }));
   }
 
   async getUser(id: number): Promise<PublicUser> {
     return this.request<PublicUser>(`/users/${id}`);
-    // const user = await this.request<PublicUser>(`/users/${id}`);
-
-    // if (user.avatar) {
-    //   user.avatar = user.avatar === "default_cat.webp"
-    //     ? `/avatars/default/${user.avatar}`
-    //     : `/avatars/uploads/${user.avatar}`;
-    // } else {
-    //   user.avatar = `/avatars/default/default_cat.webp`;
-    // }
-
-    // return user;
   }
 
   async updateUser(
@@ -370,13 +340,6 @@ export class API {
   async getUserMatchHistory(userId: number): Promise<MatchHistory[]> {
     return this.request<MatchHistory[]>(`/matches/history/${userId}`);
   }
-
-  // async submitMatchResult(data: { matchId: number; winner: number; scorePlayer1?: number; scorePlayer2?: number }): Promise<{ message: string }> {
-  //   return this.request<{ message: string }>("/matches/result", {
-  //     method: "POST",
-  //     body: JSON.stringify(data),
-  //   });
-  // }
 
   // ── Match History Endpoint ────────────────────────────────────────────
 
@@ -491,26 +454,14 @@ export class API {
 
   // ── 2FA ───────────────────────────────────────────────────────────────
 
-  // Setup 2FA
-  // async setup2FA(userId: number): Promise<{ secret: string; qrCode: string }> {
-  //   return this.request<{ secret: string; qrCode: string }>(`/auth/setup-2fa`, {
-  //     method: "POST",
-  //     body: JSON.stringify({ userId }),
-  //   });
-  // }
-  // async setup2FA(userId: number): Promise<Setup2FAResponse> {
-  //   return this.request<Setup2FAResponse>("/auth/setup-2fa", {
-  //     method: "POST",
-  //     body: JSON.stringify({ userId }),
-  //   });
-  // }
   async setup2FA(userId: number): Promise<{ secret: string; qrCode: string }> {
     const response = await this.request<{ secret: string; qrCode: string }>(`/auth/setup-2fa`, {
       method: "POST",
       body: JSON.stringify({ userId }),
     });
 
-    console.log("Saved 2FA Secret:", response.secret); // ✅ Check this
+    console.log("Saved 2FA Secret:", response.secret); // debug
+
     return response;
   }
 

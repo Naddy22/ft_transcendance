@@ -108,7 +108,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       //   WHERE username = ? OR email = ?
       // `);
       const stmt = await fastify.db.prepare(`
-        SELECT id, username, email, password, twoFactorSecret, isTwoFactorEnabled
+        SELECT id, username, email, password, status, twoFactorSecret, isTwoFactorEnabled
         FROM users 
         WHERE LOWER(email) = LOWER(?) OR username = ?
       `);
@@ -117,6 +117,11 @@ export async function authRoutes(fastify: FastifyInstance) {
       if (!user) {
         return reply.status(401).send({
           error: "Invalid username or email"
+        });
+      }
+      if (user.status.includes("anon")) {
+        return reply.status(403).send({
+          error: "This account is anonymized"
         });
       }
 

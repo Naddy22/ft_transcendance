@@ -13,7 +13,8 @@ export async function matchHistoryRoutes(fastify: FastifyInstance) {
     try {
       const { userId, type, result } = req.body as {
         userId: number;
-        type: "1vs1" | "vs AI" | "Tournament";
+        // type: "1vs1" | "vs AI" | "Tournament";
+        type: string;
         result: string;
       };
 
