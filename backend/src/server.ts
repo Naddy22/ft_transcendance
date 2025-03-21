@@ -2,7 +2,7 @@
 // Main Fastify server setup, including routes, database, and shutdown handling.
 
 import Fastify from 'fastify';
-import { FastifyRequest, FastifyReply } from 'fastify';
+import { FastifyRequest, FastifyReply, FastifyPluginCallback } from 'fastify';
 import fastifyGracefulExit from "@mgcrea/fastify-graceful-exit";
 import fastifyStatic from '@fastify/static'; // https://github.com/fastify/fastify-static
 import fastifyMultipart from "@fastify/multipart";
@@ -15,10 +15,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { fpSqlitePlugin } from 'fastify-sqlite-typed';
 
-// import fastifyMailer from 'fastify-mailer';
-
 import fastifyRequestLogger from "@mgcrea/fastify-request-logger";
-import prettifier from "@mgcrea/pino-pretty-compact";
 
 import { setupRoutes } from './routes/setupRoutes.js';
 import { setupDatabase } from './database.js';
@@ -46,24 +43,23 @@ export async function avatarRoutes(fastify: FastifyInstance) {
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Ensure cert directory exists before initializing the certificates
-const sslDir = path.join(__dirname, '../certs');
-// const sslDir = "/app/certs"; // Shared with NGINX
-if (!fs.existsSync(sslDir)) {
-  console.log('Creating directory for SSL certificates...');
-  fs.mkdirSync(sslDir, { recursive: true });
-}
+// const sslDir = path.join(__dirname, '../certs');
+// if (!fs.existsSync(sslDir)) {
+//   console.log('Creating directory for SSL certificates...');
+//   fs.mkdirSync(sslDir, { recursive: true });
+// }
 
-// Setup SSL Certificates
-const certPath = path.join(sslDir, 'cert.pem');
-const keyPath = path.join(sslDir, 'key.pem');
+// // Setup SSL Certificates
+// const certPath = path.join(sslDir, 'cert.pem');
+// const keyPath = path.join(sslDir, 'key.pem');
 
-// Generate self-signed SSL certificates if they don't exist
-if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
-  console.log('Generating self-signed SSL certificates...');
-  const { execSync } = await import('child_process');
-  execSync(`openssl req -x509 -newkey rsa:2048 -keyout ${keyPath} -out ${certPath} -days 365 -nodes -subj "/CN=localhost"`);
-  console.log('SSL certificates generated.');
-}
+// // Generate self-signed SSL certificates if they don't exist
+// if (!fs.existsSync(certPath) || !fs.existsSync(keyPath)) {
+//   console.log('Generating self-signed SSL certificates...');
+//   const { execSync } = await import('child_process');
+//   execSync(`openssl req -x509 -newkey rsa:2048 -keyout ${keyPath} -out ${certPath} -days 365 -nodes -subj "/CN=localhost"`);
+//   console.log('SSL certificates generated.');
+// }
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Ensure data directory exists before initializing the database
@@ -83,39 +79,42 @@ if (!fs.existsSync(dbPath)) {
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Transport setup for "pretty" logs only in dev mode
-const loggerOptions = process.env.NODE_ENV !== 'production'
-  ? {
+const loggerOptions = process.env.NODE_ENV !== 'production' ? {
     // level: 'info',
     // file: './server.log',
     transport: {
-      // target: 'pino-pretty',
       target: "@mgcrea/pino-pretty-compact",
       options: {
         colorize: true,
         translateTime: "SYS:H:MM:ss",
-        // translateTime: "SYS:yyyy-mm-dd HH:MM:ss",
         ignore: 'pid,hostname',
       }
     }
-  }
-  : true;  // Raw JSON logs in production for better machine parsing and performance.
+  } : true;  // Raw JSON logs in production for better machine parsing and performance.
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Initialize Fastify Server (allowing http for developpement)
-const isHttps = process.env.USE_HTTPS === "true";
+// const isHttps = process.env.USE_HTTPS === "true";
+
+// const fastify = Fastify({
+//   // logger: true,
+//   logger: loggerOptions,
+//   disableRequestLogging: true,
+//   ignoreTrailingSlash: true,
+//   trustProxy: true,
+//   ...(isHttps && {
+//     https: {
+//       key: fs.readFileSync(keyPath),
+//       cert: fs.readFileSync(certPath),
+//     }
+//   })
+// });
 
 const fastify = Fastify({
-  // logger: true,
   logger: loggerOptions,
   disableRequestLogging: true,
   ignoreTrailingSlash: true,
-  // trustProxy: true, // uncomment when/if we setup nginx
-  ...(isHttps && {
-    https: {
-      key: fs.readFileSync(keyPath),
-      cert: fs.readFileSync(certPath),
-    }
-  })
+  trustProxy: true,
 });
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -152,19 +151,6 @@ fastify.get('/protected', { preValidation: [fastify.authenticate] }, async (req,
 */
 
 // ────────────────────────────────────────────────────────────────────────────────
-// 
-// await fastify.register(fastifyMailer, {
-//   defaults: { from: process.env.EMAIL_FROM || "no-reply@catpong.com" },
-//   transport: {
-//     service: "gmail", // Or use SMTP settings
-//     auth: {
-//       user: process.env.EMAIL_USER,
-//       pass: process.env.EMAIL_PASS
-//     }
-//   }
-// });
-
-// ────────────────────────────────────────────────────────────────────────────────
 // Register helmet plugin (prevent XSS)
 await fastify.register(helmet, {
   // noSniff: true,
@@ -194,24 +180,24 @@ await fastify.register(fpSqlitePlugin, {
 await fastify.register(fastifyMultipart);
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Frontend 'dist/' folder path constant
-const FRONTEND_DIST = process.env.FRONTEND_DIST || "../../frontend/dist";
+// // Frontend 'dist/' folder path constant
+// const FRONTEND_DIST = process.env.FRONTEND_DIST || "../../frontend/dist";
 
-const frontendPath = path.resolve(__dirname, FRONTEND_DIST);
-// console.log("Serving frontend from:", frontendPath); // Debugging output
+// const frontendPath = path.resolve(__dirname, FRONTEND_DIST);
+// // console.log("Serving frontend from:", frontendPath); // Debugging output
 
-if (!fs.existsSync(frontendPath)) {
-  console.error("⚠️ Frontend dist folder does not exist:", frontendPath);
-  process.exit(1);
-}
+// if (!fs.existsSync(frontendPath)) {
+//   console.error("⚠️ Frontend dist folder does not exist:", frontendPath);
+//   process.exit(1);
+// }
 
-// Serve static frontend files (from 'frontend/dist') under '/'
-await fastify.register(fastifyStatic, {
-  root: frontendPath,
-  // root: path.resolve(__dirname, FRONTEND_DIST),
-  prefix: '/',
-  index: ['index.html'],
-});
+// // Serve static frontend files (from 'frontend/dist') under '/'
+// await fastify.register(fastifyStatic, {
+//   root: frontendPath,
+//   // root: path.resolve(__dirname, FRONTEND_DIST),
+//   prefix: '/',
+//   index: ['index.html'],
+// });
 
 // ────────────────────────────────────────────────────────────────────────────────
 // 
@@ -246,8 +232,10 @@ await setupDatabase(fastify);
 const start = async () => {
   try {
     const port = Number(process.env.PORT) || 3000;
-    await fastify.listen({ port, host: '0.0.0.0' });
+
+    await fastify.listen({ port: port, host: '0.0.0.0' });
     console.log(`Fastify server running on https://localhost:${port}`);
+
   } catch (error) {
     fastify.log.error(error);
     process.exit(1);

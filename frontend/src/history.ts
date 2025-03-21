@@ -3,7 +3,11 @@
 
 import { API, MatchHistory, NewMatchHistoryEntry } from "./api";
 
-const api = new API("https://localhost:3000");
+// const api = new API("http://localhost:3000");
+const api = new API("");
+// const api = new API("/");
+// const api = new API("http://localhost");
+// const api = new API("window.location.origin");
 
 export async function addGameToHistory(
   userId: number,

@@ -48,8 +48,10 @@ export async function anonymizationRoutes(fastify: FastifyInstance) {
 
         // Build anonymized data. Using the user ID to ensure uniqueness.
         const anonymizedData = {
-          username: `anonymous_${id}`,
-          email: `anonymous_${id}@example.com`,
+          // username: `anonymous_${id}`,
+          username: "anonymous",
+          // email: `anonymous_${id}@example.com`,
+          email: "anonymous@cat.pong",
           // avatar: null,
           avatar: ANONYMOUS_AVATAR_URL,
           status: "anonymized"

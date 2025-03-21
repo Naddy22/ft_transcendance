@@ -10,7 +10,8 @@ REPO_LINK	:= https://github.com/SaydRomey/ft_transcendence
 # Network Info
 BACKEND_PORT	:= 3000
 FRONTEND_PORT	:= 5173
-BACKEND_URL		:= https://localhost:$(BACKEND_PORT)
+# BACKEND_URL		:= https://localhost:$(BACKEND_PORT)
+BACKEND_URL		:= http://localhost:$(BACKEND_PORT)
 FRONTEND_URL	:= http://localhost:$(FRONTEND_PORT)
 
 # Directories
@@ -37,8 +38,8 @@ include $(MK_PATH)/doc.mk		# Documentation Targets
 include $(MK_PATH)/env.mk		# .env File Management
 
 # Default Target
-# .DEFAULT_GOAL	:= all
-.DEFAULT_GOAL	:= test # **tmp
+.DEFAULT_GOAL	:= all
+# .DEFAULT_GOAL	:= test # **tmp
 
 .DEFAULT:
 	$(info make: *** No rule to make target '$(MAKECMDGOALS)'.  Stop.)
@@ -72,6 +73,7 @@ tree: ## Show file structure (without node_modules/)
 # ==============================
 
 all: env build up ## Build and start containers
+	@$(OPEN) http://localhost
 
 # Comment/Uncomment these to log outputs
 # ENABLE_BACK_LOG		:= > logs/$(BACKEND_LOG_FILE) $(STDERR_STDOUT)
