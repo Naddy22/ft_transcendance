@@ -59,7 +59,10 @@ export function getErrorMessage(error: string): string {
 
 		// 📌 Update Password
 		"New password must be at least 8 characters long.": getTranslation("errorNewPasswordShort"),
-		"Old password is incorrect.": getTranslation("errorOldPasswordWrong")
+		"Old password is incorrect.": getTranslation("errorOldPasswordWrong"),
+
+		// 📌 2FA
+		"Invalid 2FA code": getTranslation("error2faInvalidCode"),
 	};
 
 	// 🔹 Recherche de l'erreur exacte ou partielle

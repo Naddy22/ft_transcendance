@@ -2,6 +2,7 @@ import { loadLanguage, applyTranslations } from "./language";
 import { startPongGame3D as startPongGame } from './game3D';
 import { stopPongGame3D as stopPongGame } from './game3D';
 import { Tournament } from './tournament3D';
+import { setup2FA, confirm2FASetup, disable2FA } from "./2fa";
 import { addGameToHistory, updateHistoryUI } from "./history";
 import { addGameToStats, updateStatsUI } from "./stats";
 import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
@@ -21,6 +22,16 @@ const loginForm = document.getElementById("loginForm") as HTMLFormElement;
 const registerForm = document.getElementById("registerForm") as HTMLFormElement;
 const loginMessage = document.getElementById("loginMessage") as HTMLParagraphElement;
 const registerMessage = document.getElementById("registerMessage") as HTMLParagraphElement;
+
+const twoFactorSection = document.getElementById("twoFactorSection")!;
+const setup2FABtn = document.getElementById("setup2FABtn") as HTMLButtonElement;
+const confirm2FASetupBtn = document.getElementById("confirm2FASetupBtn") as HTMLButtonElement;
+const disable2FABtn = document.getElementById("disable2FABtn") as HTMLButtonElement;
+const qrCodeImg = document.getElementById("qrCodeImg") as HTMLImageElement;
+const setup2FACode = document.getElementById("setup2FACode") as HTMLInputElement;
+const twoFactorResponse = document.getElementById("twoFactorResponse")!;
+const setup2FAResponse = document.getElementById("setup2FAResponse")!;
+const disable2FAResponse = document.getElementById("disable2FAResponse")!;
 
 const profileModal = document.getElementById("profileModal") as HTMLElement;
 const profileForm = document.getElementById("profileForm") as HTMLFormElement;
@@ -307,6 +318,13 @@ function loadUserProfile() {
 			(document.getElementById("userAvatar")! as HTMLImageElement).src = profile.avatar;
 			(document.getElementById("oldPassword")! as HTMLInputElement).value = "";
 			(document.getElementById("newPassword")! as HTMLInputElement).value = "";
+			if (!profile.isTwoFactorEnabled) {
+				(document.getElementById("twoFactorDisableSection"))!.style.display = "none";
+				(document.getElementById("twoFactorSetupSection"))!.style.display = "block";
+			} else {
+				(document.getElementById("twoFactorSetupSection"))!.style.display = "none";
+				(document.getElementById("twoFactorDisableSection"))!.style.display = "block";
+			}
 			(document.getElementById("friendSearchInput")! as HTMLInputElement).value = "";
 			(document.getElementById("friendSearchResults")!).innerHTML = ""; // ✅ Efface les résultats de recherche
 
@@ -370,6 +388,72 @@ uploadAvatarBtn.addEventListener("click", () => {
 			// alert("✅ Avatar mis à jour !");
 		})
 		.catch(error => alert(`${error.message}`));
+});
+
+// 🔐 Activation 2FA
+setup2FABtn.addEventListener("click", async () => {
+	twoFactorResponse.textContent = "";
+	twoFactorResponse.style.display = "none";
+	try {
+		const { qrCode } = await setup2FA(currentUser!.id);
+		qrCodeImg.src = qrCode;
+		setup2FACode.value = "";
+		document.getElementById("qrAndConfirmContainer")!.style.display = "block";
+	} catch (error: any) {
+		twoFactorResponse.textContent = error.message;
+		twoFactorResponse.style.display = "block";
+		setTimeout(() => {
+			twoFactorResponse.style.display = "none";
+		}, 10000);
+	}
+});
+
+// ✅ Confirmer 2FA
+confirm2FASetupBtn.addEventListener("click", async () => {
+	const token = setup2FACode.value.trim();
+	twoFactorResponse.textContent = "";
+	twoFactorResponse.style.display = "block";
+
+	if (!token) {
+		twoFactorResponse.textContent = getTranslation("2faMissingCode");
+		return;
+	}
+
+	confirm2FASetup(currentUser!.id, token)
+		.then((message) => {
+			twoFactorResponse.textContent = message;
+			document.getElementById("qrAndConfirmContainer")!.style.display = "none";
+			loadUserProfile()
+			setTimeout(() => {
+				twoFactorResponse.style.display = "none";
+			}, 10000);
+		})
+		.catch((error: any) => {
+			console.error("❌ Erreur 2FA confirm:", error);
+			twoFactorResponse.textContent = error.message;
+			setTimeout(() => {
+				twoFactorResponse.style.display = "none";
+			}, 10000);
+		});
+});
+
+// ❌ Désactiver 2FA
+disable2FABtn.addEventListener("click", async () => {
+	twoFactorResponse.textContent = "";
+	twoFactorResponse.style.display = "none";
+	try {
+		const message = await disable2FA(currentUser!.id);
+		twoFactorResponse.textContent = message;
+		twoFactorResponse.style.display = "block";
+		document.getElementById("twoFactorDisableSection")!.style.display = "none";
+		document.getElementById("qrAndConfirmContainer")!.style.display = "none";
+		loadUserProfile();
+		setTimeout(() => {
+			twoFactorResponse.style.display = "none";
+		}, 10000);
+	} catch (error: any) {
+		alert(error.message);
+	}
 });
 
 // 📌 Mettre à jour l'affichage des amis

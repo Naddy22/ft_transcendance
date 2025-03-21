@@ -68,6 +68,33 @@
 					<input type="password" id="oldPassword" data-i18n-placeholder="oldPasswordPlaceholder">
 					<input type="password" id="newPassword" data-i18n-placeholder="newPasswordPlaceholder">
 				</div>
+				<!-- 📱 Authentification à deux facteurs -->
+				<div id="twoFactorSection" class="two-factor-section">
+					<h3 data-i18n="2faTitle"></h3>
+
+					<!-- Activation -->
+					<div id="twoFactorSetupSection" style="display: none;">
+						<button id="setup2FABtn" data-i18n="2faEnableBtn"></button>
+						<!-- <p id="twoFactorResponse"></p> -->
+					</div>
+
+					<!-- QR Code + champ de vérification -->
+					<div id="qrAndConfirmContainer" style="display: none;">
+						<p data-i18n="2faScanMessage"></p>
+						<img id="qrCodeImg" src="" alt="QR Code 2FA"><br>
+						<input type="text" id="setup2FACode" data-i18n-placeholder="2faCodePlaceholder">
+						<button id="confirm2FASetupBtn" data-i18n="2faConfirmBtn"></button>
+						<!-- <p id="setup2FAResponse"></p> -->
+					</div>
+
+					<!-- Désactivation -->
+					<div id="twoFactorDisableSection" style="display: none;">
+						<button id="disable2FABtn" data-i18n="2faDisableBtn"></button>
+						<!-- <p id="disable2FAResponse"></p> -->
+					</div>
+					<p id="twoFactorResponse"></p>
+				</div>
+
 				<h3 data-i18n="friendsTitle"></h3>
 				<ul id="friendList"></ul>
 				<h3 data-i18n="addFriend"></h3>
