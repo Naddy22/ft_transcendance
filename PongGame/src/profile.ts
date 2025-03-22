@@ -10,6 +10,7 @@ export function getUserProfile(userId: number) {
 			username: user.username,
 			email: user.email,
 			avatar: user.avatar || "/avatars/default/default_cat.webp",
+			isTwoFactorEnabled: user.isTwoFactorEnabled
 		}))
 		.catch(error => {
 			console.error("❌ Erreur récupération profil :", error.message);
