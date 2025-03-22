@@ -560,12 +560,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // showTwoFactorLogin();
         return;
       }
-      // if (response.requires2FA) {
-      //   if (response.user) loggedInUserId = response.user.id;
-      //   loginResponse.textContent = "⚠️ 2FA Required. Please enter your 6-digit code.";
-      //   showTwoFactorLogin();
-      //   return;
-      // }
 
       // If we get here, either 2FA is not required or not enabled
       if (response.user) {

@@ -163,12 +163,12 @@ export class API {
       ...(token ? { "Authorization": `Bearer ${token}` } : {})
     };
 
-    const url = new URL(endpoint, this.baseUrl || window.location.origin).toString();
-    const response = await fetch(url, { headers, ...options });
-    // const response = await fetch(`${this.baseUrl}${endpoint}`, {
-    //   headers,
-    //   ...options,
-    // });
+    // const url = new URL(endpoint, this.baseUrl || window.location.origin).toString();
+    // const response = await fetch(url, { headers, ...options });
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      headers,
+      ...options,
+    });
 
     const responseData = await response.json();
 

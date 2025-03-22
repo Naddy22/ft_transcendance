@@ -63,13 +63,13 @@ data/
 # ======================
 
 # Docker ignore file
-.dockerignore
+# .dockerignore
 
 # Local override for docker-compose setup
 docker-compose.override.yml
 
 # Init scripts for database setup in Docker
-**/docker-entrypoint-initdb.d/
+# **/docker-entrypoint-initdb.d/
 
 # ======================
 # Babylon.js / WebGL Artifacts
