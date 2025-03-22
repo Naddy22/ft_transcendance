@@ -1,7 +1,7 @@
 import { API } from "./api";
 import { getTranslation, getErrorMessage } from "./language";
 
-const api = new API("https://localhost:3000");
+const api = new API("");
 
 // 📌 Initialiser le 2FA et récupérer le QR code
 export async function setup2FA(userId: number): Promise<{ qrCode: string }> {
@@ -24,6 +24,19 @@ export async function confirm2FASetup(userId: number, token: string): Promise<st
 		console.error("❌ Échec de la vérification 2FA :", error.message);
 		const message = getTranslation("2faVerificationError").replace("{error}", getErrorMessage(error.message));
 		throw new Error(message);
+	}
+}
+
+// 📌 Vérifie le code 2FA lors du login
+export async function verify2FALogin(userId: number, token: string): Promise<string> {
+	try {
+		const res = await api.verify2FA(userId, token);
+		if (res.token) {
+			// Tu peux éventuellement stocker le token JWT ici si nécessaire
+		}
+		return getTranslation("2faLoginSuccess"); // "✅ Authentification à deux facteurs réussie !"
+	} catch (error: any) {
+		throw new Error(getErrorMessage(error.message));
 	}
 }
 

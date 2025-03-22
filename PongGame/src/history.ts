@@ -1,7 +1,7 @@
 import { API, MatchHistory, NewMatchHistoryEntry } from "./api";
 import { getTranslation } from "./language";
 
-const api = new API("https://localhost:3000");
+const api = new API("");
 
 export function addGameToHistory(
 	userId: number,

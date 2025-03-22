@@ -2,7 +2,7 @@ import Chart from "chart.js/auto"; // 📊 pour graphique
 import { API, UserStats } from "./api";
 import { getTranslation } from "./language";
 
-const api = new API("https://localhost:3000");
+const api = new API("");
 
 let statsChart: Chart | null = null; // Variable pour stocker le graphique
 

@@ -1,7 +1,7 @@
 import { API, PublicUser } from "./api";
 import { getTranslation, getErrorMessage } from "./language";
 
-const api = new API("https://localhost:3000"); // URL du backend
+const api = new API(""); // URL du backend
 
 export async function checkSession(): Promise<PublicUser | null> {
 	try {
@@ -38,8 +38,8 @@ export async function registerUser(username: string, email: string, password: st
 export async function loginUser(identifier: string, password: string): Promise<string> {
 	try {
 		const response = await api.loginUser({ identifier, password });
-		console.log(`✅ Connecté en tant que ${response.user.username}`);
-		const successMessage = getTranslation("loginSuccess").replace("{username}", response.user.username);
+		console.log(`✅ Connecté en tant que ${response.user!.username}`);
+		const successMessage = getTranslation("loginSuccess").replace("{username}", response.user!.username);
 		return successMessage;
 	} catch (error: any) {
 		console.error("❌ Erreur de connexion :", error.message);

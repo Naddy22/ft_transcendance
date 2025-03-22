@@ -4,12 +4,12 @@
 FROM node:18 AS builder
 WORKDIR /app
 
-COPY frontend/package*.json ./
-# COPY PongGame/package*.json ./
+# COPY frontend/package*.json ./
+COPY PongGame/package*.json ./
 RUN npm ci
 
-COPY frontend .
-# COPY PongGame .
+# COPY frontend .
+COPY PongGame .
 RUN npm run build
 
 # Stage 2 - Serve using NGINX

@@ -144,8 +144,9 @@ export class API {
   private baseUrl: string;
 
   constructor(baseUrl: string = "") {
-    // Set to the backend URL (e.g., "https://localhost:3000")
+    // Set to the backend URL (e.g., "http://localhost:3000")
     this.baseUrl = baseUrl;
+    // this.baseUrl = "";
   }
 
   // Generic request method with centralized error handling.
@@ -162,10 +163,12 @@ export class API {
       ...(token ? { "Authorization": `Bearer ${token}` } : {})
     };
 
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      headers,
-      ...options,
-    });
+    const url = new URL(endpoint, this.baseUrl || window.location.origin).toString();
+    const response = await fetch(url, { headers, ...options });
+    // const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    //   headers,
+    //   ...options,
+    // });
 
     const responseData = await response.json();
 
@@ -465,6 +468,14 @@ export class API {
     return response;
   }
 
+  // Confirm and enable 2FA after QR scan
+  async confirm2FASetup(userId: number, token: string): Promise<{ message: string }> {
+    return this.request<{ message: string }>(`/auth/confirm-2fa`, {
+      method: "POST",
+      body: JSON.stringify({ userId, token }),
+    });
+  }
+
   // Verify 2FA Token
   async verify2FA(userId: number, token: string): Promise<{ message: string; token?: string }> {
     return this.request<{ message: string; token?: string }>(`/auth/verify-2fa`, {
@@ -480,14 +491,6 @@ export class API {
       body: JSON.stringify({ userId }),
     });
   }
-
-  // // Send 2FA Code via Email
-  // async send2FACode(userId: number, email: string): Promise<{ message: string }> {
-  //   return this.request<{ message: string }>("/auth/send-2fa-code", {
-  //     method: "POST",
-  //     body: JSON.stringify({ userId, email }),
-  //   });
-  // }
 
 }
 

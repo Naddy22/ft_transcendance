@@ -1,7 +1,7 @@
 import { API } from "./api";
 import { getTranslation, getErrorMessage } from "./language";
 
-const api = new API("https://localhost:3000");
+const api = new API("");
 
 export function getUserProfile(userId: number) {
 	return api.getUser(userId)
