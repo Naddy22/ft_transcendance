@@ -2,12 +2,13 @@ import { loadLanguage, applyTranslations } from "./language";
 import { startPongGame3D as startPongGame } from './game3D';
 import { stopPongGame3D as stopPongGame } from './game3D';
 import { Tournament } from './tournament3D';
-import { setup2FA, confirm2FASetup, disable2FA } from "./2fa";
+import { setup2FA, confirm2FASetup, verify2FALogin, disable2FA } from "./2fa";
 import { addGameToHistory, updateHistoryUI } from "./history";
 import { addGameToStats, updateStatsUI } from "./stats";
 import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
 import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, searchUsers, addFriend, removeFriend, deleteUserAccount, exportUserData, anonymizeUser} from "./profile";
 import { getTranslation } from "./language";
+import { PublicUser } from "./api";
 
 const languageSelect = document.getElementById("languageSelect") as HTMLSelectElement;
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -23,15 +24,18 @@ const registerForm = document.getElementById("registerForm") as HTMLFormElement;
 const loginMessage = document.getElementById("loginMessage") as HTMLParagraphElement;
 const registerMessage = document.getElementById("registerMessage") as HTMLParagraphElement;
 
-const twoFactorSection = document.getElementById("twoFactorSection")!;
+// const twoFactorSection = document.getElementById("twoFactorSection")!;
 const setup2FABtn = document.getElementById("setup2FABtn") as HTMLButtonElement;
 const confirm2FASetupBtn = document.getElementById("confirm2FASetupBtn") as HTMLButtonElement;
 const disable2FABtn = document.getElementById("disable2FABtn") as HTMLButtonElement;
 const qrCodeImg = document.getElementById("qrCodeImg") as HTMLImageElement;
 const setup2FACode = document.getElementById("setup2FACode") as HTMLInputElement;
 const twoFactorResponse = document.getElementById("twoFactorResponse")!;
-const setup2FAResponse = document.getElementById("setup2FAResponse")!;
-const disable2FAResponse = document.getElementById("disable2FAResponse")!;
+// const setup2FAResponse = document.getElementById("setup2FAResponse")!;
+// const disable2FAResponse = document.getElementById("disable2FAResponse")!;
+const verify2FAForLoginBtn = document.getElementById("verify2FAForLoginBtn") as HTMLButtonElement;
+const login2FACode = document.getElementById("login2FACode") as HTMLInputElement;
+const login2FAResponse = document.getElementById("login2FAResponse") as HTMLParagraphElement;
 
 const profileModal = document.getElementById("profileModal") as HTMLElement;
 const profileForm = document.getElementById("profileForm") as HTMLFormElement;
@@ -173,13 +177,54 @@ loginForm.addEventListener("submit", async (event) => {
 
 	try {
 		await loginUser(identifier, password);
-		authPage.style.display = "none";
-		showMenu();
-		updateAuthButton();
-		history.pushState({ page: "menu" }, "Menu", "#menu");
+
+		const response = await checkSession(); // 🔹 tu attends la réponse ici
+
+		if (response && response.isTwoFactorEnabled) {
+			// L’utilisateur a activé le 2FA
+			console.log("2FA est activé !");
+			document.getElementById("twoFactorLoginModal")!.style.display = "block";
+			return;
+		}
+		else {
+			authPage.style.display = "none";
+			showMenu();
+			updateAuthButton();
+			history.pushState({ page: "menu" }, "Menu", "#menu");
+		}
 	} catch (error: any) {
 		loginMessage.style.color = "red"; // ❌ Change la couleur en rouge
 		loginMessage.textContent = error.message; // Affiche l'erreur sous le formulaire
+	}
+});
+
+verify2FAForLoginBtn.addEventListener("click", async () => {
+	const token = login2FACode.value.trim();
+	if (!token) {
+		login2FAResponse.textContent = getTranslation("2faMissingCode");
+		login2FAResponse.style.color = "red";
+		return;
+	}
+
+	try {
+		const message = await verify2FALogin(currentUser!.id, token);
+		login2FAResponse.textContent = message;
+		login2FAResponse.style.color = "green";
+
+		setTimeout(() => {
+			document.getElementById("twoFactorLoginModal")!.style.display = "none";
+			login2FAResponse.textContent = "";
+			login2FACode.value = "";
+
+			// 🔄 Reprend le login normal
+			authPage.style.display = "none";
+			showMenu();
+			updateAuthButton();
+			history.pushState({ page: "menu" }, "Menu", "#menu");
+		}, 1500);
+	} catch (error: any) {
+		login2FAResponse.textContent = error.message;
+		login2FAResponse.style.color = "red";
 	}
 });
 

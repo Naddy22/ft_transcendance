@@ -133,5 +133,13 @@
 	"errorOldPasswordWrong": "L'ancien mot de passe est incorrect.",
 	"errorGeneric": "Une erreur est survenue (Code : {code})",
 	"errorAnonymizedAccount": "Ce compte a été anonymisé.",
-	"error2faInvalidCode": "Le code 2FA est invalide."
+	"error2faInvalidCode": "Le code 2FA est invalide.",
+
+	"2faLoginTitle": "🔐 Vérification 2FA",
+	"2faLoginPrompt": "Veuillez entrer le code à 6 chiffres généré par votre application d’authentification.",
+	"2faLoginVerifyBtn": "Vérifier",
+	"2faLoginSuccess": "✅ Authentification à deux facteurs réussie !"
+
+
+
 }

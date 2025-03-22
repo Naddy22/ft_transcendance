@@ -63,7 +63,7 @@ data/
 # ======================
 
 # Docker ignore file
-.dockerignore
+# .dockerignore
 
 # Local override for docker-compose setup
 docker-compose.override.yml
