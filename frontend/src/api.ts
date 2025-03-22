@@ -144,7 +144,7 @@ export class API {
   private baseUrl: string;
 
   constructor(baseUrl: string = "") {
-    // Set to the backend URL (e.g., "http://localhost:3000")
+    // Set to the backend URL (e.g., "http://localhost:3000" or "" if using nginx)
     this.baseUrl = baseUrl;
     // this.baseUrl = "";
   }

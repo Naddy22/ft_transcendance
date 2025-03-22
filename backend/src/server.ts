@@ -42,7 +42,8 @@ export async function avatarRoutes(fastify: FastifyInstance) {
 */
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Ensure cert directory exists before initializing the certificates
+// ────────────────────────────────────────────────────────────────────────────────
+// // Ensure cert directory exists before initializing the certificates
 // const sslDir = path.join(__dirname, '../certs');
 // if (!fs.existsSync(sslDir)) {
 //   console.log('Creating directory for SSL certificates...');
@@ -60,6 +61,8 @@ export async function avatarRoutes(fastify: FastifyInstance) {
 //   execSync(`openssl req -x509 -newkey rsa:2048 -keyout ${keyPath} -out ${certPath} -days 365 -nodes -subj "/CN=localhost"`);
 //   console.log('SSL certificates generated.');
 // }
+// ────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Ensure data directory exists before initializing the database
@@ -93,7 +96,8 @@ const loggerOptions = process.env.NODE_ENV !== 'production' ? {
   } : true;  // Raw JSON logs in production for better machine parsing and performance.
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Initialize Fastify Server (allowing http for developpement)
+// ────────────────────────────────────────────────────────────────────────────────
+// // Initialize Fastify Server (allowing http for developpement)
 // const isHttps = process.env.USE_HTTPS === "true";
 
 // const fastify = Fastify({
@@ -109,6 +113,8 @@ const loggerOptions = process.env.NODE_ENV !== 'production' ? {
 //     }
 //   })
 // });
+// ────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
 
 const fastify = Fastify({
   logger: loggerOptions,
@@ -180,8 +186,10 @@ await fastify.register(fpSqlitePlugin, {
 await fastify.register(fastifyMultipart);
 
 // ────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
 // // Frontend 'dist/' folder path constant
 // const FRONTEND_DIST = process.env.FRONTEND_DIST || "../../frontend/dist";
+// // const FRONTEND_DIST = process.env.FRONTEND_DIST || "../../PongGame/dist"; // <- PongGame
 
 // const frontendPath = path.resolve(__dirname, FRONTEND_DIST);
 // // console.log("Serving frontend from:", frontendPath); // Debugging output
@@ -198,6 +206,9 @@ await fastify.register(fastifyMultipart);
 //   prefix: '/',
 //   index: ['index.html'],
 // });
+// ────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────────
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 // 
