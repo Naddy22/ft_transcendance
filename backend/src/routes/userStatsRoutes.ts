@@ -1,11 +1,11 @@
 // File: backend/src/routes/userStatsRoutes.ts
 
 import { FastifyInstance } from 'fastify';
-import { sendError } from '../utils/error.js';
+import { sendError } from "../utils/error.js";
 
 export async function userStatsRoutes(fastify: FastifyInstance) {
 
-  //  Get a specific user's match stats
+  // Get a specific user's match stats
   fastify.get<{ Params: { id: string } }>(
     "/:id/stats",
     // { preValidation: [fastify.authenticate] },
@@ -23,7 +23,9 @@ export async function userStatsRoutes(fastify: FastifyInstance) {
       stmt.bind(id);
       const stats = await stmt.get();
 
-      if (!stats) return reply.status(404).send({ error: "User not found" });
+      if (!stats) return reply.status(404).send({
+        error: "User not found"
+      });
 
       reply.send(stats);
     } catch (error) {
@@ -31,7 +33,7 @@ export async function userStatsRoutes(fastify: FastifyInstance) {
     }
   });
 
-  // 
+  // Update a specific user's match stats
   fastify.put<{ Params: { id: string }, Body: { wins?: number; losses?: number; matchesPlayed?: number } }>(
     "/:id/stats",
     { preValidation: [fastify.authenticate] },
@@ -49,7 +51,9 @@ export async function userStatsRoutes(fastify: FastifyInstance) {
           WHERE id = ?
         `);
         await stmt.run(wins, losses, matchesPlayed, id);
-        reply.send({ message: "User stats updated" });
+        reply.send({
+          message: "User stats updated"
+        });
       } catch (error) {
         return sendError(reply, 500, "Error updating user stats", error);
       }
