@@ -107,6 +107,20 @@
 	"AIPlayer": "IA",
 	"uniquePlayerNames": "¡Todos los nombres de jugadores deben ser únicos!",
 
+	"2faTitle": "🔐 Autenticación en dos pasos (2FA)",
+	"2faEnableBtn": "Activar 2FA",
+	"2faScanMessage": "Escanea este código QR con tu aplicación de autenticación y luego introduce el código de 6 dígitos abajo.",
+	"2faDisableBtn": "Desactivar 2FA",
+	"2faConfirmBtn": "Verificar código",
+	"2faCodePlaceholder": "Introduce el código de 6 dígitos",
+	"2faSuccess": "✅ ¡2FA activado con éxito!",
+	"2faDisableSuccess": "✅ ¡2FA desactivado con éxito!",
+	"2faVerifyFail": "❌ Fallo en la verificación: {error}",
+	"2faMissingCode": "❌ Por favor, introduce el código de 6 dígitos.",
+	"2faSetupError": "❌ Error al activar el 2FA: {error}",
+	"2faVerificationError": "❌ Error al verificar el código: {error}",
+	"2faDisableError": "❌ Error al desactivar el 2FA: {error}",
+
 	"_commenterreur": "errores",
 	"errorFetch": "No se puede conectar al servidor.",
 	"errorUsernameTaken": "Este nombre de usuario ya está en uso.",
@@ -117,5 +131,11 @@
 	"errorNewPasswordShort": "La nueva contraseña debe tener al menos 8 caracteres.",
 	"errorOldPasswordWrong": "La contraseña anterior es incorrecta.",
 	"errorGeneric": "Ocurrió un error (Código: {code})",
-	"errorAnonymizedAccount": "Esta cuenta ha sido anonimizada."
+	"errorAnonymizedAccount": "Esta cuenta ha sido anonimizada.",
+	"error2faInvalidCode": "El código 2FA no es válido.",
+	
+	"2faLoginTitle": "🔐 Verificación 2FA",
+	"2faLoginPrompt": "Por favor, introduce el código de 6 dígitos generado por tu aplicación de autenticación.",
+	"2faLoginVerifyBtn": "Verificar",
+	"2faLoginSuccess": "✅ ¡Autenticación en dos pasos completada!"
 }

@@ -78,6 +78,7 @@ const inputsContainer = document.getElementById("inputsContainer") as HTMLElemen
 const playersForm = document.getElementById("playersForm") as HTMLFormElement;
 
 let currentUser: { id: number; username: string; email: string } | null = null;
+let loggedInUserId: number | null = null;
 let playerNames: string[] = [];
 let lastPlayers: string[] = [];
 let isTournamentMode: boolean = false;
@@ -117,7 +118,7 @@ function updateAuthButton() {
 	console.log("update auth");
 	const logoutButton = document.getElementById("logoutButton") as HTMLElement;
 
-	checkSession().then((user) => {
+	checkSession(loggedInUserId!).then((user) => {
 		currentUser = user;
 		if (currentUser) {
 			console.log("✅ Session active :", currentUser.username);
@@ -176,14 +177,14 @@ loginForm.addEventListener("submit", async (event) => {
 	const password = (document.getElementById("loginPassword") as HTMLInputElement).value;
 
 	try {
-		await loginUser(identifier, password);
+		const response = await loginUser(identifier, password);
 
-		const response = await checkSession(); // 🔹 tu attends la réponse ici
-
-		if (response && response.isTwoFactorEnabled) {
+		if (response.requires2FA && response.user) {
 			// L’utilisateur a activé le 2FA
 			console.log("2FA est activé !");
-			document.getElementById("twoFactorLoginModal")!.style.display = "block";
+			loggedInUserId = response.user.id;
+			login2FACode.value = "";
+			document.getElementById("twoFactorLoginModal")!.style.display = "flex";
 			return;
 		}
 		else {
@@ -206,12 +207,21 @@ verify2FAForLoginBtn.addEventListener("click", async () => {
 		return;
 	}
 
+	if (!loggedInUserId) {
+		login2FAResponse.textContent = "❌ Utilisateur inconnu pour 2FA.";
+		login2FAResponse.style.color = "red";
+		return;
+	}
+
 	try {
-		const message = await verify2FALogin(currentUser!.id, token);
-		login2FAResponse.textContent = message;
+		const res = await verify2FALogin(loggedInUserId, token);
+		console.log(res.message);
+		login2FAResponse.textContent = res.message;
 		login2FAResponse.style.color = "green";
 
-		setTimeout(() => {
+		console.log("🧠 Token après vérification 2FA :", res.token);
+
+		// setTimeout(() => {
 			document.getElementById("twoFactorLoginModal")!.style.display = "none";
 			login2FAResponse.textContent = "";
 			login2FACode.value = "";
@@ -221,7 +231,7 @@ verify2FAForLoginBtn.addEventListener("click", async () => {
 			showMenu();
 			updateAuthButton();
 			history.pushState({ page: "menu" }, "Menu", "#menu");
-		}, 1500);
+		// }, 1500);
 	} catch (error: any) {
 		login2FAResponse.textContent = error.message;
 		login2FAResponse.style.color = "red";
@@ -684,6 +694,7 @@ if (menuDropdown) {
 		if (target.id === "logoutButton") {
 			event.preventDefault();
 			logoutUser().then(() => {
+				loggedInUserId = null;
 				updateAuthButton(); // Met à jour l'affichage des boutons
 				// 🔄 Ajoute un nouvel état propre après la déconnexion
 				history.pushState({ page: "menu" }, "Menu", "#menu");

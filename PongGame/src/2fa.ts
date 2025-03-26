@@ -18,7 +18,7 @@ export async function setup2FA(userId: number): Promise<{ qrCode: string }> {
 // 📌 Vérifier le code de 2FA lors de la configuration
 export async function confirm2FASetup(userId: number, token: string): Promise<string> {
 	try {
-		const res = await api.verify2FA(userId, token);
+		const res = await api.confirm2FASetup(userId, token);
 		return getTranslation("2faSuccess"); // ✅ 2FA activé avec succès !
 	} catch (error: any) {
 		console.error("❌ Échec de la vérification 2FA :", error.message);
@@ -28,13 +28,17 @@ export async function confirm2FASetup(userId: number, token: string): Promise<st
 }
 
 // 📌 Vérifie le code 2FA lors du login
-export async function verify2FALogin(userId: number, token: string): Promise<string> {
+export async function verify2FALogin(userId: number, token: string): Promise<{ message: string; token?: string }> {
 	try {
 		const res = await api.verify2FA(userId, token);
+		console.log("Réponse du backend 2FA :", res);
 		if (res.token) {
-			// Tu peux éventuellement stocker le token JWT ici si nécessaire
+			localStorage.setItem("token", res.token);
 		}
-		return getTranslation("2faLoginSuccess"); // "✅ Authentification à deux facteurs réussie !"
+		return {
+			message: getTranslation("2faLoginSuccess"),
+			token: res.token,
+		};	// "✅ Authentification à deux facteurs réussie !"
 	} catch (error: any) {
 		throw new Error(getErrorMessage(error.message));
 	}

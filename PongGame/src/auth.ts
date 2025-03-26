@@ -3,18 +3,17 @@ import { getTranslation, getErrorMessage } from "./language";
 
 const api = new API(""); // URL du backend
 
-export async function checkSession(): Promise<PublicUser | null> {
+export async function checkSession(userId?: number): Promise<PublicUser | null> {
 	try {
-		const response = await api.getUsers();
-		const currentUser = response.find(user => user.status === "online");
-
-		if (currentUser) {
-			// console.log("✅ Session active :", currentUser.username);
-			return currentUser; // Retourne l'objet utilisateur connecté
-		} else {
-			// console.log("❌ Aucun utilisateur connecté.");
-			return null;
+		if (userId) {
+			const user = await api.getUser(userId);
+			if (user) return user;
 		}
+
+		// Fallback pour le local sans 2FA
+		const users = await api.getUsers();
+		const currentUser = users.find(user => user.status === "online");
+		return currentUser || null;
 	} catch (error: any) {
 		console.error("❌ Erreur lors de la vérification de session :", error.message);
 		return null;
@@ -35,12 +34,19 @@ export async function registerUser(username: string, email: string, password: st
 	}
 }
 
-export async function loginUser(identifier: string, password: string): Promise<string> {
+export async function loginUser(identifier: string, password: string): Promise<{ requires2FA: boolean, user?: PublicUser }> {
 	try {
+		// const response = await api.loginUser({ identifier, password });
+		// console.log(`✅ Connecté en tant que ${response.user!.username}`);
+		// const successMessage = getTranslation("loginSuccess").replace("{username}", response.user!.username);
+		// return successMessage;
 		const response = await api.loginUser({ identifier, password });
-		console.log(`✅ Connecté en tant que ${response.user!.username}`);
-		const successMessage = getTranslation("loginSuccess").replace("{username}", response.user!.username);
-		return successMessage;
+		// ✅ Tu peux logguer la réponse pour debug
+		console.log("🔐 Login response:", response);
+		return {
+			requires2FA: response.requires2FA ?? false,
+			user: response.user,
+		};
 	} catch (error: any) {
 		console.error("❌ Erreur de connexion :", error.message);
 		const errorMessage = getTranslation("loginError").replace("{error}", getErrorMessage(error.message));
