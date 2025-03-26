@@ -576,8 +576,6 @@ friendSearchBtn.addEventListener("click", () => {
 		});
 });
 
-
-
 function addFriendUI(friendId: number) {
 	addFriend(currentUser!.id, friendId)
 		.then(message => {
@@ -794,7 +792,9 @@ playersForm.addEventListener("submit", (event) => {
 	playerNames = [];
 	for (let i = 1; i <= inputsContainer.children.length / 2; i++) {
 		const input = document.getElementById(`player${i}`) as HTMLInputElement;
-		playerNames.push(input.value.trim());
+		// Supprime les caractères dangereux (protection XSS)
+		const pseudo = input.value.trim().replace(/[<>"'&`]/g, "");
+		playerNames.push(pseudo);
 	}
 	// Vérification des noms dupliqués
 	const uniqueNames = new Set(playerNames); // Convertit la liste en "Set" (qui ne peut pas avoir de doublons)
