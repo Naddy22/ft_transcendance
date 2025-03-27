@@ -144,7 +144,7 @@ export class API {
   private baseUrl: string;
 
   constructor(baseUrl: string = "") {
-    // Set to the backend URL (e.g., "http://localhost:3000")
+    // Set to the backend URL (e.g., "http://localhost:3000" or "" if using nginx)
     this.baseUrl = baseUrl;
     // this.baseUrl = "";
   }
@@ -163,12 +163,12 @@ export class API {
       ...(token ? { "Authorization": `Bearer ${token}` } : {})
     };
 
-    const url = new URL(endpoint, this.baseUrl || window.location.origin).toString();
-    const response = await fetch(url, { headers, ...options });
-    // const response = await fetch(`${this.baseUrl}${endpoint}`, {
-    //   headers,
-    //   ...options,
-    // });
+    // const url = new URL(endpoint, this.baseUrl || window.location.origin).toString();
+    // const response = await fetch(url, { headers, ...options });
+    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      headers,
+      ...options,
+    });
 
     const responseData = await response.json();
 

@@ -68,10 +68,13 @@ export function getFriends(userId: number) {
 export function searchUsers(query: string) {
 	return api.getUsers()
 		.then(users => {
-			return users.filter(user => 
+			return users.filter(user => {
+				if (user.status === "anonymized") return false;
+				return (
 				user.username.toLowerCase().includes(query.toLowerCase()) ||
 				user.email.toLowerCase().includes(query.toLowerCase())
-			);
+				);
+			});
 		})
 		.catch(error => {
 			console.error("❌ Erreur recherche amis :", error.message);
