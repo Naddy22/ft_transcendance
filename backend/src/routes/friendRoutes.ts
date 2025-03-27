@@ -89,7 +89,7 @@ export async function friendRoutes(fastify: FastifyInstance) {
   // DELETE /users/:id/friends/:friendId: remove a friend
   fastify.delete<{ Params: { id: string, friendId: string } }>(
     "/:id/friends/:friendId",
-    { preValidation: [fastify.authenticate] },
+    // { preValidation: [fastify.authenticate] },
     async (req, reply) => {
     try {
       const { id, friendId } = req.params;

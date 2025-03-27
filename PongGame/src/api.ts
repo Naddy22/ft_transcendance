@@ -150,40 +150,37 @@ export class API {
   }
 
   // Generic request method with centralized error handling.
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+private async request<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const token = localStorage.getItem("token");
 
-    // Retrieve the token from localStorage
-    const token = localStorage.getItem('token');
+  const headers = {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers, // 🧠 merge avec les headers personnalisés s'il y en a
+  };
 
-    const headers = {
-      "Content-Type": "application/json",
-      ...(token ? { "Authorization": `Bearer ${token}` } : {})
-    };
+  // Utilisation robuste de URL pour éviter les erreurs
+  const url = new URL(endpoint, this.baseUrl || window.location.origin).toString();
 
-    const url = new URL(endpoint, this.baseUrl || window.location.origin).toString();
-    const response = await fetch(url, { headers, ...options });
-    // const response = await fetch(`${this.baseUrl}${endpoint}`, {
-    //   headers,
-    //   ...options,
-    // });
+  const response = await fetch(url, {
+    headers,
+    credentials: "include", // 🔐 Envoie les cookies pour la session
+    ...options,
+  });
 
-    const responseData = await response.json();
+  const responseData = await response.json();
 
-    if (!response.ok) {
-      // Clear token if unauthorized
-      // if (response.status === 401) {
-      //   localStorage.removeItem('token');
-      // }
-      // Preserve detailed error messages from the backend
-      const errorMessage = responseData.error || response.statusText;
-      throw new Error(`Error ${response.status}: ${errorMessage}`);
-    }
-
-    return responseData;
+  if (!response.ok) {
+    const errorMessage = responseData.error || response.statusText;
+    throw new Error(`Error ${response.status}: ${errorMessage}`);
   }
+
+  return responseData;
+}
+
 
   // ── Health Check ──────────────────────────────────────────────
 
