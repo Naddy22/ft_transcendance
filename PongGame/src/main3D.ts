@@ -512,7 +512,7 @@ disable2FABtn.addEventListener("click", async () => {
 });
 
 // 📌 Mettre à jour l'affichage des amis
-function updateFriendsUI(friends: { id: number; username: string; status: string }[]) {
+function updateFriendsUI(friends: { id: number; username: string; avatar: string | null | undefined; status: string }[]) {
 	friendList.innerHTML = "";
 	if (friends.length === 0) {
 		friendList.innerHTML = `<li>${getTranslation("noFriends")}</li>`;
@@ -521,14 +521,30 @@ function updateFriendsUI(friends: { id: number; username: string; status: string
 
 	friends.forEach(friend => {
 		const li = document.createElement("li");
-		li.textContent = `${friend.username} (${friend.status})`;
 		li.id = `friend-${friend.id}`;
+
+		// 📷 Crée l'image de l'avatar
+		const avatarImg = document.createElement("img");
+		avatarImg.src = friend.avatar || "/avatars/default/default_cat.webp"; // si pas d'avatar → image par défaut
+		avatarImg.alt = `${friend.username}'s avatar`;
+		avatarImg.width = 42;
+		avatarImg.height = 42;
+		avatarImg.style.marginRight = "0px";
+		avatarImg.style.borderRadius = "50%"; // rond = joli
+		avatarImg.style.verticalAlign = "middle"; // aligne bien avec le texte
+		
+		const textSpan = document.createElement("span");
+		textSpan.textContent = `${friend.username} (${friend.status})`;
 
 		const removeBtn = document.createElement("button");
 		removeBtn.textContent = "❌";
 		removeBtn.addEventListener("click", () => removeFriendUI(friend.id));
 
+		// Ajoute tout dans <li>
+		li.appendChild(avatarImg);
+		li.appendChild(textSpan);
 		li.appendChild(removeBtn);
+
 		friendList.appendChild(li);
 	});
 }
@@ -553,6 +569,16 @@ friendSearchBtn.addEventListener("click", () => {
 
 			results.forEach(user => {
 				const listItem = document.createElement("li");
+
+				// 📷 Avatar
+				const avatarImg = document.createElement("img");
+				avatarImg.src = user.avatar || "/avatars/default/default_cat.webp";
+				avatarImg.alt = `${user.username}'s avatar`;
+				avatarImg.width = 42;
+				avatarImg.height = 42;
+				avatarImg.style.marginRight = "10px";
+				avatarImg.style.borderRadius = "50%";
+				avatarImg.style.verticalAlign = "middle";
 			
 				// 🔹 Crée un élément pour le texte (pseudo + email)
 				const userText = document.createElement("span");
@@ -564,6 +590,7 @@ friendSearchBtn.addEventListener("click", () => {
 				addBtn.addEventListener("click", () => addFriendUI(user.id));
 			
 				// 🔹 Ajoute le texte et le bouton dans la ligne
+				listItem.appendChild(avatarImg);
 				listItem.appendChild(userText);
 				listItem.appendChild(addBtn);
 			
