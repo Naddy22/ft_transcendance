@@ -20,8 +20,8 @@ services:
 
   frontend:
     build:
-      # context: ./frontend
-      context: ./PongGame
+      context: ./frontend
+      # context: ./PongGame
       dockerfile: frontend.Dockerfile
     depends_on:
       - backend

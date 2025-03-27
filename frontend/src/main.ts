@@ -385,6 +385,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+
   // // Event listener for the friend search button
   // friendSearchBtn.addEventListener("click", async () => {
 
