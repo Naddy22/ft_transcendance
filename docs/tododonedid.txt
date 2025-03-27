@@ -4,7 +4,6 @@ TOCHECK:
 
 demo fastify: https://github.com/fastify/demo/tree/main
 
-
 ---
 
 Requis
@@ -93,14 +92,16 @@ Fait:
 -(M) backend fastify
 -(m) database sqlite
 -(M) User management
+-(m) GDPR
+-(m) Multi-languages ?
+
+
 
 A faire:
--(m) GDPR
 -(M) Authentication 2FA et JWT
 
 -(M) 
 -(m) browser compatibility
--(m) Multi-languages ?
 -(m) accessibility features
 
 

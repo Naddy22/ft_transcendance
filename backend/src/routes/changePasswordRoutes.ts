@@ -1,7 +1,6 @@
 // File: backend/src/routes/changePasswordRoutes.ts
 
 import { FastifyInstance } from 'fastify';
-import sanitizeHtml from 'sanitize-html';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import { ChangePasswordRequest } from "../schemas/changePasswordSchema.js";
@@ -23,6 +22,8 @@ export async function changePasswordRoutes(fastify: FastifyInstance) {
       try {
         const { id } = req.params;
         const { oldPassword, newPassword } = req.body;
+        // const oldPasswordTrimmed = oldPassword.trim();
+        // const newPasswordTrimmed = newPassword.trim();
 
         if (!id) return reply.status(400).send({
           error: "Missing user ID"
@@ -33,7 +34,6 @@ export async function changePasswordRoutes(fastify: FastifyInstance) {
         if (!newPassword) return reply.status(400).send({
           error: "New password is required"
         });
-
         if (newPassword.length < 8) {
           return reply.status(400).send({
             error: "New password must be at least 8 characters long."
@@ -60,6 +60,14 @@ export async function changePasswordRoutes(fastify: FastifyInstance) {
             error: "Old password is incorrect."
           });
         }
+
+        // // Prevent reuse of old password
+        // const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        // if (isSamePassword) {
+        //   return reply.status(400).send({
+        //     error: "New password cannot be the same as the old password."
+        //   });
+        // }
 
         // 🔐 Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);

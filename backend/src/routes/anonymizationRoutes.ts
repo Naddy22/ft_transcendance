@@ -52,13 +52,12 @@ export async function anonymizationRoutes(fastify: FastifyInstance) {
           }
         }
 
-        // Build anonymized data.
+        // Build anonymized data with unique username.
+        // const anonymizedSuffix = `_${user.id}`;
+        const anonymizedSuffix = `_${Date.now()}`;
         const anonymizedData = {
-          // username: `anonymous_${id}`,
-          username: "anonymous",
-          // email: `anonymous_${id}@example.com`,
-          email: "anonymous@cat.pong",
-          // avatar: null,
+          username: `anonymous${anonymizedSuffix}`,
+          email: `anonymous${anonymizedSuffix}@cat.pong`,
           avatar: ANONYMOUS_AVATAR_URL,
           status: "anonymized"
         };

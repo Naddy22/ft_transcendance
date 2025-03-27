@@ -315,54 +315,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // async function fetchFriendList(userId: number) {
-  //   try {
-  //     const friends = await api.getFriends(userId);
-  //     friendList.innerHTML = "";
-  //     if (friends.length === 0) {
-  //       friendList.innerHTML = "<li>You have no friends yet.</li>";
-  //     } else {
-  //       friends.forEach(friend => {
-  //         const li = document.createElement("li");
-  //         li.classList.add("friend-item"); // apply the layout styles
-
-  //         // Create an image element for the avatar icon
-  //         const avatarIcon = document.createElement("img");
-  //         avatarIcon.classList.add("friend-avatar"); // apply the styling class
-  //         avatarIcon.src = friend.avatar ? friend.avatar : "/default-avatars/default_cat.webp";
-  //         avatarIcon.alt = `${friend.username}'s avatar`;
-
-  //         // Create a span for the friend's text details
-  //         const details = document.createElement("span");
-  //         details.textContent = `ID: ${friend.id} - ${friend.username} (${friend.status})`;
-
-  //         li.appendChild(avatarIcon);
-  //         li.appendChild(details);
-
-  //         // Create a button to remove friend
-  //         const removeBtn = document.createElement("button");
-  //         removeBtn.textContent = "Remove";
-  //         removeBtn.classList.add("danger-btn");
-  //         removeBtn.addEventListener("click", async () => {
-  //           try {
-  //             const res = await api.removeFriend(userId, friend.id);
-  //             alert(res.message);
-
-  //             // Refresh friend list (and optionally search results)
-  //             await fetchFriendList(userId);
-  //           } catch (error: any) {
-  //             alert(`Error removing friend: ${error.message}`);
-  //           }
-  //         });
-  //         li.appendChild(removeBtn);
-  //         friendList.appendChild(li);
-  //       });
-  //     }
-  //   } catch (error: any) {
-  //     friendList.innerHTML = `<li>Error fetching friends: ${error.message}</li>`;
-  //   }
-  // }
-
   // Function to search users by username or email using the getUsers() endpoint
   async function searchUsers(query: string): Promise<PublicUser[]> {
     try {
@@ -373,7 +325,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Filter out the logged-in user and any whose username or email doesn't include the query (case insensitive)
       return users.filter(user => {
         if (loggedInUserId && user.id === loggedInUserId) return false;
-        if (user.status === "anonymized") return false; // Exclude anonymized users
+        // if (user.status === "anonymized") return false; // Exclude anonymized users
         return (
           user.username.toLowerCase().includes(query.toLowerCase()) ||
           user.email.toLowerCase().includes(query.toLowerCase())
@@ -384,63 +336,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return [];
     }
   }
-
-
-  // // Event listener for the friend search button
-  // friendSearchBtn.addEventListener("click", async () => {
-
-  //   const query = friendSearchInput.value.trim();
-  //   if (!query) {
-  //     alert("Please enter a search term.");
-  //     return;
-  //   }
-
-  //   const results = await searchUsers(query);
-  //   friendSearchResults.innerHTML = "";
-  //   if (results.length === 0) {
-  //     friendSearchResults.innerHTML = "<li>No matching users found.</li>";
-  //   } else {
-  //     results.forEach(user => {
-  //       const listItem = document.createElement("li");
-  //       listItem.classList.add("friend-item"); // apply the layout styles
-
-  //       // Create an image for the avatar
-  //       const avatarIcon = document.createElement("img");
-  //       avatarIcon.classList.add("friend-avatar"); // apply the styling class
-  //       avatarIcon.src = user.avatar ? user.avatar : "/default-avatars/default_cat.webp";
-  //       avatarIcon.alt = `${user.username}'s avatar`;
-  //       avatarIcon.width = 30;
-  //       avatarIcon.height = 30;
-  //       avatarIcon.style.borderRadius = "50%";
-  //       avatarIcon.style.marginRight = "10px";
-
-  //       // Create a span for the user details
-  //       const details = document.createElement("span");
-  //       details.textContent = `ID: ${user.id} - ${user.username} (${user.email})`;
-
-  //       listItem.appendChild(avatarIcon);
-  //       listItem.appendChild(details);
-
-  //       // Button to add friend
-  //       const addBtn = document.createElement("button");
-  //       addBtn.textContent = "Add Friend";
-  //       addBtn.addEventListener("click", async () => {
-  //         if (!loggedInUserId) return;
-  //         try {
-  //           const res = await api.addFriend(loggedInUserId, user.id);
-  //           alert(res.message);
-
-  //           // Refresh the friend list after adding
-  //           await fetchFriendList(loggedInUserId);
-  //         } catch (error: any) {
-  //           alert(`Error adding friend: ${error.message}`);
-  //         }
-  //       });
-  //       listItem.appendChild(addBtn);
-  //       friendSearchResults.appendChild(listItem);
-  //     });
-  //   }
-  // });
 
   friendSearchBtn.addEventListener("click", async () => {
     const query = friendSearchInput.value.trim();

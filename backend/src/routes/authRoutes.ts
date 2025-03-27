@@ -34,7 +34,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         if (!password) return reply.status(400).send({
           error: "Password is required"
         });
-
         if (password.length < 8) {
           return reply.status(400).send({
             error: "Password must be at least 8 characters long."
@@ -59,18 +58,23 @@ export async function authRoutes(fastify: FastifyInstance) {
           });
         }
 
-        // 🔍 Check if username or email already exists (case-insensitive for email)
+        // 🔍 Check if username or email already exists (case-insensitive)
         const stmtCheck = await fastify.db.prepare(`
           SELECT id, username, email
           FROM users
-          WHERE username = ? OR LOWER(email) = LOWER(?)
+          WHERE LOWER(username) = LOWER(?) OR LOWER(email) = LOWER(?)
         `);
-        const existingUser = await stmtCheck.all(sanitizedUsername, sanitizedEmail); // `all()` returns an array
+        const existingUser = await stmtCheck.all(sanitizedUsername, sanitizedEmail);
 
         if (existingUser.length > 0) {
+
           // Check separately for email and username
-          const isUsernameTaken = existingUser.some(user => user.username === sanitizedUsername);
-          const isEmailTaken = existingUser.some(user => user.email === sanitizedEmail);
+          const isUsernameTaken = existingUser.some(
+            user => user.username.toLowerCase() === sanitizedUsername.toLowerCase()
+          );
+          const isEmailTaken = existingUser.some(
+            user => user.email.toLowerCase() === sanitizedEmail.toLowerCase()
+          );
 
           if (isUsernameTaken) {
             return reply.status(400).send({
@@ -137,18 +141,25 @@ export async function authRoutes(fastify: FastifyInstance) {
           });
         }
 
-        // 🔍 Search for user by either username or email
+        // 🔍 Search for user by either username or email (case insensitive)
+        const normalizedIdentifier = identifier.toLowerCase();
+
         const stmt = await fastify.db.prepare(`
-        SELECT id, username, email, password, status, twoFactorSecret, isTwoFactorEnabled
-        FROM users 
-        WHERE LOWER(email) = LOWER(?) OR username = ?
-      `);
-        const user = await stmt.get(identifier, identifier);
+          SELECT id, username, email, password, status, twoFactorSecret, isTwoFactorEnabled
+          FROM users 
+          WHERE LOWER(email) = LOWER(?) OR LOWER(username) = LOWER(?)
+        `);
+
+        // Allow logging in with any casing
+        const user = await stmt.get(normalizedIdentifier, normalizedIdentifier);
+
         if (!user) {
           return reply.status(401).send({
             error: "Invalid username or email"
           });
         }
+
+        // Prevent logging in if account is anonymized
         if (user.status.includes("anon")) {
           return reply.status(403).send({
             error: "This account is anonymized"
@@ -163,7 +174,7 @@ export async function authRoutes(fastify: FastifyInstance) {
           });
         }
 
-        // Check if 2FA is enabled
+        // 2FA Check (if enabled)
         if (user.isTwoFactorEnabled) {
           // If no 2FA code provided, prompt the client that 2FA is required.
           if (!twoFactorCode) {
@@ -180,6 +191,7 @@ export async function authRoutes(fastify: FastifyInstance) {
             encoding: "base32",
             token: twoFactorCode!,
           });
+
           if (!is2FAValid) {
             return reply.status(401).send({
               error: "Invalid 2FA code"
