@@ -10,7 +10,7 @@ services:
     expose:
       - "3000"
     environment:
-      - NODE_ENV=production
+      # - NODE_ENV=production
       - JWT_SECRET=supersecretkey
     volumes:
       - backend_uploads:/app/uploads

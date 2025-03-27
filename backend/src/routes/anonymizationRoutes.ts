@@ -13,7 +13,6 @@ const __dirname = path.dirname(__filename);
 export async function anonymizationRoutes(fastify: FastifyInstance) {
 
   // Directories
-  // const DEFAULT_AVATAR_DIR = path.join(__dirname, "../../img/avatars");
   const AVATAR_UPLOAD_DIR = path.join(__dirname, "../../uploads/avatars");
 
   // Define URL constants
