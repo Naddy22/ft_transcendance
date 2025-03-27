@@ -80,8 +80,7 @@ export async function friendRoutes(fastify: FastifyInstance) {
         const stmtCheck = await fastify.db.prepare(`
           SELECT *
           FROM friends
-          WHERE userId = ?
-          AND friendId = ?
+          WHERE userId = ? AND friendId = ?
         `);
         const existing = await stmtCheck.get(id, friendId);
         if (existing) {

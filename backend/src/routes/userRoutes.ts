@@ -90,14 +90,15 @@ export async function userRoutes(fastify: FastifyInstance) {
               error: "Invalid username format."
             });
           }
-          // Check if username is already taken by another user
+
+          // Case-insensitive username check (excluding current user)
           const usernameCheck = await fastify.db.prepare(`
             SELECT id
             FROM users
-            WHERE username = ?
+            WHERE LOWER(username) = LOWER(?) AND id != ?
           `);
-          const existingUser = await usernameCheck.get(username);
-          if (existingUser && existingUser.id !== parseInt(id)) {
+          const existingUser = await usernameCheck.get(username, id);
+          if (existingUser) {
             return reply.status(400).send({
               error: "Username is already taken."
             });
@@ -112,14 +113,15 @@ export async function userRoutes(fastify: FastifyInstance) {
               error: "Invalid email format."
             });
           }
-          // Check if email is already registered by another user
+
+          // Case-insensitive email check (excluding current user)
           const emailCheck = await fastify.db.prepare(`
             SELECT id
             FROM users
-            WHERE email = ?
+            WHERE LOWER(email) = LOWER(?) AND id != ?
           `);
-          const existingEmail = await emailCheck.get(email);
-          if (existingEmail && existingEmail.id !== parseInt(id)) {
+          const existingEmail = await emailCheck.get(email, id);
+          if (existingEmail) {
             return reply.status(400).send({
               error: "Email is already registered."
             });
