@@ -57,6 +57,7 @@ export function getFriends(userId: number) {
 		.then(friends => friends.map(friend => ({
 			id: friend.id,
 			username: friend.username,
+			avatar: friend.avatar,
 			status: friend.status
 		})))
 		.catch(error => {
