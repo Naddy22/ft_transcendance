@@ -10,14 +10,13 @@ REPO_LINK	:= https://github.com/SaydRomey/ft_transcendence
 # Network Info
 BACKEND_PORT	:= 3000
 FRONTEND_PORT	:= 5173
-# BACKEND_URL		:= https://localhost:$(BACKEND_PORT)
 BACKEND_URL		:= http://localhost:$(BACKEND_PORT)
 FRONTEND_URL	:= http://localhost:$(FRONTEND_PORT)
 
 # Directories
 BACKEND_DIR		:= backend
-# FRONTEND_DIR	:= frontend
-FRONTEND_DIR	:= PongGame
+FRONTEND_DIR	:= frontend
+# FRONTEND_DIR	:= PongGame
 
 # Log files
 LOG_DIRS			:= $(BACKEND_DIR)/logs $(FRONTEND_DIR)/logs

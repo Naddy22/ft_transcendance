@@ -7,11 +7,8 @@ import { addGameToHistory, updateHistoryUI } from "./history";
 import { addGameToStats, updateStatsUI } from "./stats";
 import { clearFields } from "./utils";
 
-// const api = new API("http://localhost:3000");
-// const api = new API("http://localhost");
-// const api = new API("/");
+// const api = new API("https://localhost:3000");
 const api = new API("");
-// const api = new API("window.location.origin");
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -560,12 +557,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // showTwoFactorLogin();
         return;
       }
-      // if (response.requires2FA) {
-      //   if (response.user) loggedInUserId = response.user.id;
-      //   loginResponse.textContent = "⚠️ 2FA Required. Please enter your 6-digit code.";
-      //   showTwoFactorLogin();
-      //   return;
-      // }
 
       // If we get here, either 2FA is not required or not enabled
       if (response.user) {

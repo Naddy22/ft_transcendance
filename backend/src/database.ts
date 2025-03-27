@@ -69,16 +69,6 @@ export async function setupDatabase(fastify: FastifyInstance) {
     );
   `)
 
-  await db.exec(`
-	  CREATE TABLE IF NOT EXISTS tournaments (
-	    tournamentId INTEGER PRIMARY KEY AUTOINCREMENT,
-	    name TEXT NOT NULL,
-	    status TEXT DEFAULT 'pending',
-	    winner INTEGER,
-	    FOREIGN KEY (winner) REFERENCES users(id)
-	  );
-  `);
-
   // Reset all non-anonymized users to "offline" on server restart
   await db.exec("UPDATE users SET status = 'offline' WHERE status <> 'anonymized'");
   // console.log("🛠️ Reset all users to offline on server startup.");

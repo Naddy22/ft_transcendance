@@ -3,12 +3,11 @@
 import { FastifyInstance } from 'fastify';
 import speakeasy from 'speakeasy';
 import qrcode from 'qrcode';
-
 import {
   Setup2FARequest,
   Verify2FARequest,
   Disable2FARequest,
-} from "../schemas/authSchema.js";
+} from "../schemas/2faSchemas.js";
 
 export async function twoFactorRoutes(fastify: FastifyInstance) {
 
@@ -16,7 +15,7 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
    * Generate and return a 2FA secret for a user
    */
   fastify.post<{ Body: Setup2FARequest }>(
-    '/setup-2fa',
+    "/setup-2fa",
     { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       const { userId } = req.body;
@@ -26,7 +25,8 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
 
       // Save secret in the database
       const stmt = await fastify.db.prepare(`
-        UPDATE users SET twoFactorSecret = ?
+        UPDATE users
+        SET twoFactorSecret = ?
         WHERE id = ?
       `);
       await stmt.run(secret.base32, userId);
@@ -42,8 +42,11 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
     }
   );
 
+  /**
+   * Verify 2FA code during setup
+   */
   fastify.post<{ Body: Verify2FARequest }>(
-    '/confirm-2fa',
+    "/confirm-2fa",
     { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       const { userId, token } = req.body;
@@ -61,21 +64,27 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
 
       const verified = speakeasy.totp.verify({
         secret: user.twoFactorSecret,
-        encoding: 'base32',
+        encoding: "base32",
         token
       });
 
       if (!verified) {
-        return reply.status(400).send({ error: "Invalid 2FA code" });
+        return reply.status(400).send({
+          error: "Invalid 2FA code"
+        });
       }
 
       // Enable 2FA upon successful verification
       const updateStmt = await fastify.db.prepare(`
-        UPDATE users SET isTwoFactorEnabled = 1 WHERE id = ?
+        UPDATE users
+        SET isTwoFactorEnabled = 1
+        WHERE id = ?
       `);
       await updateStmt.run(userId);
 
-      reply.send({ message: "2FA setup confirmed and enabled" });
+      reply.send({
+        message: "2FA setup confirmed and enabled"
+      });
     }
   );
 
@@ -84,15 +93,17 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
    * Verify 2FA code during login
    */
   fastify.post<{ Body: Verify2FARequest }>(
-    '/verify-2fa',
+    "/verify-2fa",
     // { preValidation: [fastify.authenticate] }, // tocheck: remain public if only part of login flow, protect if used for managin post-login settings..
     async (req, reply) => {
       const { userId, token } = req.body;
 
       // Fetch user's 2FA secret
       const stmt = await fastify.db.prepare(`
-      SELECT twoFactorSecret FROM users WHERE id = ?
-    `);
+        SELECT twoFactorSecret
+        FROM users
+        WHERE id = ?
+      `);
       const user = await stmt.get(userId);
 
       if (!user || !user.twoFactorSecret) {
@@ -117,27 +128,32 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
       // Generate and return a JWT token upon successful verification
       const jwtToken = fastify.jwt.sign({ id: userId });
 
-      reply.send({ message: "2FA Verification Successful", token: jwtToken });
-    });
+      reply.send({
+        message: "2FA Verification Successful",
+        token: jwtToken
+      });
+    }
+  );
 
   /**
    * Disable 2FA for a user
    */
   fastify.post<{ Body: Disable2FARequest }>(
-    '/disable-2fa',
+    "/disable-2fa",
     { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       const { userId } = req.body;
 
       const stmt = await fastify.db.prepare(`
-      UPDATE users SET twoFactorSecret = NULL, isTwoFactorEnabled = 0 
-      WHERE id = ?
-    `);
+        UPDATE users
+        SET twoFactorSecret = NULL, isTwoFactorEnabled = 0
+        WHERE id = ?
+      `);
       await stmt.run(userId);
 
       reply.send({
         message: "2FA Disabled Successfully"
       });
-    });
-
+    }
+  );
 }

@@ -73,6 +73,5 @@ export const userSchema = {
 } as const;
 
 export type User = FromSchema<typeof userSchema>;
-// export type PublicUser = Omit<User, "password">;
 export type PublicUser = Omit<User, "password" | "twoFactorSecret">;
 export type UpdateUserRequest = Partial<Pick<User, "username" | "email" | "avatar" | "status">>;
