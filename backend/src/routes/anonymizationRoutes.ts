@@ -26,12 +26,7 @@ export async function anonymizationRoutes(fastify: FastifyInstance) {
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (request, reply) => {
       try {
-        // const { id } = request.params;
         const id = Number(request.params.id);
-
-        // if (isNaN(id)) {
-        //   return reply.status(400).send({ error: "Invalid user ID" });
-        // }
 
         // Retrieve the current user record
         const userStmt = await fastify.db.prepare(`

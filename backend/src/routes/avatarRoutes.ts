@@ -72,8 +72,6 @@ export async function avatarRoutes(fastify: FastifyInstance) {
         }
 
         // Generate a unique filename
-        // const ext = type.ext || 'png';
-        // const fileName = `${Date.now()}-${data.filename}.${ext}`;
         const baseName = path.parse(data.filename).name;
         const fileName = `${Date.now()}-${baseName}.${type.ext}`;
         const filePath = path.join(AVATAR_UPLOAD_DIR, fileName);

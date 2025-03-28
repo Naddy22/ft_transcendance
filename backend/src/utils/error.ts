@@ -24,8 +24,6 @@ export function sendError(
   const response = isDev
     ? {
         error: errorMsg,
-        // details: error?.message,
-        // stack: error?.stack,
         details: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       }

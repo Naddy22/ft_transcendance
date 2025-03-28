@@ -31,24 +31,62 @@ tree-clean: ## Remove 'tree' outfile
 
 .PHONY: tree tree-cleen
 
+# # ==============================
+# ##@ 💾 Backup
+# # ==============================
+
+# BACKUP_NAME	:=$(ROOT_DIR)_$(USER)_$(TIMESTAMP).zip
+# BACKUP_NAME	:=$(ROOT_DIR)_$(USER)_$(TIMESTAMP).zip
+# MOVE_TO		:= ~/Desktop/$(BACKUP_NAME)
+
+# backup: ffclean ## Creates a zip file of the project
+# 	@if which zip > $(VOID); then \
+# 		zip -r --quiet $(BACKUP_NAME) ./*; \
+# 		mv $(BACKUP_NAME) $(MOVE_TO); \
+# 		$(call INFO,$(NAME),compressed as: ,$(CYAN)$(UNDERLINE)$(MOVE_TO)$(RESET)); \
+# 	else \
+# 		$(call ERROR,Please install zip to use the backup feature); \
+# 	fi
+
+# .PHONY: backup
+
 # ==============================
 ##@ 💾 Backup
 # ==============================
 
-BACKUP_NAME	:=$(ROOT_DIR)_$(USER)_$(TIMESTAMP).zip
-BACKUP_NAME	:=$(ROOT_DIR)_$(USER)_$(TIMESTAMP).zip
-MOVE_TO		:= ~/Desktop/$(BACKUP_NAME)
+TIMESTAMP   := $(shell date +%Y%m%d_%H%M%S)
+BACKUP_DIR  := $(ROOT_DIR)_$(USER)_$(TIMESTAMP)
+MOVE_TO     := ~/Desktop
 
-backup: ffclean ## Creates a zip file of the project
-	@if which zip > $(VOID); then \
-		zip -r --quiet $(BACKUP_NAME) ./*; \
-		mv $(BACKUP_NAME) $(MOVE_TO); \
-		$(call INFO,$(NAME),compressed as: ,$(CYAN)$(UNDERLINE)$(MOVE_TO)$(RESET)); \
+backup: ffclean ## Prompt and create a .zip or .tar.gz backup of the project
+	@echo "Choose backup format: [1] .zip  [2] .tar.gz"
+	@read -p "Enter your choice (1 or 2): " choice; \
+	case $$choice in \
+		1) \
+			ext=zip; \
+			cmd="zip -r --quiet"; \
+			file="$(BACKUP_DIR).zip"; \
+			;; \
+		2) \
+			ext=tar.gz; \
+			cmd="tar -czf"; \
+			file="$(BACKUP_DIR).tar.gz"; \
+			;; \
+		*) \
+			echo "❌ Invalid choice. Aborting backup."; \
+			exit 1; \
+			;; \
+	esac; \
+	if which $$cmd > $(VOID) 2>&1 || true; then \
+		$${cmd} "$$file" ./*; \
+		mv "$$file" $(MOVE_TO)/; \
+		echo "✅ Backup created and moved to: $(MOVE_TO)/$$file"; \
 	else \
-		$(call ERROR,Please install zip to use the backup feature); \
+		echo "❌ Required command '$$cmd' not found. Please install it."; \
 	fi
 
 .PHONY: backup
+
 
 # ==============================
 ##@ 🎨 Decorations

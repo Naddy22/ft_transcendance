@@ -112,10 +112,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         const row = await stmtId.get() as RowResult;
         const insertedUserId = row.id;
 
-        // const row = await stmtId.get();
-        // // const insertedUserId = row?.id ?? null;
-        // const insertedUserId = (row as any)?.id ?? null;
-
         // Respond with the user data (excluding password)
         reply.status(201).send({
           id: insertedUserId,
@@ -185,6 +181,7 @@ export async function authRoutes(fastify: FastifyInstance) {
 
         // 2FA Check (if enabled)
         if (user.isTwoFactorEnabled) {
+          
           // If no 2FA code provided, prompt the client that 2FA is required.
           if (!twoFactorCode) {
             return reply.send({
