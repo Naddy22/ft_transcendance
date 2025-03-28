@@ -1,7 +1,8 @@
 // File: backend/src/server.ts
 // Main Fastify server setup, including routes, database, and shutdown handling.
 
-import { Fastify, FastifyRequest, FastifyReply } from 'fastify';
+import Fastify from 'fastify';
+import { FastifyRequest, FastifyReply } from 'fastify';
 import fastifyRequestLogger from '@mgcrea/fastify-request-logger';
 import fastifyGracefulExit from '@mgcrea/fastify-graceful-exit';
 import { fpSqlitePlugin } from 'fastify-sqlite-typed';
