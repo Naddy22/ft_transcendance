@@ -660,11 +660,10 @@ document.getElementById("anonymizeBtn")!.addEventListener("click", () => {
 
 	anonymizeUser(currentUser!.id)
 		.then(message => {
-			document.getElementById("anonymizeMessage")!.textContent = message;
-			setTimeout(async () => {
-				await logoutUser();
-				window.location.reload();
-			}, 3000);
+			alert(message);
+			logoutUser().then(() => {
+				window.location.reload(); // 🔄 Recharge la page en mode non connecté
+			});
 		})
 		.catch(error => {
 			document.getElementById("anonymizeMessage")!.textContent = `${error.message}`;
