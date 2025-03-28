@@ -1,216 +1,229 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ft_transcendance Tester</title>
-  <link rel="stylesheet" href="src/styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Klee+One&display=swap"
-    rel="stylesheet" />
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ft_transcendance</title>
+	<link rel="stylesheet" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&family=Klee+One&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <!-- Navigation / Dark Mode -->
-  <div class="nav-buttons">
-    <button id="toggleDarkMode">🌙 Dark Mode</button>
-    <button id="toggleRegister">Toggle Register</button>
-    <button id="toggleLogin">Toggle Login</button>
-    <button id="toggleAllUsers">Show All Users</button>
-  </div>
+	<div class="top-buttons">
+		<select id="languageSelect">
+			<option value="fr">🇫🇷 Français</option>
+			<option value="en">🇬🇧 English</option>
+			<option value="es">🇪🇸 Español</option>
+		</select>
+		<button id="authButton" class="auth-button" data-i18n="authButton"></button>
+		<button id="menuButton" class="menu-button" style="display: none;">☰</button>
+	</div>
+	<div id="authPage" style="display: none; text-align: center; margin-top: 15px;">
+		<div class="auth-content">
+			<h1 data-i18n="loginTitle"></h1>
+			<form id="loginForm">
+				<input type="text" id="loginIdentifier" data-i18n-placeholder="loginPlaceholder" required>
+				<input type="password" id="loginPassword" data-i18n-placeholder="passwordPlaceholder" required>
+				<p id="loginMessage" class="auth-message"></p>
+				<button type="submit" data-i18n="login"></button>
+			</form>
+			<form id="registerForm">
+				<input type="text" id="regUsername" data-i18n-placeholder="registerUsername" required>
+				<input type="email" id="regEmail" data-i18n-placeholder="registerEmail" required>
+				<input type="password" id="regPassword" data-i18n-placeholder="registerPassword" required>
+				<p id="registerMessage" class="auth-message"></p>
+				<button type="submit" data-i18n="register"></button>
+			</form>
+		</div>
+	</div>
+	<div id="twoFactorLoginModal" class="modal" style="display: none;">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h3 data-i18n="2faLoginTitle"></h3>
+			<p data-i18n="2faLoginPrompt"></p>
+			<input type="text" id="login2FACode" data-i18n-placeholder="2faCodePlaceholder">
+			<button id="verify2FAForLoginBtn" data-i18n="2faLoginVerifyBtn"></button>
+			<p id="login2FAResponse"></p>
+		</div>
+	</div>	
+	<div id="menuDropdown" class="menu-dropdown">
+		<a href="#" data-action="profile" data-i18n="menuProfile"></a>
+		<a href="#" data-action="history" data-i18n="menuHistory"></a>
+		<a href="#" data-action="statistics" data-i18n="menuStats"></a>
+		<a href="#" data-action="howToPlay" data-i18n="menuHowToPlay"></a>
+		<a href="#" data-action="privacyData" data-i18n="menuPrivacy"></a>
+		<a href="#" id="logoutButton" style="display: none;" data-i18n="logout"></a>
+	</div>
+	<!-- 📌 fenetre modale du Profil caché-->
+	<div id="profileModal" class="modal">
+		<div class="modal-content profile-modal">
+			<span class="close">&times;</span>
+			<h1 class="text-outline" data-i18n="profileTitle"></h1>
+			<div class="profile-avatar">
+				<img id="userAvatar" src="/avatars/default.png" alt="Avatar">
+				<input type="file" id="avatarInput">
+				<button id="uploadAvatarBtn" data-i18n="changeAvatar"></button>
+			</div>
+			<form id="profileForm">
+				<div class="form-group">
+					<label for="newUsername" data-i18n="labelUsername"></label>
+					<input type="text" id="newUsername">
+				</div>
+				<div class="form-group">
+					<label for="newEmail" data-i18n="labelEmail"></label>
+					<input type="email" id="newEmail">
+				</div>
+				<div class="form-group">
+					<label for="newPassword" data-i18n="labelNewPassword"></label>
+					<input type="password" id="oldPassword" data-i18n-placeholder="oldPasswordPlaceholder">
+					<input type="password" id="newPassword" data-i18n-placeholder="newPasswordPlaceholder">
+				</div>
+				<!-- 📱 Authentification à deux facteurs -->
+				<div id="twoFactorSection" class="two-factor-section">
+					<h3 data-i18n="2faTitle"></h3>
 
-  <!-- Registration Form -->
-  <div id="registerForm" class="container hidden">
-    <h2>Register</h2>
-    <input type="text" id="regUsername" placeholder="Username" />
-    <input type="email" id="regEmail" placeholder="Email" />
-    <input type="password" id="regPassword" placeholder="Password" />
-    <button id="registerBtn">Register</button>
-    <p id="registerResponse"></p>
-  </div>
+					<!-- Activation -->
+					<div id="twoFactorSetupSection" style="display: none;">
+						<button id="setup2FABtn" data-i18n="2faEnableBtn"></button>
+						<!-- <p id="twoFactorResponse"></p> -->
+					</div>
 
-  <!-- Login Form -->
-  <div id="loginForm" class="container hidden">
-    <h2>Login</h2>
-    <input type="text" id="loginIdentifier" placeholder="Username or Email" />
-    <input type="password" id="loginPassword" placeholder="Password" />
-    <button id="loginBtn">Login</button>
-    <p id="loginResponse"></p>
-  </div>
+					<!-- QR Code + champ de vérification -->
+					<div id="qrAndConfirmContainer" style="display: none;">
+						<p data-i18n="2faScanMessage"></p>
+						<img id="qrCodeImg" src="" alt="QR Code 2FA"><br>
+						<input type="text" id="setup2FACode" data-i18n-placeholder="2faCodePlaceholder">
+						<button id="confirm2FASetupBtn" data-i18n="2faConfirmBtn"></button>
+						<!-- <p id="setup2FAResponse"></p> -->
+					</div>
 
-  <!-- 2FA Login Verification Modal (initially hidden) -->
-  <div id="twoFactorLoginModal" class="modal hidden">
-    <div class="modal-content">
-      <h4>2FA Verification</h4>
-      <input type="text" id="login2FACode" placeholder="Enter 6-digit code" />
-      <button id="verify2FAForLoginBtn">Verify 2FA</button>
-      <p id="login2FAResponse"></p>
-    </div>
-  </div>
+					<!-- Désactivation -->
+					<div id="twoFactorDisableSection" style="display: none;">
+						<button id="disable2FABtn" data-i18n="2faDisableBtn"></button>
+						<!-- <p id="disable2FAResponse"></p> -->
+					</div>
+					<p id="twoFactorResponse"></p>
+				</div>
 
-  <!-- All Users List -->
-  <pre id="allUsersResponse" class="container hidden"></pre>
+				<h3 data-i18n="friendsTitle"></h3>
+				<ul id="friendList"></ul>
+				<h3 data-i18n="addFriend"></h3>
+				<div class="friend-search-container">
+					<input type="text" id="friendSearchInput" data-i18n-placeholder="friendSearchPlaceholder">
+					<button id="friendSearchBtn" data-i18n="searchFriend"></button>
+				</div>
+				<ul id="friendSearchResults"></ul>
+				<button type="submit" id="saveChangesBtn" data-i18n="saveChanges"></button>
+				<p id="profileMessage" class="profile-message"></p>
+			</form>
+		</div>
+	</div>
+	<!-- Fenêtre modale historique cachée -->
+	<div id="historyModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h1 class="text-outline" data-i18n="historyTitle"></h1>
+			<div class="history-container">
+				<ul id="gameHistoryList"></ul>
+			</div>
+		</div>
+	</div>
+	<!-- Fenêtre modale statistiques cachée -->
+	<div id="statsModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h1 class="text-outline" data-i18n="statsTitle"></h1>
+			<div class="stats-container">
+				<div class="stats-text">
+					<p><span data-i18n="totalGames"></span> <span id="totalGames">0</span></p>
+					<p><span data-i18n="winsTitle"></span> <span id="wins">0</span></p>
+					<p><span data-i18n="lossesTitle"></span> <span id="losses">0</span></p>
+					<p><span data-i18n="winRate"></span> <span id="winRate">0.00%</span></p>
+				</div>
+				<div class="stats-chart-container">
+					<canvas id="statsChart"></canvas> <!-- Graphique avec chart.js -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Fenêtre modale Comment jouer? cachée -->
+	<div id="howToPlayModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<h1 class="text-outline" data-i18n="howToPlayTitle"></h1>
+			<p data-i18n="playerLeftControls"></p>
+			<p data-i18n="playerRightControls"></p>
+			<p data-i18n="aiMode"></p>
+		</div>
+	</div>
+	<!-- 📌 MODALE "PRIVACY & DATA" -->
+	<div id="privacyModal" class="modal">
+		<div class="modal-content privacy-modal">
+			<span class="close">&times;</span>
+			<h1 class="text-outline" data-i18n="privacyTitle"></h1>
+			<p data-i18n="privacyDescription"></p>
+			<h3 data-i18n="exportData"></h3>
+			<p data-i18n="exportDataDesc"></p>
+			<h3 data-i18n="anonymization"></h3>
+			<p data-i18n="anonymizationDesc"></p>
+			<h3 data-i18n="deleteAccountTitle"></h3>
+			<p data-i18n="deleteAccountDescription"></p>
+			<!-- 📥 Télécharger ses données -->
+			<button id="exportDataBtn" data-i18n="exportDataBtn"></button>
+			<p id="exportMessage" style="display: none;"></p>
 
-  <!-- User Info & Actions -->
-  <div id="userInfo" class="container" style="display: none;">
-    <h2>User Info</h2>
-    <p>
-      ID: <span id="userId"></span><br />
-      Username: <span id="userName"></span><br />
-      Email: <span id="userEmail"></span><br />
-      Status: <span id="userStatus"></span>
-    </p>
+			<!-- 🕵️‍♂️ Anonymiser son compte -->
+			<button id="anonymizeBtn" data-i18n="anonymizeBtn"></button>
+			<p id="anonymizeMessage" style="display: none;"></p>
 
-    <!-- Two-Factor Authentication Section -->
-    <div id="twoFactorSection" class="container" style="display: none;">
-      <h3>Two-Factor Authentication (2FA)</h3>
-
-      <!-- Setup Section (visible only when 2FA is not enabled) -->
-      <div id="twoFactorSetupSection" style="display: none;">
-        <button id="setup2FABtn">Enable 2FA</button>
-        <!-- This container appears after clicking "Enable 2FA" -->
-        <div id="qrAndConfirmContainer" style="display: none;">
-          <img id="qrCodeImg" style="width: 150px; height: 150px;" alt="QR Code" />
-          <p id="twoFactorResponse"></p>
-          <input type="text" id="setup2FACode" placeholder="Enter 6-digit code" />
-          <button id="confirm2FASetupBtn">Confirm 2FA Setup</button>
-          <p id="setup2FAResponse"></p>
-        </div>
-      </div>
-
-      <!-- Disable Section (visible only when 2FA is enabled) -->
-      <div id="twoFactorDisableSection" style="display: none;">
-        <h4>Disable 2FA</h4>
-        <button id="disable2FABtn" class="danger-btn">Disable 2FA</button>
-        <p id="disable2FAResponse"></p>
-      </div>
-    </div>
-
-    <!-- Privacy Settings Section -->
-    <div id="privacySettings" class="container">
-      <h3>Privacy Settings</h3>
-      <p>
-        In accordance with GDPR, you have the right to manage your personal data.
-        You can export your data, or if you choose, permanently anonymize your account.
-        <strong>Note:</strong> Once anonymized, your original credentials will be lost and you will no longer be able to
-        log in.
-      </p>
-      <div class="form-group">
-        <button id="exportDataBtn">Export My Data</button>
-        <button id="anonymizeBtn" class="danger-btn">Anonymize My Data Permanently</button>
-      </div>
-      <p id="privacyResponse"></p>
-    </div>
-
-    <!-- Avatar Section -->
-    <div id="avatarSection" class="form-group">
-      <h3>Avatar</h3>
-      <!-- Display current avatar -->
-      <img id="userAvatar" src="/avatars/default/default_cat.webp" alt="User Avatar" width="100" height="100" />
-      <!-- File input for uploading a new avatar -->
-      <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/webp" />
-      <button id="uploadAvatarBtn">Upload Avatar</button>
-      <!-- Button to remove avatar and revert to default -->
-      <button id="removeAvatarBtn" class="danger-btn">Remove Avatar</button>
-    </div>
-
-    <!-- Friend Section -->
-    <div id="friendSection" class="container">
-
-      <h3>Find a Friend</h3>
-      <!-- Search for a friend by username or email -->
-      <div id="friendSearch">
-        <input type="text" id="friendSearchInput" placeholder="Search by username or email" />
-        <button id="friendSearchBtn">Search</button>
-      </div>
-      <!-- Display search results with an "Add Friend" button -->
-      <ul id="friendSearchResults"></ul>
-
-      <h4>Your Friends</h4>
-      <!-- List to display current friends with remove options -->
-      <ul id="friendList"></ul>
-      <hr>
-    </div>
-
-    <!-- Manual Match -->
-    <div id="manualMatchSection" class="container">
-      <h3>Manually Add a Match (Test)</h3>
-      <select id="matchType">
-        <option value="1vs1">1vs1</option>
-        <option value="vs AI">vs AI</option>
-        <option value="Tournament">Tournament</option>
-      </select>
-      <select id="matchResult">
-        <option value="✅ Victoire">✅ Victoire</option>
-        <option value="❌ Défaite">❌ Défaite</option>
-        <!-- <option value="✅ Victory">✅ Victory</option>
-        <option value="❌ Defeat">❌ Defeat</option> -->
-      </select>
-      <button id="addMatchBtn">Add Match</button>
-      <p id="matchResponse"></p>
-    </div>
-
-    <!-- Game History Section -->
-    <div id="gameHistorySection" class="container">
-      <h3>Game History</h3>
-      <ul id="gameHistoryList" style="display: none;"></ul>
-      <button id="loadGameHistoryBtn">Load Game History</button>
-    </div>
-
-    <!-- Stats Section -->
-    <div id="statsSection" class="container">
-      <h3>Stats</h3>
-      <p>Total Games: <span id="totalGames"></span></p>
-      <p>Wins: <span id="wins"></span></p>
-      <p>Losses: <span id="losses"></span></p>
-      <p>Win Rate: <span id="winRate"></span></p>
-      <!-- Canvas element for Chart.js -->
-      <canvas id="statsChart" width="50" height="50"></canvas>
-    </div>
-
-    <!-- Update Section -->
-    <h3>Update</h3>
-
-    <!-- Update Username -->
-    <div class="form-group">
-      <input type="text" id="newUsername" placeholder="New Username" />
-      <button id="updateUsernameBtn">Update Username</button>
-    </div>
-
-    <!-- Update Email -->
-    <div class="form-group">
-      <input type="email" id="newEmail" placeholder="New Email" />
-      <button id="updateEmailBtn">Update Email</button>
-    </div>
-
-    <!-- Update Status (to remove?) -->
-    <div class="form-group">
-      <select id="newStatus">
-        <option value="online">Online</option>
-        <option value="offline">Offline</option>
-        <option value="in-game">In Game</option>
-      </select>
-      <button id="updateStatusBtn">Update Status</button>
-    </div>
-
-    <!-- Update Password Section -->
-    <div class="form-group">
-      <input type="password" id="oldPassword" placeholder="Current Password" />
-      <input type="password" id="newPassword" placeholder="New Password" />
-      <button id="updatePasswordBtn">Update Password</button>
-    </div>
-    <p id="passwordUpdateResponse"></p>
-    <p id="updateResponse"></p>
-
-    <button id="logoutBtn" style="display: none;">Logout</button>
-    <button id="deleteAccountBtn" class="danger-btn" style="display: none;">Delete Account</button>
-    <p id="logoutResponse"></p>
-    <p id="deleteResponse"></p>
-  </div>
-
-  <!-- Main script (make sure this file imports the API client and sets up events) -->
-  <script type="module" src="./src/main.ts"></script>
+			<!-- ❌ Supprimer le compte -->
+			<button id="deleteAccountBtn" class="danger" data-i18n="deleteAccountBtn"></button>
+			<p id="deleteMessage" style="display: none;"></p>
+		</div>
+	</div>
+	<!-- Home button -->
+	<button id="homeButton" class="home-button" style="visibility: hidden;">
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#333" width="32px" height="32px">
+			<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+		</svg>
+	</button>
+	<!-- Menu -->
+	<div id="menu">
+		<h1>Cat Pong Game</h1>
+		<button id="playVsGuest" style="display: none;" data-i18n="game1v1"></button>
+		<button id="playVsAI" style="display: none;" data-i18n="gameVsAI"></button>
+		<button id="tournament" style="display: none;" data-i18n="gameTournament"></button>
+	</div>
+	<!--tournament Options -->
+	<div id="tournamentOptions" style="display: none; text-align: center; margin-top: 15px;">
+		<h1 data-i18n="tournamentChoice"></h1>
+		<button id="tournament4" class="tournament-btn" data-i18n="tournament4"></button>
+		<button id="tournament8" class="tournament-btn" data-i18n="tournament8"></button>
+	</div>
+	<div id="playerInputs" style="display: none; text-align: center; margin-top: 15px;">
+		<h1 data-i18n="enterPlayerNames"></h1>
+		<form id="playersForm">
+			<div id="inputsContainer"></div>
+			<button type="submit" data-i18n="startTournament"></button>
+		</form>
+	</div>
+	<!-- Jeu -->
+	<div id="game">
+		<!-- Noms des joueurs -->
+		<div id="playerNames">
+			<span id="leftPlayerName"></span><span id="rightPlayerName"></span>
+		</div>
+		<canvas id="gameCanvas" width="900" height="600"></canvas>
+		<!-- <canvas id="gameCanvas" width="600" height="400"></canvas> -->
+	</div>
+	<div id="endScreen">
+		<h1 id="winnerMessage"></h1>
+		<p id="currentMatchInfo"></p>
+		<p id="nextMatchInfo"></p>
+		<button id="replayButton" data-i18n="replayButton"></button>
+		<button id="returnMenu" data-i18n="returnMenu"></button>
+		<button id="nextMatchButton" style="display: none;" data-i18n="nextMatchButton"></button>
+	</div>
+	<script type="module" src="./src/main3D.ts"></script>
 </body>
-
 </html>

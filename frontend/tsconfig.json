@@ -2,10 +2,7 @@
 	"compilerOptions": {
 		"target": "es5", // Version de JavaScript ciblée
 		"module": "es6", // Utilise les modules ES6
-		"lib": [
-			"DOM",
-			"ES2015"
-		], // Ajoute ES2015 pour Promise et async/await
+		"lib": ["DOM", "ES2015"], // Ajoute ES2015 pour Promise et async/await
 		"outDir": "./dist", // Répertoire de sortie
 		"rootDir": "./src", // Répertoire des fichiers source
 		"moduleResolution": "node", // pour babylonjs
