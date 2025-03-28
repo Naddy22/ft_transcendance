@@ -1,5 +1,5 @@
 # ==============================
-##@ 📜 Scripts (wip)
+##@ 📜 Scripts
 # ==============================
 
 # Scripts Paths  (relative to the main Makefile's location)
@@ -84,26 +84,6 @@ script: | $(SCRIPT_LOG_DIR) ## Interactive script selection menu
 		export LOG_ENABLED="$$LOG_ENABLED"; \
 		$(MAKE) $(NPD) run-script SCRIPT_TYPE="$$SCRIPT_TYPE" SCRIPT_CHOICE="$$SCRIPT_CHOICE" LOG_ENABLED="$$LOG_ENABLED" \
 	'
-
-# script: | $(SCRIPT_LOG_DIR) ## Interactive script selection menu
-# 	@clear
-# 	@read -p "Do you want to log script output? (y/n): " log_choice; \
-# 	case $$log_choice in \
-# 		y|Y|"") LOG_ENABLED=true; $(call INFO,Scripts,Logging enabled.);; \
-# 		*) LOG_ENABLED=false; $(call INFO,Scripts,Logging disabled.);; \
-# 	esac; \
-# 	\
-# 	$(call Scripts,Choose a script to run:); \
-# 	echo "1) Create Users"; \
-# 	echo "2) Display Terminal Colors"; \
-# 	echo ""; \
-# 	read -p "Enter your choice (1-2): " choice; \
-# 	case $$choice in \
-# 		1) SCRIPT_TYPE="Create Users"; SCRIPT_CHOICE="$(CREATE_USERS)";; \
-# 		2) SCRIPT_TYPE="Show Colors"; SCRIPT_CHOICE="$(SHOW_COLORS)";; \
-# 		*) $(call ERROR,Invalid Choice:,Please select a number between 1 and 2.); exit 1;; \
-# 	esac; \
-# 	$(call RUN_SCRIPT,$$SCRIPT_TYPE,$$SCRIPT_CHOICE,$$LOG_ENABLED)
 
 script-clean: ## Clean up test artifacts and logs
 	@$(call CLEANUP,Scripts,script artifacts,$(SCRIPT_ARTIFACTS),"All scripts artifacts removed.","No artifacts to clean.")

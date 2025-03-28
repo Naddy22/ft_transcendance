@@ -5,7 +5,6 @@
 
 # Environment variables file (contains secrets and API keys)
 .env
-certs/
 
 # ======================
 # Avatar Uploaded by Users
@@ -32,8 +31,10 @@ build/
 
 # VSCode editor settings and extensions
 .vscode/
+
 # macOS system file (not needed in repositories)
 .DS_Store
+
 # auto-formatting file
 .prettierrc
 
@@ -53,8 +54,8 @@ npm-debug.log
 # ======================
 
 # Folder for SQLite database storage
-database/
 data/
+
 # SQLite database files
 *.sqlite
 
@@ -62,27 +63,11 @@ data/
 # Docker
 # ======================
 
-# Docker ignore file
+# # Docker ignore file
 # .dockerignore
 
 # Local override for docker-compose setup
 docker-compose.override.yml
-
-# Init scripts for database setup in Docker
-# **/docker-entrypoint-initdb.d/
-
-# ======================
-# Babylon.js / WebGL Artifacts
-# ======================
-
-# # Binary GLTF files for 3D assets
-# *.glb
-# # GLTF 3D model files
-# *.gltf
-# # Binary files used with GLTF
-# *.bin
-# # Babylon.js-specific 3D model format
-# *.babylon
 
 # ======================
 # Temporary & Local Files

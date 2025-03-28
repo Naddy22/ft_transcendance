@@ -31,30 +31,10 @@ tree-clean: ## Remove 'tree' outfile
 
 .PHONY: tree tree-cleen
 
-# # ==============================
-# ##@ 💾 Backup
-# # ==============================
-
-# BACKUP_NAME	:=$(ROOT_DIR)_$(USER)_$(TIMESTAMP).zip
-# BACKUP_NAME	:=$(ROOT_DIR)_$(USER)_$(TIMESTAMP).zip
-# MOVE_TO		:= ~/Desktop/$(BACKUP_NAME)
-
-# backup: ffclean ## Creates a zip file of the project
-# 	@if which zip > $(VOID); then \
-# 		zip -r --quiet $(BACKUP_NAME) ./*; \
-# 		mv $(BACKUP_NAME) $(MOVE_TO); \
-# 		$(call INFO,$(NAME),compressed as: ,$(CYAN)$(UNDERLINE)$(MOVE_TO)$(RESET)); \
-# 	else \
-# 		$(call ERROR,Please install zip to use the backup feature); \
-# 	fi
-
-# .PHONY: backup
-
 # ==============================
 ##@ 💾 Backup
 # ==============================
 
-TIMESTAMP   := $(shell date +%Y%m%d_%H%M%S)
 BACKUP_DIR  := $(ROOT_DIR)_$(USER)_$(TIMESTAMP)
 MOVE_TO     := ~/Desktop
 
@@ -86,7 +66,6 @@ backup: ffclean ## Prompt and create a .zip or .tar.gz backup of the project
 	fi
 
 .PHONY: backup
-
 
 # ==============================
 ##@ 🎨 Decorations
