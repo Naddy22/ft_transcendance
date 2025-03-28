@@ -63,6 +63,10 @@ export function getErrorMessage(error: string): string {
 
 		// 📌 2FA
 		"Invalid 2FA code": getTranslation("error2faInvalidCode"),
+
+		// 📌 Friends
+		"Cannot add yourself as a friend": getTranslation("errorAddYourself"),
+		"Friend already added": getTranslation("errorFriendAlreadyAdded"),
 	};
 
 	// 🔹 Recherche de l'erreur exacte ou partielle

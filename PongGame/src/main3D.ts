@@ -373,6 +373,7 @@ function loadUserProfile() {
 			(document.getElementById("userAvatar")! as HTMLImageElement).src = profile.avatar;
 			(document.getElementById("oldPassword")! as HTMLInputElement).value = "";
 			(document.getElementById("newPassword")! as HTMLInputElement).value = "";
+			document.getElementById("qrAndConfirmContainer")!.style.display = "none";
 			if (!profile.isTwoFactorEnabled) {
 				(document.getElementById("twoFactorDisableSection"))!.style.display = "none";
 				(document.getElementById("twoFactorSetupSection"))!.style.display = "block";

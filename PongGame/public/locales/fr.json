@@ -134,6 +134,8 @@
 	"errorGeneric": "Une erreur est survenue (Code : {code})",
 	"errorAnonymizedAccount": "Ce compte a été anonymisé.",
 	"error2faInvalidCode": "Le code 2FA est invalide.",
+	"errorAddYourself": "Tu ne peux pas t'ajouter toi-même.",
+	"errorFriendAlreadyAdded": "Cet utilisateur est déjà ton ami.",
 	
 	"2faLoginTitle": "🔐 Vérification 2FA",
 	"2faLoginPrompt": "Veuillez entrer le code à 6 chiffres généré par votre application d’authentification.",
