@@ -17,7 +17,7 @@ export async function changePasswordRoutes(fastify: FastifyInstance) {
    */
   fastify.put<{ Params: { id: string }; Body: ChangePasswordRequest }>(
     "/:id/password",
-    { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (req, reply) => {
       try {
         const { id } = req.params;

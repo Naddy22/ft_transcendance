@@ -102,8 +102,14 @@ export async function authRoutes(fastify: FastifyInstance) {
         const stmtId = await fastify.db.prepare(`
           SELECT last_insert_rowid() as id
         `);
-        const row = await stmtId.get();
-        const insertedUserId = row?.id ?? null;
+
+        type RowResult = { id: number };
+        const row = await stmtId.get() as RowResult;
+        const insertedUserId = row.id;
+
+        // const row = await stmtId.get();
+        // // const insertedUserId = row?.id ?? null;
+        // const insertedUserId = (row as any)?.id ?? null;
 
         // Respond with the user data (excluding password)
         reply.status(201).send({

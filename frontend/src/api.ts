@@ -86,13 +86,11 @@ export interface NewMatchHistoryEntry {
   result: string;
 }
 
-
 export interface NewMatchRequest {
   player1: number;
   player2: number;
   score: MatchScore;
   startTime: string;
-  // matchType: "1vs1" | "vs AI" | "Tournament";
   matchType: string;
   tournamentId?: number | null;
 
@@ -109,30 +107,6 @@ export interface MatchResultRequest {
   winner: number;
   score?: MatchScore;
 }
-
-export interface MatchmakingRequest {
-  userId: number;
-  username: string;
-}
-
-export interface MatchmakingResponse {
-  matchId: number;
-  player1: { id: number; username: string };
-  player2: { id: number; username: string };
-  status: "waiting" | "started";
-}
-
-export interface Tournament {
-  tournamentId: number;
-  name: string;
-  players: number[];
-  matches: Match[];
-  winner?: number | null;
-  status: "pending" | "in-progress" | "completed";
-}
-
-export type NewTournamentRequest = Pick<Tournament, "name" | "players">;
-export type TournamentUpdateRequest = Partial<Pick<Tournament, "status" | "winner">>;
 
 export interface HealthResponse {
   status: string;
@@ -359,41 +333,6 @@ export class API {
     return this.request<MatchHistory[]>(`/matchHistory/${userId}`);
   }
 
-  // ── Matchmaking Endpoint ──────────────────────────────────────────────
-
-  async joinMatchmaking(
-    data: MatchmakingRequest
-  ): Promise<MatchmakingResponse> {
-    return this.request<MatchmakingResponse>("/matchmaking/join", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  }
-
-  // ── Tournament Endpoints ──────────────────────────────────────────────
-
-  async getTournaments(): Promise<Tournament[]> {
-    return this.request<Tournament[]>("/tournaments");
-  }
-
-  async getTournament(id: number): Promise<Tournament> {
-    return this.request<Tournament>(`/tournaments/${id}`);
-  }
-
-  async createTournament(data: NewTournamentRequest): Promise<{ message: string; tournamentId: number }> {
-    return this.request<{ message: string; tournamentId: number }>("/tournaments", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  }
-
-  async updateTournament(id: number, data: TournamentUpdateRequest): Promise<{ message: string }> {
-    return this.request<{ message: string }>(`/tournaments/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    });
-  }
-
   // ── Avatar Endpoints ──────────────────────────────────────────────────
 
   // Upload avatar (expects a FormData object, so do not set Content-Type manually)
@@ -443,8 +382,9 @@ export class API {
   async anonymizeUser(userId: number): Promise<{ message: string }> {
     return this.request<{ message: string }>(`/users/${userId}/anonymize`, {
       method: "PUT",
+      body: JSON.stringify({})
       // Override headers so that Content-Type isn't sent
-      headers: {}
+      // headers: {}
     });
   }
 

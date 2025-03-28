@@ -11,9 +11,9 @@ export async function matchHistoryRoutes(fastify: FastifyInstance) {
   fastify.post(
     "/",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { userId, type, result } = req.body as {
+        const { userId, type, result } = request.body as {
           userId: number;
           type: string;
           result: string;
@@ -46,19 +46,19 @@ export async function matchHistoryRoutes(fastify: FastifyInstance) {
   /**
    * Get a user's match history
    */
-  fastify.get<{ Params: { userId: string } }>(
-    "/:userId",
-    { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+  fastify.get<{ Params: { id: string } }>(
+    "/:id",
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
+    async (request, reply) => {
       try {
-        const { userId } = req.params;
+        const { id } = request.params;
         const stmt = await fastify.db.prepare(`
           SELECT date, type, result
           FROM match_history
           WHERE userId = ?
           ORDER BY date DESC
         `);
-        const history = await stmt.all(userId);
+        const history = await stmt.all(id);
         reply.send(history);
       } catch (error) {
         return sendError(reply, 500, "Internal server error while fetching match history", error);

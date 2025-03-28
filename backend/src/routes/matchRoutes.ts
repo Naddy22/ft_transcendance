@@ -17,7 +17,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
    */
   fastify.get(
     "/",
-    // { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       try {
         const stmt = await fastify.db.prepare(`
@@ -37,6 +37,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
    */
   fastify.get<{ Params: { id: string } }>(
     "/:id",
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (req, reply) => {
       try {
         const { id: matchId } = req.params;
@@ -99,7 +100,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
    */
   fastify.put<{ Params: { id: string }, Body: MatchUpdateRequest }>(
     "/:id",
-    { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (req, reply) => {
       try {
         const { id: matchId } = req.params;
@@ -149,7 +150,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
    */
   fastify.get<{ Params: { userId: string } }>(
     "/history/:userId",
-    { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (req, reply) => {
       try {
         const { userId } = req.params;

@@ -51,7 +51,7 @@ export async function avatarRoutes(fastify: FastifyInstance) {
    */
   fastify.post(
     "/avatars",
-    // { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       try {
         const data = await req.file();
@@ -141,7 +141,7 @@ export async function avatarRoutes(fastify: FastifyInstance) {
    */
   fastify.put<{ Body: { userId: number; avatarUrl: string } }>(
     "/avatars",
-    // { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       try {
         const { userId, avatarUrl } = req.body;
@@ -192,7 +192,7 @@ export async function avatarRoutes(fastify: FastifyInstance) {
    */
   fastify.delete<{ Body: { userId: number } }>(
     "/avatars",
-    // { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       try {
         const { userId } = req.body;

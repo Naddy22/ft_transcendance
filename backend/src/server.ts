@@ -83,19 +83,19 @@ if (!fs.existsSync(dbPath)) {
 // ────────────────────────────────────────────────────────────────────────────────
 // Transport setup for "pretty" logs only in dev mode
 // const loggerOptions = process.env.NODE_ENV !== 'production' ? {
-  const loggerOptions = {
-    // level: 'info',
-    // file: './server.log',
-    transport: {
-      target: "@mgcrea/pino-pretty-compact",
-      options: {
-        colorize: true,
-        translateTime: "SYS:H:MM:ss",
-        ignore: 'pid,hostname',
-      }
+const loggerOptions = {
+  // level: 'info',
+  // file: './server.log',
+  transport: {
+    target: "@mgcrea/pino-pretty-compact",
+    options: {
+      colorize: true,
+      translateTime: "SYS:H:MM:ss",
+      ignore: 'pid,hostname',
     }
-  // } : true;  // Raw JSON logs in production for better machine parsing and performance.
   }
+  // } : true;  // Raw JSON logs in production for better machine parsing and performance.
+}
 
 // ────────────────────────────────────────────────────────────────────────────────
 // ────────────────────────────────────────────────────────────────────────────────
@@ -145,33 +145,47 @@ request.jwtVerify() in protected routes.
 */
 
 // Authentication decorator to require valid JWT on protected endpoints
-fastify.decorate("authenticate", async function(request: FastifyRequest, reply: FastifyReply) {
+fastify.decorate("authenticate", async function (request: FastifyRequest, reply: FastifyReply) {
   try {
     await request.jwtVerify();
   } catch (err) {
     reply.send(err);
   }
 });
-/*
-fastify.get('/protected', { preValidation: [fastify.authenticate] }, async (req, reply) => {
-  return { secretData: "This data is protected" };
+
+fastify.decorate("isAuthorized", async function (request: FastifyRequest, reply: FastifyReply) {
+  const jwtUserId = request.user?.id;
+  const paramId = Number((request.params as { id: string }).id);
+
+  // if (!Number.isInteger(paramId)) {
+  //   return reply.status(400).send({ error: "Invalid user ID in params" });
+  // }
+
+  // if (!jwtUserId || typeof paramId !== 'number') {
+  //   return reply.status(400).send({ error: "Bad Request" });
+  // }
+
+  if (jwtUserId !== paramId) {
+    return reply.status(403).send({ error: "Forbidden" });
+  }
 });
-*/
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register helmet plugin (prevent XSS)
 await fastify.register(helmet, {
   // noSniff: true,
   contentSecurityPolicy: {
+    useDefaults: true, // <-- important to ensure basic directives are applied
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      // styleSrcElem: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       imgSrc: ["'self'", "data:", "blob:"], // allow blob: URLs for images
       connectSrc: ["'self'"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
       objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      frameAncestors: ["'none'"],
       upgradeInsecureRequests: [],
     },
   },

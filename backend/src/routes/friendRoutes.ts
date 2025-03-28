@@ -11,7 +11,7 @@ export async function friendRoutes(fastify: FastifyInstance) {
    */
   fastify.get<{ Params: { id: string } }>(
     "/:id/friends",
-    // { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (req, reply) => {
       try {
         const { id } = req.params;
@@ -49,7 +49,7 @@ export async function friendRoutes(fastify: FastifyInstance) {
    */
   fastify.post<{ Params: { id: string }, Body: { friendId: number } }>(
     "/:id/friends",
-    // { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (req, reply) => {
       try {
         const { id } = req.params;
@@ -111,7 +111,7 @@ export async function friendRoutes(fastify: FastifyInstance) {
    */
   fastify.delete<{ Params: { id: string, friendId: string } }>(
     "/:id/friends/:friendId",
-    // { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (req, reply) => {
       try {
         const { id, friendId } = req.params;

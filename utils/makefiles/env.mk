@@ -40,6 +40,13 @@ env:
 		echo "$(ENV_FILE) $(GREEN)Generated!$(RESET)"; \
 	fi
 
+env-copy: ## Copies the '.env.template' file at './backend/.env'
+	@if [ ! -f $(ENV_FILE) ]; then \
+		echo "Copying $(ENV_EXAMPLE) file at $(ENV_FILE)..."; \
+		cp $(ENV_EXAMPLE) $(ENV_FILE); \
+		echo "$(GREEN).env file created at $(ENV_FILE)"; \
+	fi
+
 env-create: ## Generate the .env with prompt for overwrite
 	@if [ ! -f $(ENV_FILE) ]; then \
 		echo "$(YELLOW)Creating $(RESET)$(ENV_FILE) $(YELLOW)file...$(RESET)"; \
@@ -56,21 +63,21 @@ env-create: ## Generate the .env with prompt for overwrite
 		fi \
 	fi
 
-env-copy: ## Copies the '.env.template' file at './backend/.env'
-	@if [ ! -f $(ENV_FILE) ]; then \
-		echo "Copying $(ENV_EXAMPLE) file at $(ENV_FILE)..."; \
-		cp $(ENV_EXAMPLE) $(ENV_FILE); \
-		echo "$(GREEN).env file created at $(ENV_FILE)"; \
-	else \
-		read -p "$(ENV_FILE) $(ORANGE)already exists.$(RESET) Overwrite? [Y/n]: " confirm; \
-		if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ] || [ -z "$$confirm" ]; then \
-			echo "$(YELLOW)Overwriting $(ENV_FILE) with template...$(RESET)"; \
-			cp $(ENV_EXAMPLE) $(ENV_FILE); \
-			echo ".env $(GREEN)file overwritten!$(RESET)"; \
-		else \
-			echo "$(GREEN)Keeping existing .env file.$(RESET)"; \
-		fi \
-	fi
+# env-copy: ## Copies the '.env.template' file at './backend/.env'
+# 	@if [ ! -f $(ENV_FILE) ]; then \
+# 		echo "Copying $(ENV_EXAMPLE) file at $(ENV_FILE)..."; \
+# 		cp $(ENV_EXAMPLE) $(ENV_FILE); \
+# 		echo "$(GREEN).env file created at $(ENV_FILE)"; \
+# 	else \
+# 		read -p "$(ENV_FILE) already exists. Overwrite? [Y/n]: " confirm; \
+# 		if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ] || [ -z "$$confirm" ]; then \
+# 			echo "Overwriting $(ENV_FILE) with template..."; \
+# 			cp $(ENV_EXAMPLE) $(ENV_FILE); \
+# 			echo ".env file overwritten!"; \
+# 		else \
+# 			echo "Keeping existing .env file."; \
+# 		fi \
+# 	fi
 
 env-clean: ## Remove .env file
 	@$(call CLEANUP,$(ENV_FILE),.env file,$(ENV_FILE))

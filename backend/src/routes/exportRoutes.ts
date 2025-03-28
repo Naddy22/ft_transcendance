@@ -10,7 +10,7 @@ export async function exportRoutes(fastify: FastifyInstance) {
    */
   fastify.get<{ Params: { id: string } }>(
     "/:id/export",
-    { preValidation: [fastify.authenticate] },
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
     async (req, reply) => {
       try {
         const { id } = req.params;

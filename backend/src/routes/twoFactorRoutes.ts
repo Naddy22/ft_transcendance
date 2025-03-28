@@ -17,8 +17,8 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: Setup2FARequest }>(
     "/setup-2fa",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
-      const { userId } = req.body;
+    async (request, reply) => {
+      const { userId } = request.body;
 
       // Generate a new secret for the user
       const secret = speakeasy.generateSecret({ name: `CatPong (${userId})` });
@@ -48,8 +48,8 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: Verify2FARequest }>(
     "/confirm-2fa",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
-      const { userId, token } = req.body;
+    async (request, reply) => {
+      const { userId, token } = request.body;
 
       const stmt = await fastify.db.prepare(`
         SELECT twoFactorSecret FROM users WHERE id = ?
@@ -94,13 +94,12 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
    */
   fastify.post<{ Body: Verify2FARequest }>(
     "/verify-2fa",
-    // { preValidation: [fastify.authenticate] }, // tocheck: remain public if only part of login flow, protect if used for managin post-login settings..
-    async (req, reply) => {
-      const { userId, token } = req.body;
+    async (request, reply) => {
+      const { userId, token } = request.body;
 
-      // Fetch user's 2FA secret
+      // Fetch user's 2FA secret and username
       const stmt = await fastify.db.prepare(`
-        SELECT twoFactorSecret
+        SELECT twoFactorSecret, username
         FROM users
         WHERE id = ?
       `);
@@ -126,7 +125,7 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
       }
 
       // Generate and return a JWT token upon successful verification
-      const jwtToken = fastify.jwt.sign({ id: userId });
+      const jwtToken = fastify.jwt.sign({ id: userId, username: user.username });
 
       reply.send({
         message: "2FA Verification Successful",
@@ -141,8 +140,8 @@ export async function twoFactorRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: Disable2FARequest }>(
     "/disable-2fa",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
-      const { userId } = req.body;
+    async (request, reply) => {
+      const { userId } = request.body;
 
       const stmt = await fastify.db.prepare(`
         UPDATE users

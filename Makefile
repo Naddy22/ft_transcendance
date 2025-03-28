@@ -17,6 +17,7 @@ FRONTEND_URL	:= http://localhost:$(FRONTEND_PORT)
 BACKEND_DIR		:= backend
 FRONTEND_DIR	:= frontend
 # FRONTEND_DIR	:= PongGame
+GAME_DIR		:= PongGame
 
 # Log files
 LOG_DIRS			:= $(BACKEND_DIR)/logs $(FRONTEND_DIR)/logs
@@ -31,8 +32,8 @@ DATABASE		:= $(DATABASE_DIR)/database.sqlite
 UPLOAD_DIR		:= $(BACKEND_DIR)/uploads
 
 # Build
-DIST_DIRS		:= $(BACKEND_DIR)/dist $(FRONTEND_DIR)/dist
-NODE_MOD_DIRS	:= node_modules $(BACKEND_DIR)/node_modules $(FRONTEND_DIR)/node_modules
+DIST_DIRS		:= $(BACKEND_DIR)/dist $(FRONTEND_DIR)/dist $(GAME_DIR)/dist
+NODE_MOD_DIRS	:= node_modules $(BACKEND_DIR)/node_modules $(FRONTEND_DIR)/node_modules $(GAME_DIR)/node_modules
 
 # Configuration Files
 MK_PATH	:= utils/makefiles

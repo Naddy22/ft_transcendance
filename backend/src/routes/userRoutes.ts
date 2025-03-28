@@ -31,10 +31,10 @@ export async function userRoutes(fastify: FastifyInstance) {
    */
   fastify.get<{ Params: { id: string } }>(
     "/:id",
-    // { preValidation: [fastify.authenticate] }, tocheck *!!
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id } = req.params;
+        const { id } = request.params;
+        const userId = request.params.id; // ?
 
         const stmt = await fastify.db.prepare(`
           SELECT id, username, email, avatar, status, wins, losses, matchesPlayed, isTwoFactorEnabled 
@@ -59,11 +59,11 @@ export async function userRoutes(fastify: FastifyInstance) {
    */
   fastify.put<{ Params: { id: string }, Body: UpdateUserRequest }>(
     "/:id",
-    { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
+    async (request, reply) => {
       try {
-        const { id } = req.params;
-        const { username, email, avatar, status } = req.body;
+        const { id } = request.params;
+        const { username, email, avatar, status } = request.body;
 
         if (!id) {
           return reply.status(400).send({
@@ -190,10 +190,10 @@ export async function userRoutes(fastify: FastifyInstance) {
    */
   fastify.delete<{ Params: { id: string } }>(
     "/:id",
-    { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
+    async (request, reply) => {
       try {
-        const { id } = req.params;
+        const { id } = request.params;
 
         // console.log(`🔍 Received request to delete user with ID: ${id}`); // Debug log
 

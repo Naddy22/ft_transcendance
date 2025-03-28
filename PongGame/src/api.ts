@@ -443,8 +443,9 @@ export class API {
   async anonymizeUser(userId: number): Promise<{ message: string }> {
     return this.request<{ message: string }>(`/users/${userId}/anonymize`, {
       method: "PUT",
+      body: JSON.stringify({})
       // Override headers so that Content-Type isn't sent
-      headers: {}
+      // headers: {}
     });
   }
 

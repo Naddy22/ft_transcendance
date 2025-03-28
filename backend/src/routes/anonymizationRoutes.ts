@@ -22,10 +22,15 @@ export async function anonymizationRoutes(fastify: FastifyInstance) {
   // GDPR Anonymization Endpoint
   fastify.put<{ Params: { id: string } }>(
     '/:id/anonymize',
-    // { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    { preValidation: [fastify.authenticate, fastify.isAuthorized] },
+    async (request, reply) => {
       try {
-        const { id } = req.params;
+        // const { id } = request.params;
+        const id = Number(request.params.id);
+
+        // if (isNaN(id)) {
+        //   return reply.status(400).send({ error: "Invalid user ID" });
+        // }
 
         // Retrieve the current user record
         const userStmt = await fastify.db.prepare(`
