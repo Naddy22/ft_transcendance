@@ -9,11 +9,10 @@ export async function userStatsRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { id: string } }>(
     "/:id/stats",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
     try {
-      const { id } = req.params;
+      const { id } = request.params;
 
-      // const stmt = await fastify.db.prepare("SELECT wins, losses, matchesPlayed FROM users WHERE id = ?");
       const stmt = await fastify.db.prepare(`
         SELECT wins, losses, matchesPlayed,
           CASE WHEN matchesPlayed > 0 THEN (wins * 100.0 / matchesPlayed) ELSE 0 END AS winRatio
@@ -37,10 +36,10 @@ export async function userStatsRoutes(fastify: FastifyInstance) {
   fastify.put<{ Params: { id: string }, Body: { wins?: number; losses?: number; matchesPlayed?: number } }>(
     "/:id/stats",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id } = req.params;
-        const { wins, losses, matchesPlayed } = req.body;
+        const { id } = request.params;
+        const { wins, losses, matchesPlayed } = request.body;
 
         const stmt = await fastify.db.prepare(`
           UPDATE users 

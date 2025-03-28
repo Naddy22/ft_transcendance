@@ -1,10 +1,11 @@
 // File: backend/src/routes/anonymizationRoutes.ts
 
 import { FastifyInstance } from 'fastify';
-import { sendError } from "../utils/error.js";
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+
+import { sendError } from "../utils/error.js";
 
 // Resolve __dirname and paths correctly in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -57,7 +58,6 @@ export async function anonymizationRoutes(fastify: FastifyInstance) {
         }
 
         // Build anonymized data with unique username.
-        // const anonymizedSuffix = `_${user.id}`;
         const anonymizedSuffix = `_${Date.now()}`;
         const anonymizedData = {
           username: `anonymous${anonymizedSuffix}`,

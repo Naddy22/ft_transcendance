@@ -72,6 +72,3 @@ export async function setupDatabase(fastify: FastifyInstance) {
     WHERE status <> 'anonymized'
   `);
 }
-
-// console.log("🛠️ Reset all users to offline on server startup.");
-// console.log("✅ Database setup complete.");

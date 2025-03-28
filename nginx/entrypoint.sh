@@ -2,13 +2,11 @@
 
 # File: nginx/entrypoint.sh
 # nginx entrypoint script
-
 # Creates self-signed SSL certificates for local HTTPS
 
 set -e # Exit on any error
 
 DOMAIN="${DOMAIN:-localhost}"
-# DOMAIN="${DOMAIN:-CatPong}" # to change later, also in nginx.conf ?
 SSL_DIR="/etc/nginx/ssl"
 CERT_FILE="$SSL_DIR/nginx.cert"
 KEY_FILE="$SSL_DIR/nginx.key"

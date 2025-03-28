@@ -12,7 +12,7 @@ export async function userRoutes(fastify: FastifyInstance) {
    */
   fastify.get(
     "/",
-    async (req, reply) => {
+    async (request, reply) => {
       try {
         const users: PublicUser[] = await fastify.db.all(`
           SELECT id, username, email, avatar, status, wins, losses, matchesPlayed, isTwoFactorEnabled
@@ -34,7 +34,6 @@ export async function userRoutes(fastify: FastifyInstance) {
     async (request, reply) => {
       try {
         const { id } = request.params;
-        const userId = request.params.id; // ?
 
         const stmt = await fastify.db.prepare(`
           SELECT id, username, email, avatar, status, wins, losses, matchesPlayed, isTwoFactorEnabled 
@@ -195,8 +194,6 @@ export async function userRoutes(fastify: FastifyInstance) {
       try {
         const { id } = request.params;
 
-        // console.log(`🔍 Received request to delete user with ID: ${id}`); // Debug log
-
         if (!id) {
           return reply.status(400).send({
             error: "Missing user Id"
@@ -208,8 +205,6 @@ export async function userRoutes(fastify: FastifyInstance) {
           WHERE id = ?
         `);
         const result = await stmt.run(id);
-
-        // console.log(`✅ Deleted Rows: ${result.changes}`); // Debug log
 
         if (result.changes === 0) {
           return reply.status(404).send({

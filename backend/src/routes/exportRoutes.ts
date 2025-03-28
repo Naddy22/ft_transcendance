@@ -11,9 +11,9 @@ export async function exportRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { id: string } }>(
     "/:id/export",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id } = req.params;
+        const { id } = request.params;
 
         // Retrieve user personal data (exclude password)
         const userStmt = await fastify.db.prepare(`

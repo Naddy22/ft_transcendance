@@ -18,7 +18,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
   fastify.get(
     "/",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
         const stmt = await fastify.db.prepare(`
           SELECT *
@@ -38,9 +38,9 @@ export async function matchRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { id: string } }>(
     "/:id",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id: matchId } = req.params;
+        const { id: matchId } = request.params;
         const stmt = await fastify.db.prepare(`
           SELECT *
           FROM matches
@@ -68,9 +68,9 @@ export async function matchRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: NewMatchRequest }>(
     "/",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { player1, player2, score, startTime, tournamentId, matchType } = req.body;
+        const { player1, player2, score, startTime, tournamentId, matchType } = request.body;
 
         if (!["1vs1", "vs AI", "Tournament"].includes(matchType)) {
           return reply.status(400).send({
@@ -101,10 +101,10 @@ export async function matchRoutes(fastify: FastifyInstance) {
   fastify.put<{ Params: { id: string }, Body: MatchUpdateRequest }>(
     "/:id",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id: matchId } = req.params;
-        const { winner, score, endTime } = req.body;
+        const { id: matchId } = request.params;
+        const { winner, score, endTime } = request.body;
 
         if (!winner && !score && !endTime) {
           return reply.status(400).send({
@@ -151,9 +151,9 @@ export async function matchRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { userId: string } }>(
     "/history/:userId",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { userId } = req.params;
+        const { userId } = request.params;
 
         const stmt = await fastify.db.prepare(`
           SELECT matchId, player1, player2, winner, score_player1, score_player2, startTime, matchType
@@ -182,9 +182,9 @@ export async function matchRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: { matchId: number; winner: number; scorePlayer1?: number; scorePlayer2?: number } }>(
     "/result",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { matchId, winner, scorePlayer1, scorePlayer2 } = req.body;
+        const { matchId, winner, scorePlayer1, scorePlayer2 } = request.body;
         if (!matchId || !winner) {
           return reply.status(400).send({
             error: "matchId and winner are required"

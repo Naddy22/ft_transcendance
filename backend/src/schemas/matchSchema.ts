@@ -70,4 +70,3 @@ export type MatchResultUpdate = Pick<Match, "winner" | "score">;
 export type NewMatchRequest = Omit<Match, "matchId" | "winner" | "endTime">;
 export type MatchUpdateRequest = Partial<Pick<Match, "winner" | "score" | "endTime">>;
 export type MatchResultRequest = Pick<Match, "matchId" | "winner" | "score">;
-

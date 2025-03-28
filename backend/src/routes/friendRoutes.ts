@@ -12,9 +12,9 @@ export async function friendRoutes(fastify: FastifyInstance) {
   fastify.get<{ Params: { id: string } }>(
     "/:id/friends",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id } = req.params;
+        const { id } = request.params;
 
         // Query friends table for friend IDs
         const stmt = await fastify.db.prepare(`
@@ -50,13 +50,15 @@ export async function friendRoutes(fastify: FastifyInstance) {
   fastify.post<{ Params: { id: string }, Body: { friendId: number } }>(
     "/:id/friends",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id } = req.params;
-        const { friendId } = req.body;
+        const { id } = request.params;
+        const { friendId } = request.body;
+
         if (!friendId) return reply.status(400).send({
           error: "Missing friendId"
         });
+
         if (parseInt(id) === friendId) {
           return reply.status(400).send({
             error: "Cannot add yourself as a friend"
@@ -112,9 +114,9 @@ export async function friendRoutes(fastify: FastifyInstance) {
   fastify.delete<{ Params: { id: string, friendId: string } }>(
     "/:id/friends/:friendId",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id, friendId } = req.params;
+        const { id, friendId } = request.params;
         const stmtDelete = await fastify.db.prepare(`
           DELETE FROM friends
           WHERE (userId = ? AND friendId = ?)

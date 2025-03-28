@@ -3,11 +3,16 @@
 
 import { FastifyInstance } from 'fastify';
 import sanitizeHtml from 'sanitize-html';
+import speakeasy from 'speakeasy';
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
-import speakeasy from 'speakeasy';
-import { RegisterRequest, LoginRequest, LogoutRequest } from "../schemas/authSchema.js";
+
 import { sendError } from "../utils/error.js";
+import {
+  RegisterRequest,
+  LoginRequest,
+  LogoutRequest
+} from "../schemas/authSchema.js";
 
 dotenv.config();
 
@@ -20,9 +25,9 @@ export async function authRoutes(fastify: FastifyInstance) {
    */
   fastify.post<{ Body: RegisterRequest }>(
     "/register",
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { username, email, password } = req.body;
+        const { username, email, password } = request.body;
 
         // Validate required fields with specific messages
         if (!username) return reply.status(400).send({
@@ -119,8 +124,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         });
 
       } catch (error) {
-        // console.error("❌ Error during registration:", error);
-        // reply.status(500).send({ error: "Internal Server Error" });
         return sendError(reply, 500, "Internal Server Error during registration", error);
       }
     }
@@ -131,9 +134,9 @@ export async function authRoutes(fastify: FastifyInstance) {
    */
   fastify.post<{ Body: LoginRequest }>(
     "/login",
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { identifier, password, twoFactorCode } = req.body;
+        const { identifier, password, twoFactorCode } = request.body;
 
         // Validate required fields
         if (!identifier) {
@@ -240,9 +243,9 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: LogoutRequest }>(
     "/logout",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id } = req.body;
+        const { id } = request.body;
 
         if (!id) return reply.status(400).send({
           error: "Missing user ID"
@@ -264,7 +267,6 @@ export async function authRoutes(fastify: FastifyInstance) {
         reply.status(500).send({
           error: "Internal Server Error"
         });
-        // return sendError(reply, 500, "Internal Server Error during logout", error);
       }
     }
   );

@@ -1,15 +1,13 @@
 // File: backend/src/routes/avatarRoutes.ts
 
 import { FastifyInstance } from 'fastify';
-import { fileURLToPath } from 'url';
+import { fileTypeFromBuffer } from 'file-type';
 import fastifyStatic from '@fastify/static';
+import { fileURLToPath } from 'url';
+import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs';
-import sharp from 'sharp';
 import { sendError } from "../utils/error.js";
-
-// import fileType from 'file-type'
-import { fileTypeFromBuffer } from 'file-type';
 
 // Resolve __dirname and paths correctly in ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -52,16 +50,15 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   fastify.post(
     "/avatars",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const data = await req.file();
+        const data = await request.file();
         if (!data) {
           return reply.status(400).send({
             error: "No file uploaded"
           });
         }
 
-        // 
         // 
         const buffer = await data.toBuffer();
 
@@ -73,8 +70,6 @@ export async function avatarRoutes(fastify: FastifyInstance) {
             error: "Invalid file type. Allowed types: JPEG, PNG, WEBP"
           });
         }
-
-        fastify.log.info(`Detected MIME type: ${type.mime}, ext: ${type.ext}`); // debug
 
         // Generate a unique filename
         // const ext = type.ext || 'png';
@@ -93,42 +88,8 @@ export async function avatarRoutes(fastify: FastifyInstance) {
         await fs.promises.writeFile(filePath, resizedBuffer);
 
         const avatarUrl = `/avatars/uploads/${fileName}`;
-        const fullUrl = `${req.protocol}://${req.hostname}${avatarUrl}`;
-
-        fastify.log.info(`avatarUrl: ${avatarUrl}`); // debug
-        fastify.log.info(`fullUrl: ${fullUrl}`); // debug
 
         reply.send({ message: "Avatar uploaded successfully", avatarUrl });
-        // 
-        //
-
-        // // Validate file type
-        // const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
-        // if (!allowedMimeTypes.includes(data.mimetype)) {
-        //   return reply.status(400).send({
-        //     error: "Invalid file type. Allowed types: JPEG, PNG, WEBP"
-        //   });
-        // }
-
-        // // Generate a unique filename
-        // const fileName = `${Date.now()}-${data.filename}`;
-        // const filePath = path.join(AVATAR_UPLOAD_DIR, fileName);
-
-        // // Resize image to a maximum of 256x256 pixels (maintaining aspect ratio)
-        // const buffer = await data.toBuffer();
-        // const resizedBuffer = await sharp(buffer)
-        //   .resize({ width: 256, height: 256, fit: "inside" })
-        //   .toBuffer();
-
-        // // Save the file
-        // await fs.promises.writeFile(filePath, resizedBuffer);
-
-        // // Return the public URL for the uploaded avatar
-        // const avatarUrl = `/avatars/uploads/${fileName}`;
-        // reply.send({
-        //   message: "Avatar uploaded successfully",
-        //   avatarUrl
-        // });
 
       } catch (error) {
         return sendError(reply, 500, "Internal Server Error during avatar upload", error);
@@ -142,9 +103,9 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   fastify.put<{ Body: { userId: number; avatarUrl: string } }>(
     "/avatars",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { userId, avatarUrl } = req.body;
+        const { userId, avatarUrl } = request.body;
         if (!userId || !avatarUrl) {
           return reply.status(400).send({
             error: "Missing userId or avatarUrl"
@@ -193,9 +154,9 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   fastify.delete<{ Body: { userId: number } }>(
     "/avatars",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { userId } = req.body;
+        const { userId } = request.body;
         if (!userId) return reply.status(400).send({
           error: "Missing userId"
         });

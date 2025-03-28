@@ -18,12 +18,10 @@ export async function changePasswordRoutes(fastify: FastifyInstance) {
   fastify.put<{ Params: { id: string }; Body: ChangePasswordRequest }>(
     "/:id/password",
     { preValidation: [fastify.authenticate, fastify.isAuthorized] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { id } = req.params;
-        const { oldPassword, newPassword } = req.body;
-        // const oldPasswordTrimmed = oldPassword.trim();
-        // const newPasswordTrimmed = newPassword.trim();
+        const { id } = request.params;
+        const { oldPassword, newPassword } = request.body;
 
         if (!id) return reply.status(400).send({
           error: "Missing user ID"
@@ -52,22 +50,13 @@ export async function changePasswordRoutes(fastify: FastifyInstance) {
           error: "User not found"
         });
 
-        // 🔒 Verify old password
-        // Verify that the provided old password matches the stored hash
+        // 🔒 Verify that the provided old password matches the stored hash
         const passwordMatch = await bcrypt.compare(oldPassword, user.password);
         if (!passwordMatch) {
           return reply.status(400).send({
             error: "Old password is incorrect."
           });
         }
-
-        // // Prevent reuse of old password
-        // const isSamePassword = await bcrypt.compare(newPassword, user.password);
-        // if (isSamePassword) {
-        //   return reply.status(400).send({
-        //     error: "New password cannot be the same as the old password."
-        //   });
-        // }
 
         // 🔐 Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
