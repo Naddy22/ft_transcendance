@@ -14,7 +14,7 @@
 # Configurable Project Variables
 PROJECT_NAME         := ft_transcendence
 BACKEND_CONTAINER    := $(PROJECT_NAME)-backend-1
-FRONTEND_CONTAINER   := $(PROJECT_NAME)-frontend-1
+FRONTEND_CONTAINER   := $(PROJECT_NAME)-nginx-1
 
 # Docker Compose Files
 COMPOSE_FILE		:= docker-compose.yml

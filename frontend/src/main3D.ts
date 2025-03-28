@@ -800,7 +800,7 @@ nextMatchButton.addEventListener('click', () => {
 		history.pushState({ page: 'game', isVsAI: false, isTournament: true, playerNames: [...playerNames]}, 'Jeu', '#game');
 		currentTournament.nextMatch((winner) => {
 			if (currentTournament && currentTournament.isTournamentOver()) {
-				let result = winner === lastPlayers[0] ? "win" : "loss";
+				let result = winner === playerNames[0] ? "win" : "loss";
 				// Add to history
 				addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 				addGameToStats(currentUser!.id, result);
