@@ -1,10 +1,9 @@
 // File: backend/src/server.ts
 // Main Fastify server setup, including routes, database, and shutdown handling.
-
 import Fastify from 'fastify';
-import { FastifyRequest, FastifyReply, FastifyPluginCallback } from 'fastify';
+import { Fastify, FastifyRequest, FastifyReply } from 'fastify';
 import fastifyGracefulExit from "@mgcrea/fastify-graceful-exit";
-import fastifyStatic from '@fastify/static'; // https://github.com/fastify/fastify-static
+// import fastifyStatic from '@fastify/static'; // https://github.com/fastify/fastify-static
 import fastifyMultipart from "@fastify/multipart";
 import fastifyRoutes from '@fastify/routes';
 import fastifyJwt from '@fastify/jwt';
@@ -234,9 +233,9 @@ await fastify.register(fastifyRoutes);
 // Register routes
 setupRoutes(fastify);
 
-// Health check endpoint
-fastify.get('/health', (req, reply) => reply.send({ status: 'ok' }));
-// curl -X GET http://localhost:3000/health
+// Health check endpoint -> curl -X GET http://localhost:3000/health
+fastify.get('/health', (request, reply) => reply.send({ status: 'ok' }));
+
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Register 'fastify-graceful-exit'

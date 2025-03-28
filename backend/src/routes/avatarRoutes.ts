@@ -52,9 +52,9 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   fastify.post(
     "/avatars",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const data = await req.file();
+        const data = await request.file();
         if (!data) {
           return reply.status(400).send({
             error: "No file uploaded"
@@ -93,10 +93,10 @@ export async function avatarRoutes(fastify: FastifyInstance) {
         await fs.promises.writeFile(filePath, resizedBuffer);
 
         const avatarUrl = `/avatars/uploads/${fileName}`;
-        const fullUrl = `${req.protocol}://${req.hostname}${avatarUrl}`;
-
         fastify.log.info(`avatarUrl: ${avatarUrl}`); // debug
-        fastify.log.info(`fullUrl: ${fullUrl}`); // debug
+
+        // const fullUrl = `${request.protocol}://${request.hostname}${avatarUrl}`;
+        // fastify.log.info(`fullUrl: ${fullUrl}`); // debug
 
         reply.send({ message: "Avatar uploaded successfully", avatarUrl });
         // 
@@ -142,9 +142,9 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   fastify.put<{ Body: { userId: number; avatarUrl: string } }>(
     "/avatars",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { userId, avatarUrl } = req.body;
+        const { userId, avatarUrl } = request.body;
         if (!userId || !avatarUrl) {
           return reply.status(400).send({
             error: "Missing userId or avatarUrl"
@@ -193,9 +193,9 @@ export async function avatarRoutes(fastify: FastifyInstance) {
   fastify.delete<{ Body: { userId: number } }>(
     "/avatars",
     { preValidation: [fastify.authenticate] },
-    async (req, reply) => {
+    async (request, reply) => {
       try {
-        const { userId } = req.body;
+        const { userId } = request.body;
         if (!userId) return reply.status(400).send({
           error: "Missing userId"
         });

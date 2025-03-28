@@ -111,7 +111,7 @@ all: env-copy build up ## Build and start containers
 # $(LOG_DIRS):
 # 	@$(MKDIR) $(LOG_DIRS)
 
-stop: ## Kill all backend running BACKEND_PORT
+stop: ## Kill all backend running on BACKEND_PORT(3000)
 	@$(call KILL_PROCESS_ON_PORT,$(BACKEND_PORT),print)
 	@echo ""
 

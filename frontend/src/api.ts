@@ -120,7 +120,6 @@ export class API {
   constructor(baseUrl: string = "") {
     // Set to the backend URL (e.g., "http://localhost:3000" or "" if using nginx)
     this.baseUrl = baseUrl;
-    // this.baseUrl = "";
   }
 
   // Generic request method with centralized error handling.
@@ -137,8 +136,6 @@ export class API {
       ...(token ? { "Authorization": `Bearer ${token}` } : {})
     };
 
-    // const url = new URL(endpoint, this.baseUrl || window.location.origin).toString();
-    // const response = await fetch(url, { headers, ...options });
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       headers,
       ...options,
@@ -147,10 +144,12 @@ export class API {
     const responseData = await response.json();
 
     if (!response.ok) {
-      // Clear token if unauthorized
+
+      // // Clear token if unauthorized
       // if (response.status === 401) {
       //   localStorage.removeItem('token');
       // }
+
       // Preserve detailed error messages from the backend
       const errorMessage = responseData.error || response.statusText;
       throw new Error(`Error ${response.status}: ${errorMessage}`);
@@ -239,8 +238,8 @@ export class API {
   async deleteUser(id: number): Promise<{ message: string }> {
     return this.request<{ message: string }>(`/users/${id}`, {
       method: "DELETE",
-      // Ensuring no empty body is sent
-      headers: {}, // Removing `Content-Type`
+      // headers: {}, // Removing `Content-Type`
+      body: JSON.stringify({ id }),
     });
   }
 
@@ -278,8 +277,7 @@ export class API {
   async removeFriend(userId: number, friendId: number): Promise<{ message: string }> {
     return this.request<{ message: string }>(`/users/${userId}/friends/${friendId}`, {
       method: "DELETE",
-      // Override headers so that Content-Type isn't sent
-      headers: {}
+      body: JSON.stringify({ userId }),
     });
   }
 
@@ -383,8 +381,6 @@ export class API {
     return this.request<{ message: string }>(`/users/${userId}/anonymize`, {
       method: "PUT",
       body: JSON.stringify({})
-      // Override headers so that Content-Type isn't sent
-      // headers: {}
     });
   }
 
@@ -403,7 +399,7 @@ export class API {
       body: JSON.stringify({ userId }),
     });
 
-    console.log("Saved 2FA Secret:", response.secret); // debug
+    // console.log("Saved 2FA Secret:", response.secret); // debug
 
     return response;
   }
