@@ -1,18 +1,16 @@
-/* Styles généraux */
 body {
 	margin: 0;
 	padding: 0;
-	background-color: #e5fbc9; /* Rose pastel */
+	background-color: #e5fbc9;
 	font-family: 'Mochiy Pop P One', sans-serif;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	height: 100vh;
 	overflow: hidden;
-	position: relative; /* Pour le pseudo-élément */
+	position: relative;
 }
 
-/* Motif de fond avec transparence et espacement */
 body::before {
 	content: "";
 	position: absolute;
@@ -22,12 +20,11 @@ body::before {
 	height: 100%;
 	background-image: url('/images/cat-face.png');
 	background-repeat: repeat;
-	background-size: 75px 75px; /* Taille du motif, ajuste selon ton image */
-	opacity: 0.1; /* Transparence (0.0 = invisible, 1.0 = opaque) */
-	z-index: -1; /* Derrière le contenu */
+	background-size: 75px 75px;
+	opacity: 0.1;
+	z-index: -1;
 }
 
-/* Menu */
 #menu {
 	text-align: center;
 	display: block;
@@ -40,35 +37,33 @@ body::before {
 }
 
 #languageSelect {
-	background-color: #f9d3d9; /* 🌸 Rose pastel */
-	border: none; /* ❌ Supprime la bordure par défaut */
-	border-radius: 20px; /* 🎀 Bords arrondis */
+	background-color: #f9d3d9;
+	border: none;
+	border-radius: 20px;
 	font-family: "Mochiy Pop P One", sans-serif;
 	font-size: 14px;
 	color: #333;
 	padding: 8px 15px;
 	cursor: pointer;
 	transition: all 0.3s ease-in-out;
-	outline: none; /* ❌ Supprime le contour bleu/noir au focus */
+	outline: none;
 	position: relative;
-	appearance: none; /* 🔹 Supprime l'apparence native */
+	appearance: none;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 
 }
 
-/* Jeu */
 #game {
-	display: none; /* Caché au début */
+	display: none;
 	width: 900px;
 	height: 600px;
 	background-color: black;
 	position: relative;
-	border: 5px solid #f9d3d9; /* Bordure kawaii */
+	border: 5px solid #f9d3d9;
 	border-radius: 15px;
 }
 
-/* Noms des joueurs */
 #playerNames {
 	position: absolute;
 	top: -50px;
@@ -92,7 +87,6 @@ body::before {
 	text-align: right;
 }
 
-/* Écran de fin */
 #endScreen {
 	display: none;
 	position: absolute;
@@ -101,7 +95,7 @@ body::before {
 	transform: translate(-50%, -50%);
 	text-align: center;
 	color: #aab0ff;
-	background-color: rgba(229, 251, 201, 0.9); /* Vert pastel #e5fbc9 */
+	background-color: rgba(229, 251, 201, 0.9);
 	width: 400px;
 	padding: 20px;
 	border-radius: 20px;
@@ -122,11 +116,10 @@ body::before {
 }
 
 #endScreen .kawaii-button {
-	background-color: #DDA0DD; /* Violet pastel */
+	background-color: #DDA0DD;
 	margin: 10px auto;
 }
 
-/* Boutons kawaï */
 button {
 	display: block;
 	width: 200px;
@@ -144,7 +137,7 @@ button {
 }
 
 button:hover {
-	transform: scale(1.1); /* Saut au survol */
+	transform: scale(1.1);
 	box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
@@ -152,28 +145,26 @@ button.danger {
 	background-color: #FF5252;
 }
 
-/* Style des inputs */
 #playersForm input {
 	width: 50%;
 	padding: 10px;
 	margin: 10px 0;
-	border: 2px solid #fdbcd1; /* Bordure rose */
-	/* background: #f5f2f3; */
+	border: 2px solid #fdbcd1;
 	border-radius: 10px;
 	font-size: 16px;
-	outline: none; /* Supprime le contour bleu */
+	outline: none;
 }
 
 #playersForm input:focus {
-	border-color: #f86b9a; /* Bordure plus foncée quand on clique */
-	background: #f9dbe6; /* Fond légèrement coloré */
+	border-color: #f86b9a;
+	background: #f9dbe6;
 }
 
 .home-button {
 	position: absolute;
 	top: 10px;
 	left: 25px;
-	background-color: #f9d3d9; /* Rose pastel */
+	background-color: #f9d3d9;
 	border: none;
 	border-radius: 50%;
 	width: 50px;
@@ -184,17 +175,16 @@ button.danger {
 	cursor: pointer;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	transition: transform 0.2s, box-shadow 0.2s;
-	z-index: 1000; /* S'assurer qu'il est au-dessus du canvas */
+	z-index: 1000;
 }
 
-/* 📌 Conteneur des boutons en haut à droite */
 .top-buttons {
 	position: absolute;
 	top: 10px;
 	right: 25px;
 	display: flex;
 	align-items: center;
-	gap: 10px; /* Espacement entre les boutons */
+	gap: 10px;
 }
 
 .auth-button {
@@ -216,30 +206,28 @@ button.danger {
 	margin-top: 5px;
 }
 
-/* Styles des inputs (identiques à ceux de #playersForm) */
 #loginForm input,
 #registerForm input,
 #profileForm input {
 	width: 50%;
 	padding: 10px;
 	margin: 10px 0;
-	border: 2px solid #fdbcd1; /* Bordure rose */
+	border: 2px solid #fdbcd1;
 	border-radius: 10px;
 	font-size: 16px;
 	outline: none;
 	background: #fff;
 }
 
-/* Effet au focus */
 #loginForm input:focus,
 #registerForm input:focus,
 #profileForm input:focus {
-	border-color: #f86b9a; /* Bordure plus foncée */
-	background: #f9dbe6; /* Fond légèrement coloré */
+	border-color: #f86b9a;
+	background: #f9dbe6;
 }
 
 .menu-button {
-	background-color: #f9d3d9; /* Rose pastel */
+	background-color: #f9d3d9;
 	border: none;
 	border-radius: 50%;
 	width: 50px;
@@ -251,12 +239,11 @@ button.danger {
 	cursor: pointer;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	transition: transform 0.2s, box-shadow 0.2s;
-	z-index: 1000; /* S'assurer qu'il est au-dessus du canvas */
+	z-index: 1000;
 }
 
-/* Menu déroulant caché par défaut */
 .menu-dropdown {
-	display: none; /* Caché par défaut */
+	display: none;
 	position: absolute;
 	top: 60px;
 	right: 10px;
@@ -265,9 +252,9 @@ button.danger {
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 	padding: 10px;
 	width: 185px;
-	border: 5px solid #f9d3d9; /* Bordure kawaii */
+	border: 5px solid #f9d3d9;
 	border-radius: 15px;
-	z-index: 1000; /* S'assurer qu'il est au-dessus du canvas */
+	z-index: 1000;
 }
 
 .menu-dropdown a {
@@ -280,44 +267,39 @@ button.danger {
 }
 
 .menu-dropdown a:hover {
-	background: #fdc2d8; /* Rose pastel au survol */
+	background: #fdc2d8;
 }
 
-/* Afficher le menu quand il est actif */
 .menu-dropdown.active {
 	display: block;
 }
 
-/* Style de la fenêtre modale */
 .modal {
-	display: none; /* Cachée par défaut */
+	display: none;
 	position: fixed;
 	z-index: 1000;
 	left: 0;
 	top: 0;
 	width: 100%;
 	height: 100%;
-	background-color: #e5fbc991; /* Fond semi-transparent */
+	background-color: #e5fbc991;
 	justify-content: center;
 	align-items: center;
 }
 
-/* Contenu de la fenêtre */
 .modal-content {
 	background-color: #e5fbc9;
 	padding: 20px;
-	/* width: 370px; suffisant pour comment jouer */
-	width: 500px; /*minimum pour historique*/
+	width: 500px;
 	text-align: center;
 	box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
 	font-family: 'Mochiy Pop P One', sans-serif;
 	color: rgb(4, 0, 8);
 	position: relative;
-	border: 5px solid #f9d3d9; /* Bordure kawaii */
+	border: 5px solid #f9d3d9;
 	border-radius: 15px;
 }
 
-/* Bouton de fermeture */
 .close {
 	position: absolute;
 	top: 10px;
@@ -335,47 +317,42 @@ button.danger {
 	text-shadow: 2px 2px 2px rgb(147, 145, 145);
 }
 
-/* 🔹 Spécifique pour la modale du profil */
 #profileModal .profile-modal {
-	width: 655px;  /* 📏 Change la largeur de la modale du profil */
-	height: auto;   /* Ajuste la hauteur selon le contenu */
-	max-height: 80vh; /* Pour éviter qu'elle soit trop grande */
+	width: 655px;
+	height: auto;
+	max-height: 80vh;
 	overflow-y: auto;
-	margin: auto; /* Centre la modale */
+	margin: auto;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%); /* Centre parfaitement */
+	transform: translate(-50%, -50%);
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* 🔹 Afficher le label et l'input sur une seule ligne */
 #profileModal .profile-modal .form-group {
 	display: flex;
 	align-items: center;
-	gap: 10px; /* Espace entre le label et l'input */
+	gap: 10px;
 	margin-bottom: 10px;
-	justify-content: center; /* Centre les champs */
+	justify-content: center;
 }
 
-/* 🔹 Ajuster la largeur du label pour que tout soit aligné */
 #profileModal .profile-modal label {
-	width: 200px; /* Ajuste cette valeur si nécessaire */
+	width: 200px;
 	font-weight: bold;
 }
 
-/* 🔹 Permettre aux inputs de prendre toute la place restante */
 #profileModal .profile-modal input {
-	width: 275px; /* 📏 Change la largeur selon tes préférences */
-	/* flex: 1; */
+	width: 275px;
 	padding: 8px;
 }
 
 #profileModal .profile-modal button {
 	width: auto;
-	font-size: 14px; /* 📏 Change la taille du texte */
+	font-size: 14px;
 }
 
 
@@ -387,76 +364,68 @@ button.danger {
 	margin: 0 auto 10px;
 }
 
-/* 🔹 Style du message de confirmation */
 .profile-message {
 	text-align: center;
 	font-size: 14px;
 	font-weight: bold;
 	margin-top: 10px;
-	opacity: 0; /* Caché par défaut */
+	opacity: 0;
 	transition: opacity 0.5s ease-in-out;
 }
 
-/* 🔹 Aligner le pseudo et le bouton "❌" sur la même ligne */
 #friendList li {
 	display: flex;
-	align-items: center; /* ✅ Centre le texte et le bouton verticalement */
-	justify-content: space-between; /* ✅ Sépare bien les éléments */
-	width: max-content; /* ✅ Ajuste la largeur au contenu */
-	text-align: center; /* ✅ S'assure que le texte est bien centré */
-	margin: 0 auto; /* ✅ Force le centrage de chaque élément */
+	align-items: center;
+	justify-content: space-between;
+	width: max-content;
+	text-align: center;
+	margin: 0 auto;
 	gap: 15px;
 }
 
-/* 🔹 Conteneur flex pour aligner l'input et le bouton */
 .friend-search-container {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	gap: 15px; /* 📏 Espacement entre l'input et le bouton */
-	width: max-content; /* ✅ S'ajuste à la taille du contenu */
-	margin: 0 auto 10px; /* ✅ Centrage horizontal */
+	gap: 15px;
+	width: max-content;
+	margin: 0 auto 10px;
 }
 
-/* 🔹 Conteneur des résultats de recherche */
 #friendSearchResults {
 	list-style: none;
 	padding: 0;
-	/* margin-top: 10px; */
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center; /* ✅ Centre le contenu */
-	width: 100%; /* ✅ Prend toute la largeur dispo */
+	justify-content: center;
+	width: 100%;
 }
 
-/* 🔹 Chaque résultat d'ami */
 #friendSearchResults li {
 	display: flex;
 	align-items: center;
-	justify-content: space-between; /* ✅ Place le pseudo à gauche et le bouton à droite */
-	width: max-content; /* ✅ Ajuste la largeur au contenu */
+	justify-content: space-between;
+	width: max-content;
 	margin: 0 auto;
 }
 
-/* 🔹 Ajustement du texte (pseudo) */
 #friendSearchResults li span {
-	flex: 1; /* ✅ Prend toute la place à gauche */
+	flex: 1;
 	text-align: left;
-	margin-right: 10px; /* ✅ Ajoute un espace entre le texte et le bouton */
-	display: inline; /* ✅ Force le texte à rester en ligne */
-	white-space: nowrap; /* ✅ Empêche les retours à la ligne automatiques */
+	margin-right: 10px;
+	display: inline;
+	white-space: nowrap;
 }
 
 .history-container {
-	max-height: 300px; /* Hauteur max avant d'afficher le scroll */
-	overflow-y: auto;  /* Active le scroll si nécessaire */
+	max-height: 300px;
+	overflow-y: auto;
 	border-top: 1px solid #ddd;
 	border-bottom: 1px solid #ddd;
 	padding: 10px;
 }
 
-/* Liste des parties */
 #gameHistoryList {
 	list-style: none;
 	padding: 0;
@@ -469,29 +438,27 @@ button.danger {
 }
 
 .stats-content {
-	display: flex; /* Flex horizontal pour texte et graphique */
-	justify-content: space-between; /* Espacement entre les deux */
-	align-items: flex-start; /* Alignement en haut */
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
 }
 
-/* Conteneur principal texte + graphique */
 .stats-container {
-	display: flex; /* Flex horizontal */
-	justify-content: space-between; /* Texte à gauche, graphique à droite */
-	align-items: flex-start; /* Alignement en haut */
+	display: flex;
+	justify-content: space-between; 
+	align-items: flex-start; 
 	width: 100%;
-	padding: 0; /* Pas de padding supplémentaire ici */
+	padding: 0; 
 }
 
-/* Zone texte à gauche */
 .stats-text {
 	display: flex;
 	flex-direction: column;
-	gap: 10px; /* Espacement entre les lignes de texte */
+	gap: 10px; 
 	font-size: 18px;
-	width: 50%; /* ✅ Réserve une partie pour le texte */
+	width: 50%;
 	font-size: 18px;
-	margin-top: 20px; /* Ajoute une marge en haut pour descendre le texte */
+	margin-top: 20px; 
 }
 
 .stats-text span {
@@ -500,41 +467,38 @@ button.danger {
 	color: #333;
 }
 
-/* S’assurer que les <p> restent des blocs */
 .stats-text p {
-	margin: 0; /* Supprime marges par défaut */
-	padding: 0; /* Pas de padding inutile */
-	display: block; /* Force le comportement bloc */
-	white-space: nowrap; /* Empêche le texte de se couper sur plusieurs lignes */
+	margin: 0; 
+	padding: 0; 
+	display: block; 
+	white-space: nowrap;
 }
 
-/* Zone graphique à droite */
 .stats-chart-container {
 	width: 45%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	max-width: 150px; /* Limite la taille du graphique */
-	margin-top: 20px; /* Ajoute une marge en haut pour descendre le texte */
+	max-width: 150px;
+	margin-top: 20px;
 }
 
-/* Ajuste la taille du canvas */
 #statsChart {
 	width: 100% !important;
 	height: auto !important;
 }
 
-/* 🔹 Spécifique pour la modale du profil */
+
 #privacyModal .privacy-modal {
-	width: 800px;  /* 📏 Change la largeur de la modale du profil */
-	height: auto;   /* Ajuste la hauteur selon le contenu */
-	max-height: 80vh; /* Pour éviter qu'elle soit trop grande */
+	width: 800px;  
+	height: auto; 
+	max-height: 80vh;
 	overflow-y: auto;
-	margin: auto; /* Centre la modale */
+	margin: auto;
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%); /* Centre parfaitement */
+	transform: translate(-50%, -50%);
 	padding: 20px;
 	border-radius: 10px;
 	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
@@ -542,5 +506,4 @@ button.danger {
 
 #privacyModal .privacy-modal button {
 	width: auto;
-	/* font-size: 14px; */
 }

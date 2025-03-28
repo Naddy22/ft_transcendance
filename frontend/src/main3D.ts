@@ -8,7 +8,6 @@ import { addGameToStats, updateStatsUI } from "./stats";
 import { checkSession, registerUser, loginUser, logoutUser } from "./auth";
 import { getCompleteProfile, updateUserProfile, updatePassword, uploadAvatar, searchUsers, addFriend, removeFriend, deleteUserAccount, exportUserData, anonymizeUser} from "./profile";
 import { getTranslation } from "./language";
-import { PublicUser } from "./api";
 
 const languageSelect = document.getElementById("languageSelect") as HTMLSelectElement;
 const homeButton = document.getElementById("homeButton") as HTMLButtonElement;
@@ -16,7 +15,6 @@ const menu = document.getElementById('menu') as HTMLElement;
 const menuButton = document.getElementById("menuButton") as HTMLButtonElement;
 const menuDropdown = document.getElementById("menuDropdown") as HTMLElement;
 
-// Gestion et affichage du bouton auth
 const authButton = document.getElementById("authButton") as HTMLElement;
 const authPage = document.getElementById("authPage") as HTMLElement;
 const loginForm = document.getElementById("loginForm") as HTMLFormElement;
@@ -24,15 +22,12 @@ const registerForm = document.getElementById("registerForm") as HTMLFormElement;
 const loginMessage = document.getElementById("loginMessage") as HTMLParagraphElement;
 const registerMessage = document.getElementById("registerMessage") as HTMLParagraphElement;
 
-// const twoFactorSection = document.getElementById("twoFactorSection")!;
 const setup2FABtn = document.getElementById("setup2FABtn") as HTMLButtonElement;
 const confirm2FASetupBtn = document.getElementById("confirm2FASetupBtn") as HTMLButtonElement;
 const disable2FABtn = document.getElementById("disable2FABtn") as HTMLButtonElement;
 const qrCodeImg = document.getElementById("qrCodeImg") as HTMLImageElement;
 const setup2FACode = document.getElementById("setup2FACode") as HTMLInputElement;
 const twoFactorResponse = document.getElementById("twoFactorResponse")!;
-// const setup2FAResponse = document.getElementById("setup2FAResponse")!;
-// const disable2FAResponse = document.getElementById("disable2FAResponse")!;
 const verify2FAForLoginBtn = document.getElementById("verify2FAForLoginBtn") as HTMLButtonElement;
 const login2FACode = document.getElementById("login2FACode") as HTMLInputElement;
 const login2FAResponse = document.getElementById("login2FAResponse") as HTMLParagraphElement;
@@ -50,8 +45,6 @@ const statsModal = document.getElementById("statsModal") as HTMLElement;
 const howToPlayModal = document.getElementById("howToPlayModal") as HTMLElement;
 
 const privacyModal = document.getElementById("privacyModal") as HTMLElement;
-const exportDataBtn = document.getElementById("exportDataBtn") as HTMLButtonElement;
-const anonymizeBtn = document.getElementById("anonymizeBtn") as HTMLButtonElement;
 const deleteAccountBtn = document.getElementById("deleteAccountBtn") as HTMLButtonElement;
 
 const closeButton = document.querySelectorAll(".close");
@@ -71,7 +64,7 @@ const currentMatchInfo = document.getElementById('currentMatchInfo') as HTMLElem
 const nextMatchInfo = document.getElementById('nextMatchInfo') as HTMLElement;
 const replayButton = document.getElementById('replayButton') as HTMLButtonElement;
 const returnMenuButton = document.getElementById('returnMenu') as HTMLButtonElement;
-const nextMatchButton = document.getElementById('nextMatchButton') as HTMLButtonElement; // Nouvelle constante
+const nextMatchButton = document.getElementById('nextMatchButton') as HTMLButtonElement;
 
 const playerInputs = document.getElementById("playerInputs") as HTMLElement;
 const inputsContainer = document.getElementById("inputsContainer") as HTMLElement;
@@ -82,57 +75,51 @@ let loggedInUserId: number | null = null;
 let playerNames: string[] = [];
 let lastPlayers: string[] = [];
 let isTournamentMode: boolean = false;
-let isVsAIMode: boolean = false; // Par défaut, pas en mode IA
+let isVsAIMode: boolean = false;
 let currentTournament: Tournament | null = null;
 let playerNumber: number = 0;
 
-// Définir l'état initial pour le menu
 history.replaceState({ page: 'menu' }, 'Menu', '#menu');
 
-// 📌 Charge la langue sauvegardée au démarrage
+// Loads the language saved at startup
 document.addEventListener("DOMContentLoaded", () => {
 	const savedLanguage = localStorage.getItem("language") || "fr";
 	languageSelect.value = savedLanguage;
 	loadLanguage(savedLanguage).then(translations => applyTranslations(translations));
 });
 
-// 📌 Met à jour les traductions quand la langue change
 languageSelect.addEventListener("change", () => {
 	const selectedLanguage = languageSelect.value;
 	loadLanguage(selectedLanguage).then(translations => applyTranslations(translations));
 
-	// 🔥 Déclenche un événement global pour prévenir BabylonJS et d'autres parties du code
+	// Trigger a global event to warn BabylonJS
 	const languageChangedEvent = new Event("languageChanged");
 	document.dispatchEvent(languageChangedEvent);
 });
 
-// 🔥 Désactive les flèches haut/bas sur le sélecteur de langue
+// Disables up/down arrows on language selector
 languageSelect.addEventListener("keydown", (event) => {
 	if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-		event.preventDefault(); // 🚫 Empêche de changer la langue avec les flèches
+		event.preventDefault();
 	}
 });
 
-// 🔹 Vérifie si l'utilisateur est connecté au chargement de la page
 function updateAuthButton() {
-	console.log("update auth");
 	const logoutButton = document.getElementById("logoutButton") as HTMLElement;
 
 	checkSession(loggedInUserId!).then((user) => {
 		currentUser = user;
 		if (currentUser) {
-			console.log("✅ Session active :", currentUser.username);
-			logoutButton.style.display = "block"; // Affiche le bouton Déconnexion dans le menu
-			authButton.style.display = "none"; // Cache le bouton Connexion / Inscription
+			logoutButton.style.display = "block";
+			authButton.style.display = "none";
 		
 			menuButton.style.display = "block";
-			menuButton.style.paddingTop = "10px"; // Ajuste si le texte est trop bas
+			menuButton.style.paddingTop = "10px";
 			homeButton.style.visibility = "visible";
 			playVsGuest.style.display = "block";
 			playVsAIButton.style.display = "block";
 			tournamentButton.style.display = "block";
 		} else {
-			console.log("❌ Aucun utilisateur connecté.");
 			logoutButton.style.display = "none";
 			authButton.style.display = "block";
 
@@ -145,14 +132,11 @@ function updateAuthButton() {
 	});
 }
 
-// Afficher la page d'authentification
 authButton.addEventListener("click", () => {
 	showAuthPage();
 	history.pushState({ page: "auth" }, "Authentification", "#auth");
 });
 
-
-// Inscription
 registerForm.addEventListener("submit", async (event) => {
 	event.preventDefault();
 
@@ -166,7 +150,7 @@ registerForm.addEventListener("submit", async (event) => {
 		registerMessage.textContent =  message;
 	} catch (error: any) {
 		registerMessage.style.color = "red";
-		registerMessage.textContent = error.message; // Affiche l'erreur sous le formulaire
+		registerMessage.textContent = error.message;
 	}
 });
 
@@ -180,8 +164,6 @@ loginForm.addEventListener("submit", async (event) => {
 		const response = await loginUser(identifier, password);
 
 		if (response.requires2FA && response.user) {
-			// L’utilisateur a activé le 2FA
-			console.log("2FA est activé !");
 			loggedInUserId = response.user.id;
 			login2FACode.value = "";
 			document.getElementById("twoFactorLoginModal")!.style.display = "flex";
@@ -194,8 +176,8 @@ loginForm.addEventListener("submit", async (event) => {
 			history.pushState({ page: "menu" }, "Menu", "#menu");
 		}
 	} catch (error: any) {
-		loginMessage.style.color = "red"; // ❌ Change la couleur en rouge
-		loginMessage.textContent = error.message; // Affiche l'erreur sous le formulaire
+		loginMessage.style.color = "red";
+		loginMessage.textContent = error.message;
 	}
 });
 
@@ -208,61 +190,51 @@ verify2FAForLoginBtn.addEventListener("click", async () => {
 	}
 
 	if (!loggedInUserId) {
-		login2FAResponse.textContent = "❌ Utilisateur inconnu pour 2FA.";
+		login2FAResponse.textContent = "❌";
 		login2FAResponse.style.color = "red";
 		return;
 	}
 
 	try {
 		const res = await verify2FALogin(loggedInUserId, token);
-		console.log(res.message);
 		login2FAResponse.textContent = res.message;
 		login2FAResponse.style.color = "green";
 
-		console.log("🧠 Token après vérification 2FA :", res.token);
+		document.getElementById("twoFactorLoginModal")!.style.display = "none";
+		login2FAResponse.textContent = "";
+		login2FACode.value = "";
 
-		// setTimeout(() => {
-			document.getElementById("twoFactorLoginModal")!.style.display = "none";
-			login2FAResponse.textContent = "";
-			login2FACode.value = "";
-
-			// 🔄 Reprend le login normal
-			authPage.style.display = "none";
-			showMenu();
-			updateAuthButton();
-			history.pushState({ page: "menu" }, "Menu", "#menu");
-		// }, 1500);
+		authPage.style.display = "none";
+		showMenu();
+		updateAuthButton();
+		history.pushState({ page: "menu" }, "Menu", "#menu");
 	} catch (error: any) {
 		login2FAResponse.textContent = error.message;
 		login2FAResponse.style.color = "red";
 	}
 });
 
-// 🌟 Met à jour le bouton d'auth au chargement
 document.addEventListener("DOMContentLoaded", () => {
 	updateAuthButton();
 });
 
-// Fonction pour afficher les champs de pseudos
 function showPlayerInputs(players: number) {
 	menu.style.display = 'none';
 	authPage.style.display = "none";
 	tournamentOptions.style.display = "none";
 	game.style.display = 'none';
 	endScreen.style.display = 'none';
-	inputsContainer.innerHTML = ""; // Réinitialiser
+	inputsContainer.innerHTML = "";
 
-	// Premier champ avec le pseudo de l'utilisateur connecté
 	inputsContainer.innerHTML += `<input type="text" value="${currentUser?.username}" id="player1"><br>`;
 
 	for (let i = 2; i <= players; i++) {
-		const placeholderText = String(getTranslation("playerPlaceholder")).replace("{num}", String(i)); // 🎯 Remplace {num} par le numéro du joueur
+		const placeholderText = String(getTranslation("playerPlaceholder")).replace("{num}", String(i));
 		inputsContainer.innerHTML += `<input type="text" placeholder="${placeholderText}" id="player${i}" required><br>`;
 	}
-	playerInputs.style.display = 'block'; // Afficher les inputs
+	playerInputs.style.display = 'block';
 }
 
-// Fonctions d’affichage
 function showMenu(): void {
 	menu.style.display = 'block';
 	authPage.style.display = "none";
@@ -281,8 +253,8 @@ function showAuthPage(): void {
 	endScreen.style.display = 'none';
 	playerInputs.style.display = 'none';
 	authPage.style.display = "block";
-	loginMessage.textContent = "";  // Réinitialise le message d'erreur du login
-	registerMessage.textContent = "";  // Réinitialise le message d'erreur de l'inscription
+	loginMessage.textContent = "";
+	registerMessage.textContent = "";
 }
 
 function showGame(): void {
@@ -302,7 +274,7 @@ function showEndScreen(winner: string, isTournament: boolean = false, isFinal: b
 	playerInputs.style.display = 'none';
 	game.style.display = 'block';
 	endScreen.style.display = 'block';
-	replayButton.style.display = isTournament ? 'none' : 'block'; // Cache "Rejouer" en tournoi
+	replayButton.style.display = isTournament ? 'none' : 'block';
 	nextMatchButton.style.display = isTournament && !isFinal ? 'block' : 'none';
 
 	if (isTournament && currentTournament) {
@@ -326,11 +298,10 @@ function showTournamentOption(): void {
 	authPage.style.display = "none";
 	game.style.display = 'none';
 	endScreen.style.display = 'none';
-	tournamentOptions.style.display = 'block'; // Afficher les choix 4 ou 8
+	tournamentOptions.style.display = 'block';
 }
 
 window.addEventListener("click", function(event) {
-	console.log("🌍 Clic global détecté, target :", event.target);
 	if (!menuDropdown.contains(event.target as Node) && !menuButton.contains(event.target as Node)) {
 		menuDropdown.classList.remove("active");
 	}
@@ -352,22 +323,14 @@ window.addEventListener("click", function(event) {
 });
 
 homeButton.addEventListener("click", () => {
-	console.log("Retour au menu via bouton Maison");
-
-	stopPongGame(); // Arrête le jeu s'il est en cours
-	showMenu(); // Affiche le menu principal
-
-	// Met à jour l'historique pour "Précédent/Suivant"
+	stopPongGame();
+	showMenu();
 	history.pushState({ page: "menu" }, "Menu", "#menu");
 });
 
-// 📌 Charger le profil utilisateur + amis
 function loadUserProfile() {
 	getCompleteProfile(currentUser!.id)
 		.then(({ profile, friends }) => {
-			console.log("✅ Profil chargé :", profile);
-			console.log("✅ Amis chargés :", friends);
-
 			(document.getElementById("newUsername")! as HTMLInputElement).value = profile.username;
 			(document.getElementById("newEmail")! as HTMLInputElement).value = profile.email;
 			(document.getElementById("userAvatar")! as HTMLImageElement).src = profile.avatar;
@@ -382,23 +345,20 @@ function loadUserProfile() {
 				(document.getElementById("twoFactorDisableSection"))!.style.display = "block";
 			}
 			(document.getElementById("friendSearchInput")! as HTMLInputElement).value = "";
-			(document.getElementById("friendSearchResults")!).innerHTML = ""; // ✅ Efface les résultats de recherche
+			(document.getElementById("friendSearchResults")!).innerHTML = "";
 
 			updateFriendsUI(friends);
 		})
 		.catch(error => {
-			console.error("❌ Erreur chargement profil :", error.message);
 			alert(getTranslation("profileLoadError"));
 		});
 }
 
-// 📌 Mettre à jour le profil
 profileForm.addEventListener("submit", (event) => {
 	event.preventDefault();
 
-	// Vérifier quel bouton a été cliqué
 	const clickedButton = event.submitter as HTMLButtonElement;
-	if (clickedButton.id !== "saveChangesBtn") return; // 🔥 Vérifie si c'est "Sauvegarder"
+	if (clickedButton.id !== "saveChangesBtn") return;
 
 	const updatedData = {
 		username: (document.getElementById("newUsername")! as HTMLInputElement).value.trim(),
@@ -415,7 +375,7 @@ profileForm.addEventListener("submit", (event) => {
 	.then(messages => {
 		profileMessage.style.color = "green";
 		profileMessage.textContent = messages.join("\n");
-		loadUserProfile(); // Recharge après modification
+		loadUserProfile();
 
 		setTimeout(() => {
 			profileMessage.style.opacity = "0";
@@ -425,28 +385,23 @@ profileForm.addEventListener("submit", (event) => {
 		profileMessage.style.color = "red";
 		profileMessage.textContent = `${error.message}`;
 
-		// 🔹 Supprime le message après 5 secondes
 		setTimeout(() => {
 			profileMessage.style.opacity = "0";
 		}, 10000);
 	});
-	// 🔹 Montre le message immédiatement
 	profileMessage.style.opacity = "1";
 });
 
-// 📌 Changer l'avatar
 uploadAvatarBtn.addEventListener("click", () => {
 	if (!currentUser!.id || !avatarInput.files || avatarInput.files.length === 0) return;
 
 	uploadAvatar(currentUser!.id, avatarInput.files[0])
 		.then(newAvatarUrl => {
 			(document.getElementById("userAvatar")! as HTMLImageElement).src = newAvatarUrl;
-			// alert("✅ Avatar mis à jour !");
 		})
 		.catch(error => alert(`${error.message}`));
 });
 
-// 🔐 Activation 2FA
 setup2FABtn.addEventListener("click", async () => {
 	twoFactorResponse.textContent = "";
 	twoFactorResponse.style.display = "none";
@@ -464,7 +419,6 @@ setup2FABtn.addEventListener("click", async () => {
 	}
 });
 
-// ✅ Confirmer 2FA
 confirm2FASetupBtn.addEventListener("click", async () => {
 	const token = setup2FACode.value.trim();
 	twoFactorResponse.textContent = "";
@@ -485,7 +439,6 @@ confirm2FASetupBtn.addEventListener("click", async () => {
 			}, 10000);
 		})
 		.catch((error: any) => {
-			console.error("❌ Erreur 2FA confirm:", error);
 			twoFactorResponse.textContent = error.message;
 			setTimeout(() => {
 				twoFactorResponse.style.display = "none";
@@ -493,7 +446,6 @@ confirm2FASetupBtn.addEventListener("click", async () => {
 		});
 });
 
-// ❌ Désactiver 2FA
 disable2FABtn.addEventListener("click", async () => {
 	twoFactorResponse.textContent = "";
 	twoFactorResponse.style.display = "none";
@@ -512,7 +464,6 @@ disable2FABtn.addEventListener("click", async () => {
 	}
 });
 
-// 📌 Mettre à jour l'affichage des amis
 function updateFriendsUI(friends: { id: number; username: string; avatar: string | null | undefined; status: string }[]) {
 	friendList.innerHTML = "";
 	if (friends.length === 0) {
@@ -524,15 +475,14 @@ function updateFriendsUI(friends: { id: number; username: string; avatar: string
 		const li = document.createElement("li");
 		li.id = `friend-${friend.id}`;
 
-		// 📷 Crée l'image de l'avatar
 		const avatarImg = document.createElement("img");
-		avatarImg.src = friend.avatar || "/avatars/default/default_cat.webp"; // si pas d'avatar → image par défaut
+		avatarImg.src = friend.avatar || "/avatars/default/default_cat.webp";
 		avatarImg.alt = `${friend.username}'s avatar`;
 		avatarImg.width = 42;
 		avatarImg.height = 42;
 		avatarImg.style.marginRight = "0px";
-		avatarImg.style.borderRadius = "50%"; // rond = joli
-		avatarImg.style.verticalAlign = "middle"; // aligne bien avec le texte
+		avatarImg.style.borderRadius = "50%";
+		avatarImg.style.verticalAlign = "middle";
 		
 		const textSpan = document.createElement("span");
 		textSpan.textContent = `${friend.username} (${friend.status})`;
@@ -541,7 +491,6 @@ function updateFriendsUI(friends: { id: number; username: string; avatar: string
 		removeBtn.textContent = "❌";
 		removeBtn.addEventListener("click", () => removeFriendUI(friend.id));
 
-		// Ajoute tout dans <li>
 		li.appendChild(avatarImg);
 		li.appendChild(textSpan);
 		li.appendChild(removeBtn);
@@ -555,23 +504,19 @@ friendSearchBtn.addEventListener("click", () => {
 	const friendSearchResults = document.getElementById("friendSearchResults")!;
 
 	if (!query) {
-		// alert("❌ Veuillez entrer un nom ou un email pour la recherche.");
 		return;
 	}
 
 	searchUsers(query)
 		.then(results => {
-			friendSearchResults.innerHTML = ""; // Vide la liste précédente
-
+			friendSearchResults.innerHTML = "";
 			if (results.length === 0) {
 				friendSearchResults.innerHTML = `<li>${getTranslation("noUserFound")}</li>`;
 				return;
 			}
-
 			results.forEach(user => {
 				const listItem = document.createElement("li");
 
-				// 📷 Avatar
 				const avatarImg = document.createElement("img");
 				avatarImg.src = user.avatar || "/avatars/default/default_cat.webp";
 				avatarImg.alt = `${user.username}'s avatar`;
@@ -581,23 +526,19 @@ friendSearchBtn.addEventListener("click", () => {
 				avatarImg.style.borderRadius = "50%";
 				avatarImg.style.verticalAlign = "middle";
 			
-				// 🔹 Crée un élément pour le texte (pseudo + email)
 				const userText = document.createElement("span");
 				userText.textContent = `${user.username} (${user.email}) (${user.status})`;
-			
-				// 🔹 Crée le bouton "Ajouter"
+	
 				const addBtn = document.createElement("button");
 				addBtn.textContent = getTranslation("addFriendBtn");
 				addBtn.addEventListener("click", () => addFriendUI(user.id));
 			
-				// 🔹 Ajoute le texte et le bouton dans la ligne
 				listItem.appendChild(avatarImg);
 				listItem.appendChild(userText);
 				listItem.appendChild(addBtn);
 			
 				friendSearchResults.appendChild(listItem);
 			});
-			
 		})
 		.catch(error => {
 			friendSearchResults.innerHTML = `<li>${error.message}</li>`;
@@ -607,23 +548,19 @@ friendSearchBtn.addEventListener("click", () => {
 function addFriendUI(friendId: number) {
 	addFriend(currentUser!.id, friendId)
 		.then(message => {
-			// alert(message);
-			loadUserProfile(); // Recharge la liste d'amis après ajout
+			loadUserProfile();
 		})
 		.catch(error => alert(`${error.message}`));
 }
 
-// 📌 Supprimer un ami
 function removeFriendUI(friendId: number) {
 	removeFriend(currentUser!.id, friendId)
 		.then(message => {
-			// alert(message);
 			document.getElementById(`friend-${friendId}`)?.remove();
 		})
 		.catch(error => alert(`${error.message}`));
 }
 
-// 📥 Télécharger les données
 document.getElementById("exportDataBtn")!.addEventListener("click", () => {
 	exportUserData(currentUser!.id)
 		.then(blob => {
@@ -635,7 +572,6 @@ document.getElementById("exportDataBtn")!.addEventListener("click", () => {
 			a.click();
 			document.body.removeChild(a);
 
-			// 🔥 Utilisation de la traduction
 			const exportMessage = document.getElementById("exportMessage")!;
 			exportMessage.textContent = getTranslation("exportSuccess");
 
@@ -653,7 +589,6 @@ document.getElementById("exportDataBtn")!.addEventListener("click", () => {
 		document.getElementById("exportMessage")!.style.display = "block";
 });
 
-// 🕵️‍♂️ Anonymiser le compte
 document.getElementById("anonymizeBtn")!.addEventListener("click", () => {
 	const confirmationMessage = getTranslation("anonymizeConfirm");
 	if (!currentUser!.id || !confirm(confirmationMessage)) return;
@@ -662,7 +597,7 @@ document.getElementById("anonymizeBtn")!.addEventListener("click", () => {
 		.then(message => {
 			alert(message);
 			logoutUser().then(() => {
-				window.location.reload(); // 🔄 Recharge la page en mode non connecté
+				window.location.reload();
 			});
 		})
 		.catch(error => {
@@ -674,14 +609,12 @@ document.getElementById("anonymizeBtn")!.addEventListener("click", () => {
 		document.getElementById("anonymizeMessage")!.style.display = "block";
 });
 
-// 📌 Supprimer son compte
 deleteAccountBtn.addEventListener("click", () => {
 	const confirmationMessage = getTranslation("deleteConfirm");
 	if (!currentUser!.id || !confirm(confirmationMessage)) return;
 
 	deleteUserAccount(currentUser!.id)
 		.then(message => {
-			// alert(message);
 			window.location.reload();
 		})
 		.catch(error => {
@@ -690,7 +623,7 @@ deleteAccountBtn.addEventListener("click", () => {
 });
 
 menuButton.addEventListener("click", () => {
-	menuDropdown.classList.toggle("active"); // Affiche/Cache le menu
+	menuDropdown.classList.toggle("active");
 });
 
 if (menuDropdown) {
@@ -703,7 +636,7 @@ if (menuDropdown) {
 		}
 		if (target.dataset.action === "history" && historyModal) {
 			event.preventDefault();
-			updateHistoryUI(currentUser!.id); // Mets à jour l'historique
+			updateHistoryUI(currentUser!.id);
 			historyModal.style.display = "flex";
 		}
 		if (target.dataset.action === "howToPlay" && howToPlayModal) {
@@ -712,8 +645,7 @@ if (menuDropdown) {
 		}
 		if (target.dataset.action === "statistics" && statsModal) {
 			event.preventDefault();
-			updateStatsUI(currentUser!.id); // Met à jour les nombres
-			// renderStatsChart(); // Génère le graphique
+			updateStatsUI(currentUser!.id);
 			statsModal.style.display = "flex";
 		}
 		if (target.dataset.action === "privacyData" && privacyModal) {
@@ -724,10 +656,9 @@ if (menuDropdown) {
 			event.preventDefault();
 			logoutUser().then(() => {
 				loggedInUserId = null;
-				updateAuthButton(); // Met à jour l'affichage des boutons
-				// 🔄 Ajoute un nouvel état propre après la déconnexion
+				updateAuthButton();
 				history.pushState({ page: "menu" }, "Menu", "#menu");
-				showMenu(); // Affiche le menu
+				showMenu();
 			});
 		}
 		menuDropdown.classList.remove("active");
@@ -737,7 +668,6 @@ if (menuDropdown) {
 if (closeButton) {
 	closeButton.forEach((button) => {
 		button.addEventListener("click", () => {
-			// Trouver la modale parente de ce bouton
 			const modal = button.closest(".modal") as HTMLElement;
 			if (modal) {
 				modal.style.display = "none";
@@ -746,61 +676,49 @@ if (closeButton) {
 	});
 }
 
-// Vérification que l'élément startButton existe avant d'ajouter l'écouteur
 if (playVsGuest) {
 	playVsGuest.addEventListener('click', function() {
 		playerNames = [currentUser!.username, getTranslation("playerTwo")];
-		lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
+		lastPlayers = playerNames.slice();
 		showGame();
 
-		// Manipulation de l'historique (ajouter un état pour le jeu)
 		history.pushState({ page: 'game', isVsAI: false, isTournament: false, playerNames: [...playerNames] }, 'Jeu', '#game');
 
 		if (playerNames.length === 2) {
-			console.log("Match simple entre", playerNames[0], "et", playerNames[1]);
 			isTournamentMode = false;
 			isVsAIMode = false;
 			startPongGame(playerNames[0], playerNames[1], false, (winner) => {
-				console.log("Match terminé, gagnant :", winner);
-
-				// Déterminer le résultat
 				let result = winner === playerNames[0] ? "win" : "loss";
-				// Ajouter à l’historique
+				// add to history
 				addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 				addGameToStats(currentUser!.id, result);
 				showEndScreen(winner);
 			});
 		} else {
-			// alert("Pas assez de joueurs pour jouer !");
 			showMenu();
 		}
 	});
 }
 
 playVsAIButton.addEventListener("click", () => {
-	console.log("Démarrage du jeu contre l'IA");
 	isTournamentMode = false;
 	isVsAIMode = true;
 
 	playerNames = [currentUser!.username, getTranslation("AIPlayer")];
-	lastPlayers = playerNames.slice(); // Sauvegarde pour "Rejouer"
+	lastPlayers = playerNames.slice();
 
 	showGame();
 	history.pushState({ page: 'game', isVsAI: true, isTournament: false, playerNames: [...playerNames]}, 'Jeu', '#game');
 
 	startPongGame(playerNames[0], playerNames[1], true, (winner) => {
-		console.log("Match terminé, gagnant :", winner);
-
-		// Déterminer le résultat
 		let result = winner === playerNames[0] ? "win" : "loss";
-		// Ajouter à l’historique
+		// Add to history
 		addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);;
 		addGameToStats(currentUser!.id, result);
 		showEndScreen(winner);
 	});
 });
 
-// Quand on clique sur "Tournoi", afficher les options
 tournamentButton.addEventListener("click", () => {
 	showTournamentOption();
 	history.pushState({ page: 'tournamentOption' }, 'Tournament', '#tournamentOption');
@@ -817,41 +735,34 @@ tournament8.addEventListener("click", () => {
 	history.pushState({ page: 'tournamentForm' }, 'tournamentForm', '#tournamentForm');
 });
 
-// Gérer le clic sur "lancer le tournoi"
 playersForm.addEventListener("submit", (event) => {
-	event.preventDefault(); // Empêche le rechargement de la page
+	event.preventDefault();
 	playerNames = [];
 	for (let i = 1; i <= inputsContainer.children.length / 2; i++) {
 		const input = document.getElementById(`player${i}`) as HTMLInputElement;
-		// Supprime les caractères dangereux (protection XSS)
+		// Removes dangerous characters (XSS protection)
 		const pseudo = input.value.trim().replace(/[<>"'&`]/g, "");
 		playerNames.push(pseudo);
 	}
-	// Vérification des noms dupliqués
-	const uniqueNames = new Set(playerNames); // Convertit la liste en "Set" (qui ne peut pas avoir de doublons)
+	// Checking for duplicate names
+	const uniqueNames = new Set(playerNames);
 	if (uniqueNames.size !== playerNames.length) {
 		alert(getTranslation("uniquePlayerNames"));
 		return;
 	}
-	console.log("Joueurs enregistrés :", playerNames);
 	playerInputs.style.display = "none";
 	showGame();
 
-	// Manipulation de l'historique (ajouter un état pour le jeu)
 	history.pushState({ page: 'game', isVsAI: false, isTournament: true, playerNames: [...playerNames]}, 'Jeu', '#game');
 
 	if (playerNames.length === 4 || playerNames.length === 8) {
-		console.log("Lancement d’un tournoi avec", playerNames.length, "joueurs");
 		isTournamentMode = true;
 		isVsAIMode = false;
 		currentTournament = new Tournament(playerNames);
 		currentTournament.start((winner) => {
-			console.log("Match terminé, gagnant :", winner);
 			if (currentTournament && currentTournament.isTournamentOver()) {
-				console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
-				// Déterminer le résultat
 				let result = winner === playerNames[0] ? "win" : "loss";
-				// Ajouter à l’historique
+				// Add to history
 				addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 				addGameToStats(currentUser!.id, result);
 				showEndScreen(winner, true, true);
@@ -863,23 +774,19 @@ playersForm.addEventListener("submit", (event) => {
 	
 });
 
-// Bouton "Rejouer"
 replayButton.addEventListener('click', () => {
 	stopPongGame();
 	showGame();
 	history.pushState({ page: 'game', isVsAI: isVsAIMode, isTournament: false, playerNames: [...playerNames]}, 'Jeu', '#game');
 	startPongGame(lastPlayers[0], lastPlayers[1], isVsAIMode, (winner) => {
-		console.log("Match terminé, gagnant :", winner);
-		// Déterminer le résultat
 		let result = winner === lastPlayers[0] ? "win" : "loss";
-		// Ajouter à l’historique
+		// Add to history
 		addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 		addGameToStats(currentUser!.id, result);
 		showEndScreen(winner);
 	});
 });
 
-// Bouton "Retour au menu"
 returnMenuButton.addEventListener('click', () => {
 	stopPongGame();
 	showMenu();
@@ -891,12 +798,9 @@ nextMatchButton.addEventListener('click', () => {
 		showGame();
 		history.pushState({ page: 'game', isVsAI: false, isTournament: true, playerNames: [...playerNames]}, 'Jeu', '#game');
 		currentTournament.nextMatch((winner) => {
-			console.log("Match terminé, gagnant :", winner);
 			if (currentTournament && currentTournament.isTournamentOver()) {
-				console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
-				// Déterminer le résultat
 				let result = winner === lastPlayers[0] ? "win" : "loss";
-				// Ajouter à l’historique
+				// Add to history
 				addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 				addGameToStats(currentUser!.id, result);
 				showEndScreen(winner, true, true);
@@ -909,20 +813,17 @@ nextMatchButton.addEventListener('click', () => {
 		return ;
 });
 
-// Écouter l'événement popstate pour gérer "précédent" et "suivant"
 window.addEventListener("popstate", (event) => {
 	console.log("popstate event:", event.state);
 
-	// Masquer tous les écrans au début pour éviter qu'un mauvais reste affiché
 	menu.style.display = "none";
 	game.style.display = "none";
 	endScreen.style.display = "none";
 	tournamentOptions.style.display = "none";
 	playerInputs.style.display = "none";
 	
-	// 🔹 Vérification si `event.state` est valide
 	if (!event.state || !event.state.page) {
-		console.log("Aucun état trouvé, retour au menu par défaut.");
+		console.log("Default state.");
 		showMenu();
 		history.replaceState({ page: "menu" }, "Menu", "#menu");
 		return;
@@ -934,51 +835,44 @@ window.addEventListener("popstate", (event) => {
 
 	switch (event.state.page) {
 		case "menu":
-			console.log("Retour au menu via popstate");
+			console.log("menu using popstate");
 			stopPongGame();
 			showMenu();
 			currentTournament = null;
 			break;
 		
 		case "auth":
-			console.log("Retour au auth via popstate");
+			console.log("auth using popstate");
 			showAuthPage();
 			break;
 
 		case "game":
-			console.log("Reprise du jeu via popstate");
+			console.log("game using popstate");
 			lastPlayers = playerNames.slice();
 			showGame();
 
 			if (lastGameWasVsAI) {
-				console.log("Démarrage du jeu via state contre l'IA");
 				isTournamentMode = false;
 				isVsAIMode = true;
 
-				lastPlayers = StatePlayerNames.slice(); // Sauvegarde pour "Rejouer"
+				lastPlayers = StatePlayerNames.slice();
 
 				startPongGame(StatePlayerNames[0], StatePlayerNames[1], true, (winner) => {
-					console.log("Match terminé, gagnant :", winner);
-					// Déterminer le résultat
 					let result = winner === StatePlayerNames[0] ? "win" : "loss";
-					// Ajouter à l’historique
+					// Add to history
 					addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 					addGameToStats(currentUser!.id, result);
 					showEndScreen(winner);
 				});
 			}
 			else if (lastGameWasTournament) {
-				console.log("Lancement d’un tournoi via state avec", playerNames.length, "joueurs");
 				isTournamentMode = true;
 				isVsAIMode = false;
 				currentTournament = new Tournament(StatePlayerNames);
 				currentTournament.start((winner) => {
-				console.log("Match terminé, gagnant :", winner);
 				if (currentTournament && currentTournament.isTournamentOver()) {
-					console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
-					// Déterminer le résultat
 					let result = winner === StatePlayerNames[0] ? "win" : "loss";
-					// Ajouter à l’historique
+					// Add to history
 					addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 					addGameToStats(currentUser!.id, result);
 					showEndScreen(winner, true, true);
@@ -987,17 +881,13 @@ window.addEventListener("popstate", (event) => {
 				}
 			});
 			} else {
-				lastPlayers = StatePlayerNames.slice(); // Sauvegarde pour "Rejouer"
-
-				console.log("Match simple via state entre", StatePlayerNames[0], "et", StatePlayerNames[1]);
+				lastPlayers = StatePlayerNames.slice();
 				isTournamentMode = false;
 				isVsAIMode = false;
 
 				startPongGame(StatePlayerNames[0], StatePlayerNames[1], false, (winner) => {
-					console.log("Match terminé, gagnant :", winner);
-					// Déterminer le résultat
 					let result = winner === StatePlayerNames[0] ? "win" : "loss";
-					// Ajouter à l’historique
+					// Add to history
 					addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 					addGameToStats(currentUser!.id, result);
 					showEndScreen(winner);
@@ -1007,30 +897,18 @@ window.addEventListener("popstate", (event) => {
 
 
 		case "tournamentOption":
-			console.log("Retour à la sélection du tournoi");
+			console.log("tournamentOption using popstate");
 			showTournamentOption();
 			break;
 
 		case "tournamentForm":
 			stopPongGame();
-			console.log("Retour à la configuration du tournoi");
+			console.log("tournamentForm using popstate");
 			showPlayerInputs(playerNumber);
 			break;
 
 		default:
-			console.log("État inconnu, retour au menu.");
+			console.log("Unknown state, back to menu.");
 			showMenu();
 	}
 });
-
-// function resizeCanvas() {
-// 	// Obtenir la taille du conteneur en pixels
-// 	const rect = game.getBoundingClientRect();
-// 	canvas.width = rect.width;
-// 	canvas.height = rect.height;
-// 	// Tu pourras aussi recalculer tes valeurs de conversion (scale, etc.) ici, si nécessaire.
-// }
-
-// window.addEventListener('resize', resizeCanvas);
-// // resizeCanvas(); // Appel initial
- 

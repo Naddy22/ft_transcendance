@@ -1,19 +1,19 @@
 {
 	"compilerOptions": {
-		"target": "es5", // Version de JavaScript ciblée
-		"module": "es6", // Utilise les modules ES6
-		"lib": ["DOM", "ES2015"], // Ajoute ES2015 pour Promise et async/await
-		"outDir": "./dist", // Répertoire de sortie
-		"rootDir": "./src", // Répertoire des fichiers source
-		"moduleResolution": "node", // pour babylonjs
-		"esModuleInterop": true, // Compatibilité avec les modules CommonJS
-		"strict": true, // Active les vérifications strictes des types
-		"skipLibCheck": true // Ignore les vérifications des types dans les bibliothèques
+		"target": "es5",
+		"module": "es6", 
+		"lib": ["DOM", "ES2015"], 
+		"outDir": "./dist",
+		"rootDir": "./src", 
+		"moduleResolution": "node", 
+		"esModuleInterop": true, 
+		"strict": true, 
+		"skipLibCheck": true 
 	},
 	"include": [
-		"src/**/*.ts" // Inclut tous les fichiers .ts dans src
+		"src/**/*.ts" 
 	],
 	"exclude": [
-		"node_modules" // Exclut le répertoire node_modules
+		"node_modules" 
 	]
 }

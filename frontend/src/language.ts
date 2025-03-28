@@ -1,25 +1,23 @@
-export let currentLanguage = "fr"; // 🌍 Langue par défaut
+export let currentLanguage = "fr";
 
-// 📥 Charge le fichier JSON de la langue choisie
+// Loads the JSON file for the selected language
 export function loadLanguage(lang: string): Promise<Record<string, string>> {
-	console.log(`🚀 Chargement de la langue : ${lang}`);
 	return fetch(`/locales/${lang}.json`)
 		.then(response => response.json())
 		.then(translations => {
 			currentLanguage = lang;
-			localStorage.setItem("language", lang); // 🔄 Sauvegarde la langue choisie
-			localStorage.setItem("translations", JSON.stringify(translations)); // 🔄 Sauvegarde aussi les traductions
-			return translations; // Renvoie les traductions
+			localStorage.setItem("language", lang);
+			localStorage.setItem("translations", JSON.stringify(translations));
+			return translations;
 		})
 		.catch(error => {
-			console.error("❌ Erreur chargement langue :", error);
-			return {}; // Retourne un objet vide en cas d'erreur
+			console.error("❌ Error loadlanguage:", error);
+			return {};
 		});
 }
 
-// 🌐 Remplace les textes dans le HTML
 export function applyTranslations(translations: Record<string, string>) {
-	// Met à jour le texte des éléments ayant l'attribut data-i18n
+	// Updates the text of elements with the data-i18n attribute
 	document.querySelectorAll("[data-i18n]").forEach(el => {
 		const key = el.getAttribute("data-i18n")!;
 		if (translations[key]) {
@@ -27,7 +25,7 @@ export function applyTranslations(translations: Record<string, string>) {
 		}
 	});
 
-	// Met à jour les placeholders des inputs ayant data-i18n-placeholder
+	// Updates input placeholders with data-i18n-placeholder
 	document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
 		const key = el.getAttribute("data-i18n-placeholder")!;
 		if (translations[key]) {
@@ -38,18 +36,17 @@ export function applyTranslations(translations: Record<string, string>) {
 
 export function getTranslation(key: string): string {
 	const translations = JSON.parse(localStorage.getItem("translations") || "{}");
-	return translations[key] || key; // Retourne la clé si la traduction n'existe pas
+	return translations[key] || key; // Returns the key if the translation does not exist
 }
 
-/** 📌 Convertit un message d'erreur en version traduite */
 export function getErrorMessage(error: string): string {
 	const errorTranslations: Record<string, string> = {
-		// 📌 Messages communs
+		// 📌 General
 		"Failed to fetch": getTranslation("errorFetch"),
+		
+		// 📌 Register
 		"Username is already taken": getTranslation("errorUsernameTaken"),
 		"Email is already registered": getTranslation("errorEmailTaken"),
-
-		// 📌 Register
 		"Password must be at least 8 characters long": getTranslation("errorPasswordShort"),
 
 		// 📌 Login
@@ -69,18 +66,15 @@ export function getErrorMessage(error: string): string {
 		"Friend already added": getTranslation("errorFriendAlreadyAdded"),
 	};
 
-	// 🔹 Recherche de l'erreur exacte ou partielle
 	for (const key in errorTranslations) {
 		if (error.includes(key)) { 
 			return errorTranslations[key];
 		}
 	}
 
-	// 🔹 Gestion des erreurs génériques type "Error [code]: Message"
 	const errorCodeMatch = error.match(/Error\s*(\d+)/);
 	if (errorCodeMatch) {
 		return getTranslation("errorGeneric").replace("{code}", errorCodeMatch[1]);
 	}
-	// 🔹 Si aucune traduction trouvée, retourne l'erreur originale
 	return error;
 }

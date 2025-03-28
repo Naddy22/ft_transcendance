@@ -240,7 +240,8 @@ export class API {
     return this.request<{ message: string }>(`/users/${id}`, {
       method: "DELETE",
       // Ensuring no empty body is sent
-      headers: {}, // Removing `Content-Type`
+      // headers: {}, // Removing Content-Type
+      body: JSON.stringify({ id }),
     });
   }
 
@@ -279,7 +280,8 @@ export class API {
     return this.request<{ message: string }>(`/users/${userId}/friends/${friendId}`, {
       method: "DELETE",
       // Override headers so that Content-Type isn't sent
-      headers: {}
+      // headers: {}
+      body: JSON.stringify({ userId }),
     });
   }
 

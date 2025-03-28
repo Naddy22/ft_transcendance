@@ -8,23 +8,19 @@ export class Player3D {
 	constructor(name: string) {
 		this.name = name;
 		this.score = 0;
-		// Crée le TextBlock pour afficher le score
 		this.scoreText = new GUI.TextBlock(name + "scoreMessage");
 		this.scoreText.text = this.score.toString();
 		this.scoreText.color = "#f9d3d9";
 		this.scoreText.fontSize = 30;
-		this.scoreText.fontFamily = "Mochiy Pop P One"; // Police kawaii
-		this.scoreText.outlineWidth = 4; // Contour pour contraste
-        this.scoreText.outlineColor = "#333"; // Contour sombre
+		this.scoreText.fontFamily = "Mochiy Pop P One";
+		this.scoreText.outlineWidth = 4;
+		this.scoreText.outlineColor = "#333";
 	}
 
-	// Méthode pour placer le score sur l'interface GUI
- 	// x et y en pixels (par exemple, pour positionner le score sur le canvas)
 	drawScore(x: number, y: number, advancedTexture: GUI.AdvancedDynamicTexture): void {
 		this.scoreText.left = x + "%";
 		this.scoreText.top = y + "%";
 		
-		// On vérifie si le contrôle a déjà été ajouté à l'advancedTexture
 		if (!advancedTexture.getControlByName(this.name + "scoreMessage")) {
 			advancedTexture.addControl(this.scoreText);
 		}

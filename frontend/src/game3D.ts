@@ -7,36 +7,26 @@ import { getTranslation } from './language.js';
 
 let engine: BABYLON.Engine;
 let guiTexture: GUI.AdvancedDynamicTexture;
-let gameStarted: boolean = false; // Variable pour savoir si le jeu a commencé
+let gameStarted: boolean = false;
 
-//nettoie les ecouteurs precedents sinon espace garde en memoire parti d'Avant
-let activeListeners: { type: string; listener: EventListener }[] = []; // Ajoute cette ligne au début du fichier
+let activeListeners: { type: string; listener: EventListener }[] = [];
 
+//cleans previous headphones
 function removeListeners(): void {
-	console.log("Suppression des écouteurs existants, nombre actuel :", activeListeners.length);
 	activeListeners.forEach(({ type, listener }, index) => {
-		console.log(`Suppression de l’écouteur ${index + 1} : ${type}`);
 		window.removeEventListener(type, listener);
 	});
 	activeListeners = [];
 }
 
 export function startPongGame3D(leftPlayerName: string, rightPlayerName: string, isVsAI: boolean, onGameEnd: (winner: string) => void): void {
-	console.log("Début startPongGame3D pour", leftPlayerName, "vs", rightPlayerName, "- gameStarted:", gameStarted);
-	removeListeners(); // Ajoute ceci pour nettoyer les anciens écouteurs
-	console.log("Écouteurs supprimés, activeListeners devrait être vide :", activeListeners.length);
-	gameStarted = false; // Réinitialise explicitement
-
+	removeListeners();
+	gameStarted = false;
 	if (engine) {
-		console.log("Arrêt de l’ancien engine avant réinitialisation");
 		engine.stopRenderLoop();
-		engine.dispose(); // Ajoute ceci pour nettoyer l’ancien engine
+		engine.dispose();
 	}
-	
-	// 1. Récupère le canvas et crée le moteur BabylonJS
 	const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
-	// const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-	
 	engine = new BABYLON.Engine(canvas, true);
 
 	const leftPlayer = new Player3D(leftPlayerName);
@@ -44,9 +34,8 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 
 	const MAX_SCORE = 3;
 
-	// Une fois que tes joueurs sont créés, mets à jour le DOM pour afficher leurs noms
+	// Update DOM with player name
 	function updatePlayerNames(): void {
-		// Sélectionner les éléments du DOM et assigner les noms des joueurs
 		const leftPlayerNameElement = document.getElementById('leftPlayerName') as HTMLElement;
 		const rightPlayerNameElement = document.getElementById('rightPlayerName') as HTMLElement;
 
@@ -63,26 +52,26 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		const advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 		
 		const startMessage = new GUI.TextBlock("startMessage");
-		startMessage.text = getTranslation("startGameMessage"); // 🔥 Texte dynamique
-		startMessage.color = "#f9d3d9"; //rose pastel
+		startMessage.text = getTranslation("startGameMessage");
+		startMessage.color = "#f9d3d9";
 		startMessage.fontSize = 20;
-		startMessage.fontFamily = "Mochiy Pop P One"; // Police kawaii
+		startMessage.fontFamily = "Mochiy Pop P One";
 		startMessage.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
 		startMessage.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
 		startMessage.top = "-75px";
-		startMessage.outlineWidth = 4; // Contour noir pour contraste
-		startMessage.outlineColor = "#333"; // Contour sombre
+		startMessage.outlineWidth = 4;
+		startMessage.outlineColor = "#333";
 		advancedTexture.addControl(startMessage);
 
-		// Écran de chargement
+		// loading screen
 		const loadingBackground = new GUI.Rectangle("loadingBackground");
 		loadingBackground.width = 1.0;
 		loadingBackground.height = 1.0;
-		loadingBackground.background = "rgb(229, 251, 201)"; // Fond sombre semi-transparent
+		loadingBackground.background = "rgb(229, 251, 201)";
 		advancedTexture.addControl(loadingBackground);
 	
 		const loadingText = new GUI.TextBlock("loadingText");
-		loadingText.text = getTranslation("loadingGameText"); // 🔥 Texte dynamique
+		loadingText.text = getTranslation("loadingGameText");
 		loadingText.color = "black";
 		loadingText.fontSize = 30;
 		loadingText.fontFamily = "Mochiy Pop P One";
@@ -90,82 +79,53 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		loadingText.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_CENTER;
 		loadingBackground.addControl(loadingText);
 
-		// 🔹 Mettre à jour les traductions quand la langue change
 		document.addEventListener("languageChanged", () => {
 			startMessage.text = getTranslation("startGameMessage");
 			loadingText.text = getTranslation("loadingGameText");
 		});
-		
 		return advancedTexture;
 	}
 	
-
-	// Création de la scène
 	const createScene = (): BABYLON.Scene => {
 		const scene = new BABYLON.Scene(engine);
 		guiTexture = createGUI(scene);
 
-		// Utiliser une ArcRotateCamera pour une vue top-down classique
-		// alpha = 0, beta = PI/2 pour regarder directemen t vers le bas
 		const camera = new BABYLON.ArcRotateCamera(
 			"topCamera",
-			-Math.PI / 2,                // alpha
-			Math.PI / 2,      // beta
-			20,               // radius
-			BABYLON.Vector3.Zero(), // cible au centre
+			-Math.PI / 2, // alpha
+			Math.PI / 2, // beta
+			20, // radius
+			BABYLON.Vector3.Zero(),
 			scene
 		);
-		// // On n'attache pas les contrôles si on veut garder la vue fixe
+
+		// // Optional camera control
 		// camera.attachControl(canvas, false);
 		
 		const desiredSceneWidthUnits = 25.3;
 		let scale = canvas.width / desiredSceneWidthUnits;
-		// const scale = 23.7; //(fonctionne pour 600px par 400px)
-		// const scale = 35.5; //fonctionne pour 900px par 600px
-		// Pour une zone de jeu de 20 unités de large (de -10 à 10)
 		const sceneWidthUnits = canvas.width / scale;
 		const sceneHeightUnits = canvas.height / scale;
-
-		// // pour mettre des bordures pour test
-		// const halfWidth = sceneWidthUnits / 2;
-		// const halfHeight = sceneHeightUnits / 2;
-		// const borderPoints = [
-		// 	new BABYLON.Vector3(-halfWidth, -halfHeight, 0),
-		// 	new BABYLON.Vector3(halfWidth, -halfHeight, 0),
-		// 	new BABYLON.Vector3(halfWidth, halfHeight, 0),
-		// 	new BABYLON.Vector3(-halfWidth, halfHeight, 0),
-		// 	new BABYLON.Vector3(-halfWidth, -halfHeight, 0)
-		// ];
-		// const border = BABYLON.MeshBuilder.CreateLines("border", { points: borderPoints }, scene);
-		// border.color = new BABYLON.Color3(1, 0, 0); // rouge
 	
-		// Ajout du sol grace a photo importer
 		const ground = BABYLON.MeshBuilder.CreatePlane("ground", { width: sceneWidthUnits + 5, height: sceneHeightUnits + 5}, scene);
-		ground.rotation.x = 0; // Oriente le plan horizontalement
-		ground.position.z = 0.8; // Légèrement derrière les objets pour éviter le z-fighting
+		ground.rotation.x = 0;
+		ground.position.z = 0.8;
 		const groundMaterial = new BABYLON.StandardMaterial("groundMaterial", scene);
 		groundMaterial.diffuseTexture = new BABYLON.Texture("/textures/grass-draw.jpg", scene);
-		groundMaterial.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15); // Supprime la réflexion spéculaire
-		// groundMaterial.roughness = 1.0; // Rend le matériau mat (moins de brillance)
+		groundMaterial.specularColor = new BABYLON.Color3(0.15, 0.15, 0.15);
 		ground.material = groundMaterial;
 
-		// Ajouter une lumière
 		const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 0, -1), scene);
 	
-		// Création de la balle au centre et attends chargement
 		const ball = new Ball3D(scene, 0.5, 0, 0);
 
-		const offset = 0.5; // Pour ecarter un peu mes raquettes du bord
+		const offset = 0.5;
 		const leftPaddle = new Paddle3D(scene, -sceneWidthUnits / 2 + offset, 0, "left");
 		const rightPaddle = new Paddle3D(scene, sceneWidthUnits / 2 - offset, 0, "right", isVsAI);
 
+		leftPlayer.drawScore(-42, -45, guiTexture);
+		rightPlayer.drawScore(42, -45, guiTexture);
 
-		// Placer les scores sur l'interface GUI (les positions en pixels sont à ajuster selon ton design)
-		leftPlayer.drawScore(-42, -45, guiTexture); // à gauche
-		rightPlayer.drawScore(42, -45, guiTexture); // à droite
-
-		
-		// 6. Gestion des entrées clavier pour les paddles et pour démarrer le jeu
 		const keydownHandler = ((event: KeyboardEvent) => {
 			if (event.key === "w") leftPaddle.movingUp = true;
 			if (event.key === "s") leftPaddle.movingDown = true;
@@ -174,9 +134,7 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 				if (event.key === "ArrowDown") rightPaddle.movingDown = true;
 			}
 			if (event.code === "Space" && !gameStarted) {
-				console.log("Tentative ESPACE - Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
 				if (ball.mesh && leftPaddle.mesh && rightPaddle.mesh) {
-					console.log("ESPACE accepté, jeu démarré");
 					gameStarted = true;
 				} else {
 					console.log("ESPACE bloqué, modèles non chargés");
@@ -196,18 +154,15 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 		window.addEventListener("keyup", keyupHandler);
 		activeListeners.push({ type: "keydown", listener: keydownHandler });
 		activeListeners.push({ type: "keyup", listener: keyupHandler });
-		console.log("Écouteurs ajoutés, total actuel :", activeListeners.length);
-		
-		// IA pour le paddle droit si isVsAI
+
 		if (isVsAI) {
 			setInterval(() => {
 				if (gameStarted && ball.mesh && rightPaddle.mesh) {
 					updateAIDecision(rightPaddle, ball, sceneWidthUnits, sceneHeightUnits);
 				}
-			}, 1000); // Refresh toutes les secondes
+			}, 1000);
 		}
 
-		// Calcule la position finale de la balle sur l’axe Y quand elle atteint le paddle droit
 		function calculateFuturBallY(ball: Ball3D, paddleL: Paddle3D, paddleR: Paddle3D, sceneHeight: number): number {
 			if (!ball.mesh || !paddleL.mesh || !paddleR.mesh)
 				return 0;
@@ -216,23 +171,18 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 			let velocityX = ball.dx;
 			let velocityY = ball.dy;
 			const ballRadius = ball.radius;
-			const paddleWidth = 1; // Suppose une largeur approximative du paddle (ajuste selon ton modèle)
-			const acceleration = 1.00025; // Même accélération que dans Ball3D
+			const paddleWidth = 1;
+			const acceleration = 1.00025;
 
 			while (futurBallX < (paddleR.mesh.position.x - paddleWidth / 2)) {
-				// Rebond sur le paddle gauche
 				if (futurBallX - velocityX <= (paddleL.mesh.position.x + paddleWidth / 2) && velocityX < 0) {
-					velocityX *= -1; // Inversion simple (pas de boost comme 1.075 pour simplicité)
+					velocityX *= -1;
 					
-					// ⚠️ Modifier l'angle en fonction du point d'impact
 					const impact = futurBallY - paddleL.mesh.position.y;
-					const maxAngle = Math.PI / 4; // Max 45° de déviation
+					const maxAngle = Math.PI / 4;
 					const angleFactor = (impact / (paddleL.height / 2)) * maxAngle;
-					velocityY += Math.sin(angleFactor) * Math.abs(velocityX); // Ajuste l'effet
-					console.log(`🎯 Rebond gauche : impact=${impact.toFixed(2)}, nouvel angle=${angleFactor.toFixed(2)}`);
+					velocityY += Math.sin(angleFactor) * Math.abs(velocityX);
 				}
-	
-				// Rebond sur les murs haut/bas
 				const topWall = sceneHeight / 2 - ballRadius;
 				const bottomWall = -sceneHeight / 2 + ballRadius;
 				if (futurBallY + velocityY > topWall && velocityY > 0) {
@@ -242,8 +192,6 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 					velocityY *= -1;
 					futurBallY = bottomWall + (futurBallY + velocityY - bottomWall);
 				}
-
-				// Accélération progressive
 				velocityX *= acceleration;
 				velocityY *= acceleration;
 			
@@ -251,76 +199,66 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 				futurBallY += velocityY;
 			}
 	
-			return futurBallY; // Position finale en Y
+			return futurBallY;
 		}
 
 		function updateAIDecision(aiPaddle: Paddle3D, ball: Ball3D, sceneWidth: number, sceneHeight: number): void {
 			if (!aiPaddle.isAI || !aiPaddle.mesh || !gameStarted || !ball.mesh) {
-				console.log("IA arrêtée : conditions non remplies");
 				return;
 			}
 			let ballFutureY: number;
 			const paddleCenterY = aiPaddle.mesh.position.y;
-			const threshold = 1; // Zone morte plus large pour stabilité
+			const threshold = 1;
 
 			const closeDistance = sceneWidth / 10;
 			if (ball.dx <= 0) {
-				console.log("IA: La balle s’éloigne, retour à initialY");
 				ballFutureY = aiPaddle.initialY;
 			} else if (Math.abs(aiPaddle.mesh.position.x - ball.mesh.position.x) < closeDistance) {
-				console.log("IA: Balle proche, suivi direct");
 				ballFutureY = ball.mesh.position.y;
 			} else {
-				console.log("IA: Calcul de la trajectoire");
 				ballFutureY = calculateFuturBallY(ball, leftPaddle, aiPaddle, sceneHeight);
 			}
-				
-				let moveUp = false;
-				let moveDown = false;
+			let moveUp = false;
+			let moveDown = false;
 
-				if (ballFutureY > paddleCenterY + threshold) {
-					moveUp = true;
-				} else if (ballFutureY < paddleCenterY - threshold) {
-					moveDown = true;
-				} else {
-					// Explicitement arrêter si proche de la cible
-					moveUp = false;
-					moveDown = false;
-				}
-
-				console.log(`🎮 IA: BallY=${ballFutureY}, PaddleY=${paddleCenterY}, UP=${moveUp}, DOWN=${moveDown}`);
-				aiPaddle.simulateKeyPress(moveUp, moveDown, ballFutureY);
-			// }
+			if (ballFutureY > paddleCenterY + threshold) {
+				moveUp = true;
+			} else if (ballFutureY < paddleCenterY - threshold) {
+				moveDown = true;
+			} else {
+				moveUp = false;
+				moveDown = false;
+			}
+			aiPaddle.simulateKeyPress(moveUp, moveDown, ballFutureY);
 		}
 
 		function update(): void {
-			if (!ball.mesh) return; // Sécurité avant chargement
+			if (!ball.mesh) return;
 			ball.update(sceneHeightUnits, leftPaddle, rightPaddle);
-			// Ici, tu pourras ajouter ta logique de détection des buts, réinitialisation, etc.
 			
 			if (ball.mesh.position.x - ball.radius <= -sceneWidthUnits / 2) {
-				rightPlayer.score++;  // Si la balle sort à gauche, le joueur de droite marque
+				rightPlayer.score++;
 				rightPlayer.scoreText.text = rightPlayer.score.toString();
 				gameStarted = false;
 				if (rightPlayer.score >= MAX_SCORE) {
-					endGame(rightPlayer.name); // Fin du jeu si le joueur de droite atteint le score limite
+					endGame(rightPlayer.name);
 					return;
 				}
 				leftPaddle.reset();
 				rightPaddle.reset();
-				ball.reset(true);  // Le joueur gauche sert
+				ball.reset(true);
 			}
 			else if (ball.mesh.position.x + ball.radius >= sceneWidthUnits / 2) {
-				leftPlayer.score++;  // Si la balle sort à droite, le joueur de gauche marque
+				leftPlayer.score++;
 				leftPlayer.scoreText.text = leftPlayer.score.toString();
 				gameStarted = false;
 				if (leftPlayer.score >= MAX_SCORE) {
-					endGame(leftPlayer.name); // Fin du jeu si le joueur de gauche atteint le score limite
+					endGame(leftPlayer.name);
 					return;
 				}
 				leftPaddle.reset();
 				rightPaddle.reset();
-				ball.reset(false);  // Le joueur droit sert
+				ball.reset(false);
 			}
 
 			leftPaddle.update(sceneHeightUnits);
@@ -329,45 +267,20 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 
 		function endGame(winner: string) {
 			stopPongGame3D();
-
-			// resetGame(); // a ajouté si je veux reset avant d'Avoir msg de fin
-
-			// Appelle le callback ici pour informer du gagnant
 			onGameEnd(winner);
 		}
 
-		// // Fonction pour réinitialiser le jeu
-		// function resetGame(): void {
-		// 	// const endScreen = document.getElementById('endScreen'); // Supprime l'écran de fin
-		// 	// if (endScreen)
-		// 	// 	endScreen.remove();
-		// 	// if (canvas)
-		// 	// 	canvas.style.display = 'block';
-	
-		// 	leftPlayer.score = 0;
-		// 	leftPlayer.scoreText.text = leftPlayer.score.toString();
-		// 	rightPlayer.score = 0;
-		// 	rightPlayer.scoreText.text = rightPlayer.score.toString();
-	
-		// 	const serves = Math.random() < 0.5;
-		// 	ball.reset(serves);
-		// 	leftPaddle.reset();
-		// 	rightPaddle.reset();
-		// }
-
-		// 7. La boucle de jeu : ici, on met à jour la logique avant chaque rendu de la scène
 		scene.registerBeforeRender(() => {
 			const startMsg = guiTexture.getControlByName("startMessage") as GUI.TextBlock;
 			const loadingBg = guiTexture.getControlByName("loadingBackground") as GUI.Rectangle;
-			console.log("Avant rendu - gameStarted:", gameStarted, "Mesh : Ball:", !!ball.mesh, "Left Paddle:", !!leftPaddle.mesh, "Right Paddle:", !!rightPaddle.mesh);
 			if (!ball.mesh || !leftPaddle.mesh || !rightPaddle.mesh)
 			{
-				if (startMsg) startMsg.isVisible = false; // Cache le message de départ
-				if (loadingBg) loadingBg.isVisible = true; // Affiche l’écran de chargement
+				if (startMsg) startMsg.isVisible = false;
+				if (loadingBg) loadingBg.isVisible = true;
 				return;
 			}
-			// Une fois chargé, masque l’écran de chargement
-			if (loadingBg) loadingBg.isVisible = false;
+			if (loadingBg)
+				loadingBg.isVisible = false;
 			if (!gameStarted) {
 				if (startMsg) {
 					startMsg.isVisible = true;
@@ -375,7 +288,6 @@ export function startPongGame3D(leftPlayerName: string, rightPlayerName: string,
 				return;
 			}
 			startMsg.isVisible = false;
-
 			update();
 		});
 
@@ -392,7 +304,6 @@ export function stopPongGame3D(): void {
 	if (!engine) {
 		return;
 	}
-	// engine.dispose(); // Ajouter ceci pour nettoyer l’ancien engine mais on voit plus le jeu en fond quand le message "joueur x a gagné"
 	engine.stopRenderLoop();
 	removeListeners();
 }

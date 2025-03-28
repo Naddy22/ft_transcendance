@@ -55,12 +55,10 @@ export class Tournament {
 	start(callback: (winner: string) => void): void {
 		const currentMatch = this.getCurrentMatch();
 		if (!currentMatch) {
-			console.log("Tournoi terminé ! Gagnant :", this.getWinner());
 			callback(this.getWinner()!);
 			return;
 		}
-	
-		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
+
 		startPongGame3D(currentMatch.player1, currentMatch.player2, false, (winner) => {
 			stopPongGame3D();
 			this.setMatchWinner(winner);
@@ -71,12 +69,10 @@ export class Tournament {
 	nextMatch(callback: (winner: string) => void): void {
 		const currentMatch = this.getCurrentMatch();
 		if (!currentMatch) {
-			console.log("Tournoi terminé ! Gagnant :", this.getWinner());
 			callback(this.getWinner()!);
 			return;
 		}
 	
-		console.log(`Match : ${currentMatch.player1} vs ${currentMatch.player2}`);
 		startPongGame3D(currentMatch.player1, currentMatch.player2, false, (winner) => {
 			stopPongGame3D();
 			this.setMatchWinner(winner);

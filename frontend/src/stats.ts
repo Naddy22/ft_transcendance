@@ -1,10 +1,10 @@
-import Chart from "chart.js/auto"; // 📊 pour graphique
+import Chart from "chart.js/auto";
 import { API, UserStats } from "./api";
 import { getTranslation } from "./language";
 
 const api = new API("");
 
-let statsChart: Chart | null = null; // Variable pour stocker le graphique
+let statsChart: Chart | null = null;
 
 export function addGameToStats(userId: number, result: string): void {
 	const statsIncrement = result.includes("win")
@@ -13,10 +13,10 @@ export function addGameToStats(userId: number, result: string): void {
 
 	api.updateUserStats(userId, statsIncrement)
 		.then((res) => {
-			console.log("✅ Stats utilisateur mises à jour :", res.message);
+			console.log("✅ addGameToStats :", res.message);
 		})
 		.catch((error) => {
-			console.error("❌ Erreur lors de la mise à jour des stats :", error.message);
+			console.error("❌ Error addGameToStats", error.message);
 		});
 }
 
@@ -39,18 +39,15 @@ export function updateStatsUI(userId: number): void {
 			renderStatsChart(stats);
 		})
 		.catch((error) => {
-			console.error("❌ Erreur lors de la mise à jour des stats :", error.message);
+			console.error("❌ Error updateStatsUI", error.message);
 		});
 }
 
-/** 🎯 Génère le graphique avec Chart.js */
 export function renderStatsChart(stats: UserStats): void {
 	const ctx = document.getElementById("statsChart") as HTMLCanvasElement;
 	if (!ctx) return;
 
-	// 🔥 Vérifie si un graphique existe déjà, et le détruit avant de recréer un nouveau
 	if (statsChart) {
-		console.log("🗑️ Suppression du graphique existant...");
 		statsChart.destroy();
 	}
 
@@ -61,10 +58,9 @@ export function renderStatsChart(stats: UserStats): void {
 			datasets: [
 				{
 					data: [stats.wins, stats.losses],
-					backgroundColor: ["#4CAF50", "#FF5252"], // Vert = win, Rouge = lose
+					backgroundColor: ["#4CAF50", "#FF5252"],
 				},
 			],
 		},
 	});
-	console.log("📊 Nouveau graphique créé !");
 }

@@ -5,7 +5,6 @@ const api = new API("");
 
 export function addGameToHistory(
 	userId: number,
-	// type: "1vs1" | "vs AI" | "Tournament",
 	type: string,
 	result: string
 ): void {
@@ -13,7 +12,6 @@ export function addGameToHistory(
   
 	api.createMatchHistoryEntry(data)
 		.then((res) => {
-		console.log("History entry added with ID:", res.id);
 		updateHistoryUI(userId);
 	})
 		.catch((error) => {
@@ -21,7 +19,6 @@ export function addGameToHistory(
 	});
 }
 
-// Update the UI by fetching the match history from the backend:
 export function updateHistoryUI(userId: number): void {
 	const historyList = document.getElementById("gameHistoryList") as HTMLUListElement;
 	if (!historyList) return;

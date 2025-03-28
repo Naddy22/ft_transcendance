@@ -13,7 +13,6 @@ export function getUserProfile(userId: number) {
 			isTwoFactorEnabled: user.isTwoFactorEnabled
 		}))
 		.catch(error => {
-			console.error("❌ Erreur récupération profil :", error.message);
 			throw error;
 		});
 }
@@ -22,9 +21,8 @@ export function updateUserProfile(userId: number, data: { username?: string; ema
 	return api.updateUser(userId, data)
 		.then(() => getTranslation("profileUpdateSuccess"))
 		.catch(error => {
-			console.error("❌ Erreur mise à jour profil :", error.message);
 			const errorMessage = getTranslation("profileUpdateError").replace("{error}", getErrorMessage(error.message));
-			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
+			throw new Error(errorMessage);
 		});
 }
 
@@ -32,9 +30,8 @@ export function updatePassword(userId: number, oldPassword: string, newPassword:
 	return api.updatePassword(userId, oldPassword, newPassword)
 		.then(() => getTranslation("passwordUpdateSuccess"))
 		.catch(error => {
-			console.error("❌ Erreur mise à jour du mot de passe :", error.message);
 			const errorMessage = getTranslation("passwordUpdateError").replace("{error}", getErrorMessage(error.message));
-			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
+			throw new Error(errorMessage);
 		});
 }
 
@@ -47,7 +44,6 @@ export function uploadAvatar(userId: number, file: File) {
 			return api.updateUser(userId, { avatar: response.avatarUrl }).then(() => response.avatarUrl);
 		})
 		.catch(error => {
-			console.error("❌ Erreur changement d'avatar :", error.message);
 			throw error;
 		});
 }
@@ -61,7 +57,6 @@ export function getFriends(userId: number) {
 			status: friend.status
 		})))
 		.catch(error => {
-			console.error("❌ Erreur récupération amis :", error.message);
 			throw error;
 		});
 }
@@ -78,32 +73,25 @@ export function searchUsers(query: string) {
 			});
 		})
 		.catch(error => {
-			console.error("❌ Erreur recherche amis :", error.message);
 			throw error;
 		});
 }
 
 export function addFriend(userId: number, friendId: number) {
 	return api.addFriend(userId, friendId)
-		// .then(() => "✅ Ami ajouté avec succès !")
 		.catch(error => {
-			console.error("❌ Erreur ajout ami :", error.message);
 			const errorMessage = getErrorMessage(error.message);
-			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
+			throw new Error(errorMessage);
 		});
 }
 
 export function removeFriend(userId: number, friendId: number) {
 	return api.removeFriend(userId, friendId)
-		// .then(() => "✅ Ami supprimé avec succès !")
 		.catch(error => {
-			console.error("❌ Erreur suppression ami :", error.message);
 			throw error;
 		});
 }
 
-
-/** ✅ Fonction qui charge tout le profil d'un coup (profil + amis) */
 export function getCompleteProfile(userId: number) {
 	return Promise.all([
 		getUserProfile(userId),
@@ -114,27 +102,22 @@ export function getCompleteProfile(userId: number) {
 		friends
 	}))
 	.catch(error => {
-		console.error("❌ Erreur récupération profil complet :", error.message);
 		throw error;
 	});
 }
 
-// 📥 Télécharger ses données personnelles
 export function exportUserData(userId: number): Promise<Blob> {
 	return api.exportUserData(userId)
 		.then(data => new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }))
 		.catch(error => {
-			console.error("❌ Erreur lors de l'export :", error);
 			throw error;
 		});
 }
 
-// 🕵️‍♂️ Anonymiser son compte
 export function anonymizeUser(userId: number): Promise<string> {
 	return api.anonymizeUser(userId)
 		.then(() => getTranslation("anonymizeSuccess"))
 		.catch(error => {
-			console.error("❌ Erreur anonymisation :", error.message);
 			const errorMessage = getTranslation("anonymizeError").replace("{error}", error.message);
 			throw new Error(errorMessage);
 		});
@@ -142,9 +125,7 @@ export function anonymizeUser(userId: number): Promise<string> {
 
 export function deleteUserAccount(userId: number) {
 	return api.deleteUser(userId)
-		// .then(() => "✅ Compte supprimé avec succès !")
 		.catch(error => {
-			console.error("❌ Erreur suppression compte :", error.message);
 			throw error;
 		});
 }
