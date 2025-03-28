@@ -1,5 +1,6 @@
+# backend.Dockerfile (from "backend/" context)
+# File: backend/backend.Dockerfile
 
-# backend.Dockerfile
 FROM node:18
 
 WORKDIR /app

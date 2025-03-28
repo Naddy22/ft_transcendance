@@ -82,7 +82,8 @@ if (!fs.existsSync(dbPath)) {
 
 // ────────────────────────────────────────────────────────────────────────────────
 // Transport setup for "pretty" logs only in dev mode
-const loggerOptions = process.env.NODE_ENV !== 'production' ? {
+// const loggerOptions = process.env.NODE_ENV !== 'production' ? {
+  const loggerOptions = {
     // level: 'info',
     // file: './server.log',
     transport: {
@@ -93,7 +94,8 @@ const loggerOptions = process.env.NODE_ENV !== 'production' ? {
         ignore: 'pid,hostname',
       }
     }
-  } : true;  // Raw JSON logs in production for better machine parsing and performance.
+  // } : true;  // Raw JSON logs in production for better machine parsing and performance.
+  }
 
 // ────────────────────────────────────────────────────────────────────────────────
 // ────────────────────────────────────────────────────────────────────────────────
@@ -219,11 +221,11 @@ await fastify.register(fastifyRoutes);
 setupRoutes(fastify);
 
 // Health check endpoint
-// fastify.get('/health', (req, reply) => reply.send({ message: 'Backend is running!' }));
 fastify.get('/health', (req, reply) => reply.send({ status: 'ok' }));
+// curl -X GET http://localhost:3000/health
 
 // ────────────────────────────────────────────────────────────────────────────────
-// Register `fastify-graceful-exit` AFTER `onClose` hook
+// Register 'fastify-graceful-exit'
 await fastify.register(fastifyGracefulExit, { timeout: 3000 });
 
 // ────────────────────────────────────────────────────────────────────────────────
@@ -234,7 +236,7 @@ await fastify.ready();
 await setupDatabase(fastify);
 
 // Log all registered routes
-// console.log(fastify.routes);
+console.log(fastify.routes);
 
 // console.log("🛠️ Fastify Decorators:", Object.keys(fastify)); // debug
 

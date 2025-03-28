@@ -1,13 +1,13 @@
 
 # Path to the .env file relative to the project root
-ENV_FILE = backend/.env
+ENV_FILE	:= backend/.env
+ENV_EXAMPLE := ./utils/templates/.env.template
 
 # Define multi-line variable for the .env content
 define ENV_CONTENT
-## Database Configuration
-# DATABASE_URL="file:../database/data.db"
+
+# Path to the SQLite database file
 DATABASE_URL=sqlite://./data/database.sqlite
-# (Path to the SQLite database file)
 
 # Authentication
 JWT_SECRET="super_secret_key"
@@ -20,21 +20,12 @@ BCRYPT_SALT_ROUNDS=10
 PORT=3000
 # (The port Fastify will run on)
 
-# Allow HTTP for local development
-# USE_HTTPS=false
-USE_HTTPS=true
-
 # Node environment
 NODE_ENV=development
 # NODE_ENV=production
 
 # Frontend built directory for serving static files
-FRONTEND_DIST="../../frontend/dist";
-# FRONTEND_DIST="../../PongGame/dist";
-
-# CORS Configuration
-# CORS_ORIGIN="http://localhost:5173"
-# (Frontend URL during development)
+FRONTEND_DIST="../../frontend/dist"
 
 endef
 export ENV_CONTENT
@@ -65,12 +56,19 @@ env-create: ## Generate the .env with prompt for overwrite
 		fi \
 	fi
 
+env-copy: ## Copies the '.env.example' file at './backend/.env'
+	@if [ ! -f $(ENV_FILE) ]; then \
+		$(call INFO,ENV,,Copying $(ENV_EXAMPLE) at $(ENV_FILE)); \
+		cp $(ENV_EXAMPLE) $(ENV_FILE); \
+		$(call SUCESS,ENV,$(ENV_FILE) created.); \
+	fi
+
 env-clean: ## Remove .env file
 	@$(call CLEANUP,$(ENV_FILE),.env file,$(ENV_FILE))
 
 env-reset: env-clean env-create ## Overwrite .env file
 
-.PHONY: env env-create env-clean env-reset
+.PHONY: env env-create env-copy env-clean env-reset
 
 # ==============================
 # ==============================

@@ -8,6 +8,9 @@ import fs from 'fs';
 import sharp from 'sharp';
 import { sendError } from "../utils/error.js";
 
+// import fileType from 'file-type'
+import { fileTypeFromBuffer } from 'file-type';
+
 // Resolve __dirname and paths correctly in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,33 +61,75 @@ export async function avatarRoutes(fastify: FastifyInstance) {
           });
         }
 
-        // Validate file type
-        const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
-        if (!allowedMimeTypes.includes(data.mimetype)) {
+        // 
+        // 
+        const buffer = await data.toBuffer();
+
+        const type = await fileTypeFromBuffer(buffer);
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+        if (!type || !allowedTypes.includes(type.mime)) {
           return reply.status(400).send({
             error: "Invalid file type. Allowed types: JPEG, PNG, WEBP"
           });
         }
 
+        fastify.log.info(`Detected MIME type: ${type.mime}, ext: ${type.ext}`); // debug
+
         // Generate a unique filename
-        const fileName = `${Date.now()}-${data.filename}`;
+        // const ext = type.ext || 'png';
+        // const fileName = `${Date.now()}-${data.filename}.${ext}`;
+        const baseName = path.parse(data.filename).name;
+        const fileName = `${Date.now()}-${baseName}.${type.ext}`;
         const filePath = path.join(AVATAR_UPLOAD_DIR, fileName);
 
-        // Resize image to a maximum of 256x256 pixels (maintaining aspect ratio)
-        const buffer = await data.toBuffer();
+        fastify.log.info(`Avatar saved to: ${filePath}`); // debug
+
+        // Resize image to a maximum of 256x256 pixels
         const resizedBuffer = await sharp(buffer)
           .resize({ width: 256, height: 256, fit: "inside" })
           .toBuffer();
 
-        // Save the file
         await fs.promises.writeFile(filePath, resizedBuffer);
 
-        // Return the public URL for the uploaded avatar
         const avatarUrl = `/avatars/uploads/${fileName}`;
-        reply.send({
-          message: "Avatar uploaded successfully",
-          avatarUrl
-        });
+        const fullUrl = `${req.protocol}://${req.hostname}${avatarUrl}`;
+
+        fastify.log.info(`avatarUrl: ${avatarUrl}`); // debug
+        fastify.log.info(`fullUrl: ${fullUrl}`); // debug
+
+        reply.send({ message: "Avatar uploaded successfully", avatarUrl });
+        // 
+        //
+
+        // // Validate file type
+        // const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+        // if (!allowedMimeTypes.includes(data.mimetype)) {
+        //   return reply.status(400).send({
+        //     error: "Invalid file type. Allowed types: JPEG, PNG, WEBP"
+        //   });
+        // }
+
+        // // Generate a unique filename
+        // const fileName = `${Date.now()}-${data.filename}`;
+        // const filePath = path.join(AVATAR_UPLOAD_DIR, fileName);
+
+        // // Resize image to a maximum of 256x256 pixels (maintaining aspect ratio)
+        // const buffer = await data.toBuffer();
+        // const resizedBuffer = await sharp(buffer)
+        //   .resize({ width: 256, height: 256, fit: "inside" })
+        //   .toBuffer();
+
+        // // Save the file
+        // await fs.promises.writeFile(filePath, resizedBuffer);
+
+        // // Return the public URL for the uploaded avatar
+        // const avatarUrl = `/avatars/uploads/${fileName}`;
+        // reply.send({
+        //   message: "Avatar uploaded successfully",
+        //   avatarUrl
+        // });
+
       } catch (error) {
         return sendError(reply, 500, "Internal Server Error during avatar upload", error);
       }

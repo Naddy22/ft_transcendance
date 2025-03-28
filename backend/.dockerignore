@@ -1,2 +1,35 @@
-node_modules
+# .dockerignore for backend/.dockerignore
+
+# Build output
 dist
+node_modules
+
+# Runtime state (handled via Docker volumes, not needed in image)
+uploads/
+data/
+
+# Ignore DB files
+*.sqlite
+
+# IDE/editor
+.vscode
+*.swp
+
+# System files
+.DS_Store
+
+# Git and version control
+.git
+.gitignore
+
+# Environment/config
+.env
+.env.* 
+
+# Logs
+*.log
+
+# Documentation, utils, etc.
+README.md
+utils/
+tests/

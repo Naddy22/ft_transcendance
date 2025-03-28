@@ -1,4 +1,6 @@
-# frontend.Dockerfile
+# frontend.Dockerfile (from "frontend/" context)
+# File: frontend/frontend.Dockerfile
+
 FROM node:18 AS builder
 
 WORKDIR /app

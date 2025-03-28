@@ -17,7 +17,7 @@ export async function matchRoutes(fastify: FastifyInstance) {
    */
   fastify.get(
     "/",
-    { preValidation: [fastify.authenticate] },
+    // { preValidation: [fastify.authenticate] },
     async (req, reply) => {
       try {
         const stmt = await fastify.db.prepare(`

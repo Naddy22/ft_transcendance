@@ -7,12 +7,8 @@ import { FastifyInstance } from 'fastify';
  * Creates required tables if they don't exist.
  */
 export async function setupDatabase(fastify: FastifyInstance) {
-  // if (!fastify.db) {
-  //   throw new Error("SQLite database is not available in Fastify instance.");
-  // }
 
   const db = fastify.db;
-  // console.log("🔍 Fastify database instance:", fastify.db); // debug
 
   await db.exec(`
     CREATE TABLE IF NOT EXISTS users (
@@ -70,8 +66,12 @@ export async function setupDatabase(fastify: FastifyInstance) {
   `)
 
   // Reset all non-anonymized users to "offline" on server restart
-  await db.exec("UPDATE users SET status = 'offline' WHERE status <> 'anonymized'");
-  // console.log("🛠️ Reset all users to offline on server startup.");
-
-  // console.log("✅ Database setup complete.");
+  await db.exec(`
+    UPDATE users
+    SET status = 'offline'
+    WHERE status <> 'anonymized'
+  `);
 }
+
+// console.log("🛠️ Reset all users to offline on server startup.");
+// console.log("✅ Database setup complete.");

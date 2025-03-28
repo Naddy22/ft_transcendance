@@ -1,5 +1,14 @@
+# File: docker-compose.yml
 
 version: "3.8"
+
+networks:
+  catpong_network:
+
+volumes:
+  backend_uploads:
+  backend_data:
+  nginx_certs:
 
 services:
   backend:
@@ -10,13 +19,13 @@ services:
     expose:
       - "3000"
     environment:
-      # - NODE_ENV=production
+      - NODE_ENV=production
       - JWT_SECRET=supersecretkey
     volumes:
       - backend_uploads:/app/uploads
       - backend_data:/app/data
     networks:
-      - ft_net
+      - catpong_network
 
   frontend:
     build:
@@ -26,7 +35,7 @@ services:
     depends_on:
       - backend
     networks:
-      - ft_net
+      - catpong_network
 
   nginx:
     build:
@@ -40,17 +49,7 @@ services:
     depends_on:
       - backend
     networks:
-      - ft_net
-
-volumes:
-  backend_uploads:
-  backend_data:
-  nginx_certs:
-
-networks:
-  ft_net:
-
-
+      - catpong_network
 
 
 

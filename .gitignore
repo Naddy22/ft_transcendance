@@ -90,5 +90,6 @@ docker-compose.override.yml
 
 # Local folder for personal notes, tests, or temp files
 _local/
+
 # Temporary files (wildcard to match any file prefixed with tmp)
 tmp*

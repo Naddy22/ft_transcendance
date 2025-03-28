@@ -1,2 +1,26 @@
+# .dockerignore for root (if building nginx from root context)
+
+# Node-related
 node_modules
-dist
+**/node_modules
+
+# Build output
+**/dist
+
+# Git
+.git
+.gitignore
+
+# IDEs / OS
+.vscode
+.DS_Store
+
+# Project utils and docs
+utils/
+README.md
+Makefile
+docker-compose.yml
+
+# Environment
+.env
+.env.*

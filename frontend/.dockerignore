@@ -1,2 +1,29 @@
+# .dockerignore for frontend/.dockerignore
+
+# Build output
 dist
 node_modules
+
+# IDE/editor
+.vscode
+.idea
+*.swp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Git and version control
+.git
+.gitignore
+
+# Environment/config
+.env
+.env.*
+
+# Logs
+*.log
+
+# Docs or misc
+README.md
+tests/

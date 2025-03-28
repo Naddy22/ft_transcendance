@@ -54,6 +54,11 @@ GRAYTALIC	:= $(ESC)[3;90m
 UP			:= $(ESC)[A
 ERASE_LINE	:= $(ESC)[2K
 
+PINK		:= $(ESC)[38;5;205m
+PINK_HOT	:= $(ESC)[38;5;198m
+PINK_LIGHT	:= $(ESC)[38;5;200m
+PINK_PASTEL	:= $(ESC)[38;5;219m
+
 # ==============================
 # Standardized Output Macros
 # ==============================
