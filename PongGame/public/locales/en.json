@@ -87,6 +87,7 @@
 	"passwordUpdateError": "❌ Error updating password: {error}",
 	"anonymizeSuccess": "✅ Your account has been anonymized.",
 	"anonymizeError": "❌ Error anonymizing account: {error}",
+	"anonymizeConfirm": "Are you sure you want to anonymize your account? This action is irreversible.",
 
 	"_commentmain3D": "file main3D.ts",
 	"playerPlaceholder": "Player {num}",

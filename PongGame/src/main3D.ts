@@ -654,12 +654,16 @@ document.getElementById("exportDataBtn")!.addEventListener("click", () => {
 
 // 🕵️‍♂️ Anonymiser le compte
 document.getElementById("anonymizeBtn")!.addEventListener("click", () => {
+	const confirmationMessage = getTranslation("anonymizeConfirm");
+	if (!currentUser!.id || !confirm(confirmationMessage)) return;
+
 	anonymizeUser(currentUser!.id)
 		.then(message => {
 			document.getElementById("anonymizeMessage")!.textContent = message;
-			setTimeout(() => {
-				document.getElementById("anonymizeMessage")!.style.display = "none";
-			}, 10000);
+			setTimeout(async () => {
+				await logoutUser();
+				window.location.reload();
+			}, 3000);
 		})
 		.catch(error => {
 			document.getElementById("anonymizeMessage")!.textContent = `${error.message}`;

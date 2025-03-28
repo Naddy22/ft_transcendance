@@ -87,6 +87,7 @@
 	"passwordUpdateError": "❌ Erreur lors de la mise à jour du mot de passe : {error}",
 	"anonymizeSuccess": "✅ Votre compte a été anonymisé.",
 	"anonymizeError": "❌ Erreur lors de l'anonymisation : {error}",
+	"anonymizeConfirm": "Es-tu sûre de vouloir anonymiser ton compte ? Cette action est irréversible.",
 
 	"_commentmain3D": "fichier main3D.ts",
 	"playerPlaceholder": "Joueur {num}",
