@@ -896,7 +896,7 @@ nextMatchButton.addEventListener('click', () => {
 			if (currentTournament && currentTournament.isTournamentOver()) {
 				console.log("Tournoi terminé ! Champion :", currentTournament.getWinner());
 				// Déterminer le résultat
-				let result = winner === lastPlayers[0] ? "win" : "loss";
+				let result = winner === playerNames[0] ? "win" : "loss";
 				// Ajouter à l’historique
 				addGameToHistory(currentUser!.id, isTournamentMode ? "gameTournament" : isVsAIMode ? "gameVsAI" : "game1v1", result);
 				addGameToStats(currentUser!.id, result);

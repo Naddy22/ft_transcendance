@@ -10,6 +10,7 @@ export function addGameToHistory(
 	result: string
 ): void {
 	const data: NewMatchHistoryEntry = { userId, type, result };
+	console.log("result dans addgamehistory: ", result);
   
 	api.createMatchHistoryEntry(data)
 		.then((res) => {
