@@ -88,6 +88,7 @@
 	"anonymizeSuccess": "✅ Your account has been anonymized.",
 	"anonymizeError": "❌ Error anonymizing account: {error}",
 	"anonymizeConfirm": "Are you sure you want to anonymize your account? This action is irreversible.",
+	"uploadAvatarError": "The image file is invalid or too large. Only JPEG, PNG or WEBP formats are accepted.",
 
 	"_commentmain3D": "file main3D.ts",
 	"playerPlaceholder": "Player {num}",

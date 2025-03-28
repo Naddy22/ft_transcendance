@@ -48,7 +48,8 @@ export function uploadAvatar(userId: number, file: File) {
 		})
 		.catch(error => {
 			console.error("❌ Erreur changement d'avatar :", error.message);
-			throw error;
+			const errorMessage = getTranslation("uploadAvatarError");
+			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
 		});
 }
 
