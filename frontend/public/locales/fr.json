@@ -88,6 +88,7 @@
 	"anonymizeSuccess": "✅ Votre compte a été anonymisé.",
 	"anonymizeError": "❌ Erreur lors de l'anonymisation : {error}",
 	"anonymizeConfirm": "Es-tu sûre de vouloir anonymiser ton compte ? Cette action est irréversible.",
+	"uploadAvatarError": "Le fichier d'image est invalide ou trop lourd. Seuls les formats JPEG, PNG ou WEBP sont acceptés.",
 
 	"_commentmain3D": "fichier main3D.ts",
 	"playerPlaceholder": "Joueur {num}",

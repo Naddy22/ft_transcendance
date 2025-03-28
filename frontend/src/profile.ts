@@ -44,7 +44,9 @@ export function uploadAvatar(userId: number, file: File) {
 			return api.updateUser(userId, { avatar: response.avatarUrl }).then(() => response.avatarUrl);
 		})
 		.catch(error => {
-			throw error;
+			// throw error;
+			const errorMessage = getTranslation("uploadAvatarError");
+			throw new Error(errorMessage);
 		});
 }
 

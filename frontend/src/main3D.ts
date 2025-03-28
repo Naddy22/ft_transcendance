@@ -334,6 +334,7 @@ function loadUserProfile() {
 			(document.getElementById("newUsername")! as HTMLInputElement).value = profile.username;
 			(document.getElementById("newEmail")! as HTMLInputElement).value = profile.email;
 			(document.getElementById("userAvatar")! as HTMLImageElement).src = profile.avatar;
+			avatarInput.value = "";
 			(document.getElementById("oldPassword")! as HTMLInputElement).value = "";
 			(document.getElementById("newPassword")! as HTMLInputElement).value = "";
 			document.getElementById("qrAndConfirmContainer")!.style.display = "none";
