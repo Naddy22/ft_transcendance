@@ -88,7 +88,8 @@ export function addFriend(userId: number, friendId: number) {
 		// .then(() => "✅ Ami ajouté avec succès !")
 		.catch(error => {
 			console.error("❌ Erreur ajout ami :", error.message);
-			throw error;
+			const errorMessage = getErrorMessage(error.message);
+			throw new Error(errorMessage); // 🔄 Traduction de l'erreur
 		});
 }
 

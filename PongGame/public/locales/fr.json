@@ -87,6 +87,7 @@
 	"passwordUpdateError": "❌ Erreur lors de la mise à jour du mot de passe : {error}",
 	"anonymizeSuccess": "✅ Votre compte a été anonymisé.",
 	"anonymizeError": "❌ Erreur lors de l'anonymisation : {error}",
+	"anonymizeConfirm": "Es-tu sûre de vouloir anonymiser ton compte ? Cette action est irréversible.",
 
 	"_commentmain3D": "fichier main3D.ts",
 	"playerPlaceholder": "Joueur {num}",
@@ -133,6 +134,8 @@
 	"errorGeneric": "Une erreur est survenue (Code : {code})",
 	"errorAnonymizedAccount": "Ce compte a été anonymisé.",
 	"error2faInvalidCode": "Le code 2FA est invalide.",
+	"errorAddYourself": "Tu ne peux pas t'ajouter toi-même.",
+	"errorFriendAlreadyAdded": "Cet utilisateur est déjà ton ami.",
 	
 	"2faLoginTitle": "🔐 Vérification 2FA",
 	"2faLoginPrompt": "Veuillez entrer le code à 6 chiffres généré par votre application d’authentification.",

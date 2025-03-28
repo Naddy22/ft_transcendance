@@ -87,6 +87,7 @@
 	"passwordUpdateError": "❌ Error al actualizar la contraseña: {error}",
 	"anonymizeSuccess": "✅ Tu cuenta ha sido anonimizada.",
 	"anonymizeError": "❌ Error en la anonimización: {error}",
+	"anonymizeConfirm": "¿Estás segura de que quieres anonimizar tu cuenta? Esta acción es irreversible.",
 
 	"_commentmain3D": "archivo main3D.ts",
 	"playerPlaceholder": "Jugador {num}",
@@ -133,6 +134,8 @@
 	"errorGeneric": "Ocurrió un error (Código: {code})",
 	"errorAnonymizedAccount": "Esta cuenta ha sido anonimizada.",
 	"error2faInvalidCode": "El código 2FA no es válido.",
+	"errorAddYourself": "No puedes agregarte a ti mismo.",
+	"errorFriendAlreadyAdded": "Este usuario ya es tu amigo.",
 	
 	"2faLoginTitle": "🔐 Verificación 2FA",
 	"2faLoginPrompt": "Por favor, introduce el código de 6 dígitos generado por tu aplicación de autenticación.",
